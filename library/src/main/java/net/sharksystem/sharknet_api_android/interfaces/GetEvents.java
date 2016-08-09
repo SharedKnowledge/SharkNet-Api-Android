@@ -5,13 +5,15 @@ package net.sharksystem.sharknet_api_android.interfaces;
  */
 
 
+import net.sharkfw.knowledgeBase.SharkKBException;
+
 /**
  * This Interface have to be implemented to receive Notifications when sth is received
  */
 public interface GetEvents {
-	public void receivedMessage(Message m);
-	public void receivedFeed(Feed f);
-	public void receivedComment(Comment c);
+	public void receivedMessage(Message m) throws SharkKBException;
+	public void receivedFeed(Feed f) throws SharkKBException;
+	public void receivedComment(Comment c) throws SharkKBException;
 	public void receivedContact(Contact c);
 
 }

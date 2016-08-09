@@ -12,17 +12,17 @@ import net.sharksystem.sharknet_api_android.interfaces.Message;
  */
 public class TestListener  implements GetEvents {
 	@Override
-	public void receivedMessage(Message m) {
+	public void receivedMessage(Message m) throws SharkKBException {
 		System.out.println(m.getContent().getMessage());
 	}
 
 	@Override
-	public void receivedFeed(Feed f) {
+	public void receivedFeed(Feed f) throws SharkKBException {
 		System.out.println(f.getContent().getMessage());
 	}
 
 	@Override
-	public void receivedComment(Comment c) {
+	public void receivedComment(Comment c) throws SharkKBException {
 		System.out.println(c.getContent().getMessage());
 	}
 

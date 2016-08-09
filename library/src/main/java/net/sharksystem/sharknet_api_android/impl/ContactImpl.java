@@ -123,7 +123,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setPicture(Content pic) throws IOException, SharkKBException {
-        this.setInfoWithName(INFONAME_PICTURE, pic.getInputstream());
+        this.setInfoWithName(INFONAME_PICTURE, pic.getInputStream());
     }
 
     @Override

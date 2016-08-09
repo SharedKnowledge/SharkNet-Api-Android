@@ -67,7 +67,7 @@ public class ChatImpl implements Chat {
     @Override
     public void sendMessage(Content content) throws SharkKBException {
         ASIPSpace space = createASIPSpace();
-        this.chatKB.addInformation(content.getInputstream(), content.getLength(), space);
+        this.chatKB.addInformation(content.getInputStream(), content.getLength(), space);
     }
 
     private ASIPSpace createASIPSpace() throws SharkKBException {

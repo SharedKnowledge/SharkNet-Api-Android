@@ -104,19 +104,19 @@ public interface SharkNet {
 	 * Methods calls all Methods of registered listeners when the profile matches a contact in the recipientslist of the message
 	 * @param m
      */
-	public void informMessage(Message m);
+	public void informMessage(Message m) throws SharkKBException;
 
 	/**
 	 * Methods calls all Methods of registered listeners and informs about feed
 	 * @param f
      */
-	public void informFeed(Feed f);
+	public void informFeed(Feed f) throws SharkKBException;
 
 	/**
 	 * Methods calls all Methods of registered listeners and informs about comment
 	 * @param c
      */
-	public void informComment(Comment c);
+	public void informComment(Comment c) throws SharkKBException;
 
 	/**
 	 * Methods calls all Methods of registered listeners and informs about contact (for example when exchanged via NFC)

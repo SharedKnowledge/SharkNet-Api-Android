@@ -217,7 +217,7 @@ public class ImplSharkNet implements SharkNet {
 		}
 	}
 
-	public void informMessage(Message m){
+	public void informMessage(Message m) throws SharkKBException {
 		List<Profile> pList = getProfiles();
 		for(Contact c : m.getRecipients()){
 			for(Profile p : pList){
@@ -233,7 +233,7 @@ public class ImplSharkNet implements SharkNet {
 		}
 	}
 
-	public void informFeed(Feed f){
+	public void informFeed(Feed f) throws SharkKBException {
 		Iterator it = ListenerMap.entrySet().iterator();
 		while(it.hasNext()){
 			Map.Entry pair = (Map.Entry)it.next();
@@ -245,7 +245,7 @@ public class ImplSharkNet implements SharkNet {
 	}
 
 
-	public void informComment(Comment c){
+	public void informComment(Comment c) throws SharkKBException {
 		Iterator it = ListenerMap.entrySet().iterator();
 		while(it.hasNext()){
 			Map.Entry pair = (Map.Entry)it.next();

@@ -622,7 +622,7 @@ public class DummyDB {
 	}
 
 
-	private List<? extends ContainsContent> search(String searchterm, List<? extends  ContainsContent> searchList){
+	private List<? extends ContainsContent> search(String searchterm, List<? extends  ContainsContent> searchList) throws SharkKBException {
 		List<ContainsContent> swaplist = new LinkedList<>();
 		swaplist.addAll(searchList);
 		searchterm = searchterm.toLowerCase();

@@ -1,4 +1,5 @@
 package net.sharksystem.sharknet_api_android.interfaces;
+import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoInformation;
 import net.sharksystem.sharknet_api_android.dummy_impl.ImplVoting;
 import net.sharksystem.sharknet_api_android.dummy_impl.Reminder;
@@ -21,36 +22,36 @@ public interface Content {
 	 * Add a File as Inputstream to the Content, returns true if the Inputstream got saved, false if the Inputstream was bigger than maxfilesize
 	 * @param is
 	 */
-	public boolean setInputstream(InputStream is);
+	public boolean setInputstream(InputStream is) throws IOException, SharkKBException;
 
 	/**
 	 * Returns a Outputstream of the File
 	 * @return
 	 */
-	public OutputStream getOutputstream();
+	public OutputStream getOutputStream() throws SharkKBException;
 
 	/**
 	 * Returns the Filetype as Mime
 	 * @return
 	 */
-	public String getMimeType();
+	public String getMimeType() throws SharkKBException;
 
 	/**
 	 * Sets the Filetype (must be mime)
 	 * @param mimeType
 	 */
-	public void setMimeType(String mimeType);
+	public void setMimeType(String mimeType) throws SharkKBException;
 
 	/**
 	 *Returns the File as Inputstream
 	 */
-	public InputStream getInputstream();
+	public InputStream getInputStream() throws SharkKBException;
 
 	/**
 	 * Returns the Message as String
 	 * @return
 	 */
-	public String getMessage();
+	public String getMessage() throws SharkKBException;
 
 	/**
 	 * Returns Filename as String
@@ -66,7 +67,7 @@ public interface Content {
 	/**
 	 * Setter for the Message
 	 */
-	public void setMessage(String message);
+	public void setMessage(String message) throws SharkKBException;
 
 	/**
 	 * Adds a Voting to the Content if not already done and returns the Object

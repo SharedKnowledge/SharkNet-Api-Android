@@ -81,7 +81,7 @@ public class ImplContent implements Content {
 	}
 
 	@Override
-	public OutputStream getOutputstream(){
+	public OutputStream getOutputStream(){
 		try {
 			return sharkFile.getOutputStream();
 		} catch (SharkKBException e) {
@@ -165,7 +165,7 @@ public class ImplContent implements Content {
 	}
 
 	@Override
-	public InputStream getInputstream() {
+	public InputStream getInputStream() {
 
 		/*
 		   JarInputStream are don't supports marks in this
