@@ -43,7 +43,7 @@ public class ContentImpl implements Content {
     }
 
     @Override
-    public boolean setInputstream(InputStream is) throws SharkKBException {
+    public boolean setInputStream(InputStream is) throws SharkKBException {
         try {
             ASIPInformation asipInformation = mSharkKB.addInformation(is, is.available(), mASIPSpace);
             asipInformation.setName(CONTENT_INFO);

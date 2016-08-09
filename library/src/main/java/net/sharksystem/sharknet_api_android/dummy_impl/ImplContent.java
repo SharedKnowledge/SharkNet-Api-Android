@@ -41,7 +41,7 @@ public class ImplContent implements Content {
 	}
 
 	@Override
-	public boolean setInputstream(InputStream is){
+	public boolean setInputStream(InputStream is){
 		int isSize = 0;
 		try {
 				isSize = getLengthOfIS(is);

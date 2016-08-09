@@ -22,7 +22,7 @@ public interface Content {
 	 * Add a File as Inputstream to the Content, returns true if the Inputstream got saved, false if the Inputstream was bigger than maxfilesize
 	 * @param is
 	 */
-	public boolean setInputstream(InputStream is) throws IOException, SharkKBException;
+	public boolean setInputStream(InputStream is) throws IOException, SharkKBException;
 
 	/**
 	 * Returns a Outputstream of the File

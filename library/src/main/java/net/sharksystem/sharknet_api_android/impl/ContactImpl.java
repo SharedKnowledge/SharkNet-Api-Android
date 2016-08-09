@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class ContactImpl implements Contact {
 
-    private SharkKB sharkKB;
-    private ASIPSpace asipSpace;
+    private SharkKB mSharkKB;
+    private ASIPSpace mSpace;
     public final static String INFONAME_NAME = "INFONAME_NAME";
 
     public final static String INFONAME_NICKNAME = "INFONAME_NICKNAME";
@@ -40,11 +40,11 @@ public class ContactImpl implements Contact {
 
     public ContactImpl(SharkKB sharkKB, PeerSemanticTag tag) throws SharkKBException {
 
-        this.sharkKB = sharkKB;
-        this.asipSpace = createASIPSpace(tag);
+        mSharkKB = sharkKB;
+        mSpace = createASIPSpace(tag);
 
         // SET FIRST INFO - NAME
-        this.setInfoWithName(INFONAME_NICKNAME, tag.getName());
+        setInfoWithName(INFONAME_NICKNAME, tag.getName());
     }
 
     public ContactImpl(SharkKB sharkKB, String nickname, String deviceId) throws SharkKBException {
@@ -52,8 +52,8 @@ public class ContactImpl implements Contact {
     }
 
     public ContactImpl(SharkKB sharkKB, ASIPInformationSpace informationSpace) throws SharkKBException {
-        this.sharkKB = sharkKB;
-        this.asipSpace = informationSpace.getASIPSpace();
+        mSharkKB = sharkKB;
+        mSpace = informationSpace.getASIPSpace();
     }
 
     public static PeerSemanticTag createPeerSemanticTag(String nickname, String deviceId) {
@@ -62,11 +62,11 @@ public class ContactImpl implements Contact {
     }
 
     private ASIPSpace createASIPSpace(PeerSemanticTag tag) throws SharkKBException {
-        return this.sharkKB.createASIPSpace((SemanticTag) null, null, null, tag, null, null, null, ASIPSpace.DIRECTION_NOTHING);
+        return mSharkKB.createASIPSpace((SemanticTag) null, null, null, tag, null, null, null, ASIPSpace.DIRECTION_NOTHING);
     }
 
     private ASIPInformation getInfoByName(String name) throws SharkKBException {
-        Iterator<ASIPInformation> information = this.sharkKB.getInformation(this.asipSpace);
+        Iterator<ASIPInformation> information = mSharkKB.getInformation(mSpace);
         while (information.hasNext()) {
             ASIPInformation next = information.next();
             if (next.getName().equals(name)) {
@@ -77,20 +77,20 @@ public class ContactImpl implements Contact {
     }
 
     private void setInfoWithName(String name, String content) throws SharkKBException {
-        ASIPInformation asipInformation = this.sharkKB.addInformation(content, this.asipSpace);
+        ASIPInformation asipInformation = mSharkKB.addInformation(content, mSpace);
         asipInformation.setName(name);
     }
 
 
     private void setInfoWithName(String name, InputStream content) throws SharkKBException, IOException {
-        ASIPInformation asipInformation = this.sharkKB.addInformation(content, content.available(), this.asipSpace);
+        ASIPInformation asipInformation = mSharkKB.addInformation(content, content.available(), mSpace);
         asipInformation.setName(name);
     }
 
 
     @Override
     public PeerSemanticTag getPST() throws SharkKBException {
-        return this.asipSpace.getSender();
+        return mSpace.getSender();
     }
 
     @Override
@@ -101,7 +101,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setNickname(String nickname) throws SharkKBException {
-        this.setInfoWithName(INFONAME_NICKNAME, nickname);
+        setInfoWithName(INFONAME_NICKNAME, nickname);
     }
 
     @Override
@@ -112,18 +112,20 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setUID(String uid) throws SharkKBException {
-        this.setInfoWithName(INFONAME_NICKNAME, uid);
+        setInfoWithName(INFONAME_NICKNAME, uid);
     }
 
     @Override
     public Content getPicture() throws SharkKBException {
-//        return getInfoByName(INFONAME_PICTURE); TODO IMPLEMENT CONTENT
-        return null;
+        return new ContentImpl(mSharkKB, mSpace);
     }
 
     @Override
-    public void setPicture(Content pic) throws IOException, SharkKBException {
-        this.setInfoWithName(INFONAME_PICTURE, pic.getInputStream());
+    public void setPicture(InputStream is, String title, String mimeType) throws IOException, SharkKBException {
+        ContentImpl content = new ContentImpl(mSharkKB, mSpace);
+        content.setInputStream(is);
+        content.setMessage(title);
+        content.setMimeType(mimeType);
     }
 
     @Override
@@ -134,7 +136,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setPublicKey(String publicKey) throws SharkKBException {
-        this.setInfoWithName(INFONAME_PUBLIC_KEY, publicKey);
+        setInfoWithName(INFONAME_PUBLIC_KEY, publicKey);
     }
 
     @Override
@@ -179,7 +181,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void addName(String name) throws SharkKBException {
-        this.setInfoWithName(INFONAME_NAME, name);
+        setInfoWithName(INFONAME_NAME, name);
     }
 
     @Override
@@ -216,7 +218,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void addNote(String note) throws SharkKBException {
-        this.setInfoWithName(INFONAME_NOTE, note);
+        setInfoWithName(INFONAME_NOTE, note);
     }
 
     @Override
@@ -227,7 +229,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setEmail(String email) throws SharkKBException {
-        this.setInfoWithName(INFONAME_EMAIL, email);
+        setInfoWithName(INFONAME_EMAIL, email);
     }
 
     @Override

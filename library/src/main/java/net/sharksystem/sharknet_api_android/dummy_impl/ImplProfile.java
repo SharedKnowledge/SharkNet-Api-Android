@@ -1,6 +1,7 @@
 package net.sharksystem.sharknet_api_android.dummy_impl;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharksystem.sharknet_api_android.interfaces.Blacklist;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
@@ -8,6 +9,8 @@ import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.interfaces.Setting;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -87,7 +90,7 @@ public class ImplProfile implements Profile {
 	}
 
 	@Override
-	public void setPicture(Content pic) {
+	public void setPicture(InputStream is, String title, String mimeType) throws IOException, SharkKBException {
 
 	}
 

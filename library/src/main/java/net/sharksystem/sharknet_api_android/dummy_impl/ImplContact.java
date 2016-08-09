@@ -10,6 +10,8 @@ import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.interfaces.StudentContact;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +60,7 @@ public class ImplContact implements Contact, StudentContact {
 
         // Dummy public key generation
 
-        setDefaultPicture();
+//        setDefaultPicture();
         save();
 
     }
@@ -187,8 +189,8 @@ public class ImplContact implements Contact, StudentContact {
     }
 
     @Override
-    public void setPicture(Content pic) {
-        this.picture = pic;
+    public void setPicture(InputStream is, String title, String mimeType) throws IOException, SharkKBException {
+
     }
 
     @Override
@@ -263,11 +265,11 @@ public class ImplContact implements Contact, StudentContact {
         this.lastWifiContact = lastWifiContact;
     }
 
-    private void setDefaultPicture() {
-        File personpic = Resources.get("person.png");
-        Content piccon = new ImplContent(owner);
-        setPicture(piccon);
-    }
+//    private void setDefaultPicture() {
+//        File personpic = Resources.get("person.png");
+//        Content piccon = new ImplContent(owner);
+//        setPicture(piccon);
+//    }
 
     @Override
     public String getGrade() {
