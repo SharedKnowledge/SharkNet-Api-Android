@@ -10,8 +10,11 @@ import net.sharksystem.sharknet_api_android.interfaces.Message;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.dummy_impl.utils.Resources;
 
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
@@ -52,7 +55,7 @@ public class ImplChat implements Chat {
 	 * @param owner
      */
 
-	public ImplChat(Message m, Profile owner){
+	public ImplChat(Message m, Profile owner) throws SharkKBException {
 		this.owner  = owner;
 		this.admin = m.getSender();
 		List<Contact> contactList = m.getRecipients();
@@ -94,6 +97,11 @@ public class ImplChat implements Chat {
 	public void sendMessage(Content content) throws SharkKBException {
 		Message m = new ImplMessage(content, getContacts(), owner, owner);
 		m.setRead(true);
+	}
+
+	@Override
+	public void sendMessage(InputStream inputStream, String message, String mimetype) throws JSONException, SharkKBException {
+
 	}
 
 	@Override

@@ -14,6 +14,9 @@ import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Message;
 
+import org.json.JSONException;
+
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -25,14 +28,14 @@ import java.util.List;
 public class ChatImpl implements Chat {
 
     public static final String SHARKNET_CHAT_RECIPIENTS = "SHARKNET_CHAT_RECIPIENTS";
-    private SharkNetEngine sharkNetEngine;
-
-    private SyncKB chatKB;
-    private List<Contact> recipients;
+    
+    private SharkNetEngine mSharkNetEngine;
+    private SyncKB mChatKB;
+    private List<Contact> mRecipients;
 
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
-        this.chatKB = new SyncKB(sharkKB);
-        this.sharkNetEngine = sharkNetEngine;
+        mChatKB = new SyncKB(sharkKB);
+        mSharkNetEngine = sharkNetEngine;
 
         String property = sharkKB.getProperty(SHARKNET_CHAT_RECIPIENTS);
 
@@ -41,13 +44,13 @@ public class ChatImpl implements Chat {
         Enumeration<PeerSemanticTag> enumeration = stSet.peerTags();
         while (enumeration.hasMoreElements()){
             PeerSemanticTag next = enumeration.nextElement();
-            recipients.add(this.sharkNetEngine.getContactByTag(next));
+            mRecipients.add(mSharkNetEngine.getContactByTag(next));
         }
     }
 
     public ChatImpl(SharkKB sharkKB, List<Contact> recipients) throws SharkKBException {
 
-        this.chatKB = new SyncKB(sharkKB);
+        mChatKB = new SyncKB(sharkKB);
 
         PeerSTSet peers = InMemoSharkKB.createInMemoPeerSTSet();
 
@@ -59,21 +62,29 @@ public class ChatImpl implements Chat {
 
         String serializedPeers = ""; // TODO ASIPSerializer.serializeSTSet(peers);
 
-        this.chatKB.setProperty(SHARKNET_CHAT_RECIPIENTS, serializedPeers);
+        mChatKB.setProperty(SHARKNET_CHAT_RECIPIENTS, serializedPeers);
 
-        this.recipients = recipients;
-    }
-
-    @Override
-    public void sendMessage(Content content) throws SharkKBException {
-        ASIPSpace space = createASIPSpace();
-        this.chatKB.addInformation(content.getInputStream(), content.getLength(), space);
+        mRecipients = recipients;
     }
 
     private ASIPSpace createASIPSpace() throws SharkKBException {
         TimeSemanticTag timeSemanticTag =
-                this.chatKB.getTimeSTSet().createTimeSemanticTag(System.currentTimeMillis(), 0);
-        return this.chatKB.createASIPSpace(null, null, null, null, null, timeSemanticTag, null, ASIPSpace.DIRECTION_OUT);
+                mChatKB.getTimeSTSet().createTimeSemanticTag(System.currentTimeMillis(), 0);
+        return mChatKB.createASIPSpace(null, null, null, null, null, timeSemanticTag, null, ASIPSpace.DIRECTION_OUT);
+    }
+
+    @Override
+    public void sendMessage(Content content) throws SharkKBException {
+//        ASIPSpace space = createASIPSpace();
+//        new MessageImpl(space);
+//        mChatKB.addInformation(content.getInputStream(), content.getLength(), space);
+    }
+
+    @Override
+    public void sendMessage(InputStream inputStream, String messageString, String mimetype) throws JSONException, SharkKBException {
+        ASIPSpace space = createASIPSpace();
+        MessageImpl message = new MessageImpl(mSharkNetEngine, mChatKB, space);
+        message.setContent(inputStream, messageString, mimetype);
     }
 
     @Override

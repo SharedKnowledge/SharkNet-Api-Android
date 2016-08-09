@@ -7,6 +7,7 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.dummy_impl.ImplVoting;
 import net.sharksystem.sharknet_api_android.dummy_impl.Reminder;
+import net.sharksystem.sharknet_api_android.utils.SharkNetUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,17 +32,6 @@ public class ContentImpl implements Content {
         mASIPSpace = space;
     }
 
-    private ASIPInformation getInfoByName(String name) throws SharkKBException {
-        Iterator<ASIPInformation> information = mSharkKB.getInformation(mASIPSpace);
-        while(information.hasNext()){
-            ASIPInformation next = information.next();
-            if(next.getName().equals(name)){
-                return next;
-            }
-        }
-        return null;
-    }
-
     @Override
     public boolean setInputStream(InputStream is) throws SharkKBException {
         try {
@@ -62,7 +52,7 @@ public class ContentImpl implements Content {
 
     @Override
     public String getMimeType() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTENT_INFO);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mASIPSpace, CONTENT_INFO);
         if(information!=null){
             return information.getContentType();
         }
@@ -71,7 +61,7 @@ public class ContentImpl implements Content {
 
     @Override
     public void setMimeType(String mimeType) throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTENT_INFO);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mASIPSpace, CONTENT_INFO);
         if(information!=null){
             information.setContentType(mimeType);
         }
@@ -79,7 +69,7 @@ public class ContentImpl implements Content {
 
     @Override
     public InputStream getInputStream() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTENT_INFO);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mASIPSpace, CONTENT_INFO);
         if(information!=null){
             return new ByteArrayInputStream(information.getContentAsByte());
         }
@@ -88,7 +78,7 @@ public class ContentImpl implements Content {
 
     @Override
     public String getMessage() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTENT_MESSAGE);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mASIPSpace, CONTENT_MESSAGE);
         if(information!=null){
             return information.getContentAsString();
         }

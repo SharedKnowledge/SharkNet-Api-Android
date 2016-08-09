@@ -10,9 +10,7 @@ import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Message;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.interfaces.Voting;
-import net.sharksystem.sharknet_api_android.dummy_impl.utils.Resources;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -198,7 +196,7 @@ public class Dummy {
 		for(Message m : chat1_m){
 			m.setEncrypted(true);
 			m.setSigned(true);
-			m.setDierectRecived(true);
+			m.setDirectReceived(true);
 			m.setVerified(true);
 		}
 

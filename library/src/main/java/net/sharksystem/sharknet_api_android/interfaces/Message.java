@@ -2,6 +2,7 @@ package net.sharksystem.sharknet_api_android.interfaces;
 
 import net.sharkfw.knowledgeBase.SharkKBException;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface Message extends Timeable, ContainsContent {
 	 * returns the Author of a message
 	 * @return
      */
-    public Contact getSender();
+    public Contact getSender() throws SharkKBException;
 	/**
 	 *returns the recipient of a message
 	 */
@@ -60,7 +61,7 @@ public interface Message extends Timeable, ContainsContent {
 	/**
 	 * Returns if the Comment is isDisliked
 	 */
-	public boolean isdisliked();
+	public boolean isDisliked();
 
 	/**
 	 * returns if the Message is sent by the user
@@ -114,11 +115,13 @@ public interface Message extends Timeable, ContainsContent {
 	 * Returns if the Message was recived through direct contact with sender
 	 * @return
      */
-	public boolean isDierectRecived();
+	public boolean isDirectReceived();
 
 	/**
 	 * Sets if Message was recived through direct contact with sender
 	 * @param dierectRecived
      */
-	public void setDierectRecived(boolean dierectRecived);
-	}
+	public void setDirectReceived(boolean dierectRecived);
+
+	void setContent(InputStream inputStream, String messageString, String mimeType) throws SharkKBException;
+}

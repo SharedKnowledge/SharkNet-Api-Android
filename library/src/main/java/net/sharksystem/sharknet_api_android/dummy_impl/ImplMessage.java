@@ -8,6 +8,7 @@ import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Message;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
@@ -194,19 +195,24 @@ public class ImplMessage implements Message {
 	}
 
 	@Override
-	public boolean isdisliked() {
+	public boolean isDisliked() {
 		return disliked;
 	}
 
 
 	@Override
-	public boolean isDierectRecived() {
+	public boolean isDirectReceived() {
 		return dierectRecived;
 	}
 
 	@Override
-	public void setDierectRecived(boolean dierectRecived) {
+	public void setDirectReceived(boolean dierectRecived) {
 		this.dierectRecived = dierectRecived;
+	}
+
+	@Override
+	public void setContent(InputStream inputStream, String messageString, String mimeType) throws SharkKBException {
+
 	}
 
 }

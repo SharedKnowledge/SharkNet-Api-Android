@@ -1,11 +1,13 @@
 package net.sharksystem.sharknet_api_android.dummy_impl;
 
+import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharksystem.sharknet_api_android.interfaces.Chat;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Message;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -64,7 +66,7 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public boolean isdisliked() {
+    public boolean isDisliked() {
         return false;
     }
 
@@ -109,12 +111,17 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public boolean isDierectRecived() {
+    public boolean isDirectReceived() {
         return false;
     }
 
     @Override
-    public void setDierectRecived(boolean dierectRecived) {
+    public void setDirectReceived(boolean dierectRecived) {
 
+    }
+
+    @Override
+    public void setContent(InputStream inputStream, String messageString, String mimeType) throws SharkKBException {
+        
     }
 }
