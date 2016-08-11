@@ -10,45 +10,45 @@ public interface Profile extends Contact{
 	 * Returns the Settings of the App
 	 * @return
      */
-    public Setting getSettings();
+    Setting getSettings();
 
 	/**
 	 * deletes a Profile
 	 */
-	public void delete();
+	void delete();
 
 	/**
-	 * Safes the Profile in the KB
+	 * Saves the Profile in the KB
 	 */
-	public void save();
+	void save();
 
-	public void update();
+	void update();
 
 	/**
 	 * Method for the Login
 	 */
 
-	public boolean login(String password);
+	boolean login(String password);
 	/**
 	 * Method to set password
 	 */
-	public void setPassword(String password);
+	void setPassword(String password);
 
 	/**
 	 * Returns true if profiles are equal
 	 * @param p
 	 * @return
      */
-	public boolean isEqual(Profile p);
+	boolean isEqual(Profile p);
 
 	/**
 	 * Returns the Blacklist of the Profile
 	 * @return
      */
-	public Blacklist getBlacklist();
+	Blacklist getBlacklist();
 
 	/**
 	 * Generates new pair of keys
 	 */
-	public void renewKeys();
+	void renewKeys();
 }

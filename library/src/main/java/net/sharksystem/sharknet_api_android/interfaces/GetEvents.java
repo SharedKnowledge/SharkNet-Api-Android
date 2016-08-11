@@ -11,9 +11,9 @@ import net.sharkfw.knowledgeBase.SharkKBException;
  * This Interface have to be implemented to receive Notifications when sth is received
  */
 public interface GetEvents {
-	public void receivedMessage(Message m) throws SharkKBException;
-	public void receivedFeed(Feed f) throws SharkKBException;
-	public void receivedComment(Comment c) throws SharkKBException;
-	public void receivedContact(Contact c);
+	void receivedMessage(Message m) throws SharkKBException;
+	void receivedFeed(Feed f) throws SharkKBException;
+	void receivedComment(Comment c) throws SharkKBException;
+	void receivedContact(Contact c);
 
 }

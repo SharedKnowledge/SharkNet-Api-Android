@@ -159,47 +159,6 @@ public class ImplSetting implements Setting {
 	}
 
 	@Override
-	public boolean isSyncnfc() {
-		return syncnfc;
-	}
-	@Override
-	public void setSyncnfc(boolean syncnfc) {
-		this.syncnfc = syncnfc;
-	}
-	@Override
-	public boolean isSyncbluetooth() {
-		return syncbluetooth;
-	}
-	@Override
-	public void setSyncbluetooth(boolean syncbluetooth) {
-		this.syncbluetooth = syncbluetooth;
-	}
-	@Override
-	public boolean isSynctcp() {
-		return synctcp;
-	}
-	@Override
-	public void setSynctcp(boolean synctcp) {
-		this.synctcp = synctcp;
-	}
-	@Override
-	public boolean isSyncwifi() {
-		return syncwifi;
-	}
-	@Override
-	public void setSyncwifi(boolean syncwifi) {
-		this.syncwifi = syncwifi;
-	}
-	@Override
-	public boolean isSyncmail() {
-		return syncmail;
-	}
-	@Override
-	public void setSyncmail(boolean syncmail) {
-		this.syncmail = syncmail;
-	}
-
-	@Override
 	public void startTCP() {
 	//not implemented
 	}
@@ -300,12 +259,12 @@ public class ImplSetting implements Setting {
 	}
 
 	@Override
-	public boolean isSyncConctact() {
+	public boolean isSyncContact() {
 		return syncConctact;
 	}
 
 	@Override
-	public void setSyncConctact(boolean syncConctact) {
+	public void setSyncContact(boolean syncContact) {
 		this.syncConctact = syncConctact;
 	}
 
@@ -317,6 +276,56 @@ public class ImplSetting implements Setting {
 	@Override
 	public void setSyncProfile(boolean syncProfile) {
 		this.syncProfile = syncProfile;
+	}
+
+	@Override
+	public boolean isSyncNfc() {
+		return false;
+	}
+
+	@Override
+	public void setSyncNfc(boolean syncNfc) {
+
+	}
+
+	@Override
+	public boolean isSyncBluetooth() {
+		return false;
+	}
+
+	@Override
+	public void setSyncBluetooth(boolean syncBluetooth) {
+
+	}
+
+	@Override
+	public boolean isSyncTcp() {
+		return false;
+	}
+
+	@Override
+	public void setSyncTcp(boolean syncTcp) {
+
+	}
+
+	@Override
+	public boolean isSyncWifi() {
+		return false;
+	}
+
+	@Override
+	public void setSyncWifi(boolean syncWifi) {
+
+	}
+
+	@Override
+	public boolean isSyncMail() {
+		return false;
+	}
+
+	@Override
+	public void setSyncMail(boolean syncMail) {
+
 	}
 
 	@Override

@@ -12,17 +12,17 @@ public class ImplVoting implements Voting {
 
 	String question;
 	HashMap<String, List<Contact>> answers = new HashMap<>();
-	boolean singleqoice;
+	boolean singleChoice;
 
-	public ImplVoting(String question, HashMap<String, List<Contact>> answers, boolean singleqoice) {
+	public ImplVoting(String question, HashMap<String, List<Contact>> answers, boolean singleChoice) {
 		this.question = question;
 		this.answers = answers;
-		this.singleqoice = singleqoice;
+		this.singleChoice = singleChoice;
 	}
 
-	public ImplVoting(String question, boolean singleqoice){
+	public ImplVoting(String question, boolean singleChoice){
 		this.question = question;
-		this.singleqoice = singleqoice;
+		this.singleChoice = singleChoice;
 	}
 
 	@Override
@@ -30,9 +30,8 @@ public class ImplVoting implements Voting {
 		return question;
 	}
 
-	@Override
-	public boolean isSingleqoice() {
-		return singleqoice;
+	public boolean isSingleChoice() {
+		return singleChoice;
 	}
 
 	@Override
@@ -61,7 +60,7 @@ public class ImplVoting implements Voting {
 
 	@Override
 	public boolean vote(HashMap<String, Contact> votes){
-		if(isSingleqoice()){
+		if(isSingleChoice()){
 			Collection<Contact> contactColl = votes.values();
 			if(contactColl.size() > 1 ){
 				return false;

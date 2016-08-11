@@ -12,55 +12,55 @@ public interface Voting {
 	 * Returns the Question of the Voting
 	 * @return
      */
-	public String getQuestion();
+	String getQuestion();
 
 	/**
-	 * Returns if the Voting is Singleqoice (only one Answer per Person possible)
+	 * Returns if the Voting is Single choice (only one Answer per Person possible)
 	 * No evaluation, this has to be done in the gui
 	 * @return
      */
-	public boolean isSingleqoice();
+	boolean isSingleChoice();
 
 	/**
 	 * Adds the List of Answers to the voting
 	 * @param answers
      */
-	public void addAnswers(List<String> answers);
+	void addAnswers(List<String> answers);
 
 	/**
-	 * Returns the Answers including the votes as a hashmap
+	 * Returns the Answers including the votes as a hashMap
 	 * @return
      */
-	public HashMap<String, List<Contact>> getVotings();
+	HashMap<String, List<Contact>> getVotings();
 
 	/**
 	 * Returns the Answers in a HashMap, Contact can be added to the answers to vote
 	 * @return
      */
-	public HashMap<String, Contact> getAnswers();
+	HashMap<String, Contact> getAnswers();
 
 	/**
 	 * add the contact to the answers they voted for
 	 * @param votes
      */
-	public boolean vote(HashMap<String, Contact> votes);
+	boolean vote(HashMap<String, Contact> votes);
 
 	/**
 	 * Evaluates if the Contact already has voted
 	 * @param c
 	 * @return
      */
-	public boolean alreadyVoted(Contact c);
+	boolean alreadyVoted(Contact c);
 
 	/**
 	 * Saves the Voting in the Database
 	 */
-	public void save();
+	void save();
 
 	/**
-	 * Delets the Voting from the Database
+	 * Deletes the Voting from the Database
 	 */
-	public void delete();
+	void delete();
 
 
 }

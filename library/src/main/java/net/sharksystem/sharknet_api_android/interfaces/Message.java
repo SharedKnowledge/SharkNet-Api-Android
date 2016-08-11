@@ -16,112 +16,112 @@ public interface Message extends Timeable, ContainsContent {
 	 * Returns the Date, Time when a message was created
 	 * @return
      */
-    public Timestamp getTimestamp() throws SharkKBException;
+    Timestamp getTimestamp() throws SharkKBException;
 
 	/**
 	 * returns the Author of a message
 	 * @return
      */
-    public Contact getSender() throws SharkKBException;
+    Contact getSender() throws SharkKBException;
 	/**
-	 *returns the recipient of a message
+	 * returns the recipient of a message
 	 */
-    public List<Contact> getRecipients();
+    List<Contact> getRecipients();
 
 	/**
 	 * returns the content of a Message
 	 * @return
      */
-    public Content getContent();
+    Content getContent();
 
 
 	/**
 	 * valuates if a Message was signed
 	 * @return
      */
-    public boolean isSigned();
+    boolean isSigned();
 
 	/**
 	 * valuates if a message was encrypted
 	 * @return
      */
-    public boolean isEncrypted();
+    boolean isEncrypted();
 
 	/**
 	 * deletes the message from a chat
 	 */
-	public void deleteMessage() throws SharkKBException;
+	void deleteMessage() throws SharkKBException;
 
 	/**
 	 * marks the Message as is disliked. Shark will collect dislikes and after an special amount it will inform the author
 	 * @param isDisliked
 	 */
-	public void setDisliked(boolean isDisliked);
+	void setDisliked(boolean isDisliked);
 
 	/**
 	 * Returns if the Comment is isDisliked
 	 */
-	public boolean isDisliked();
+	boolean isDisliked();
 
 	/**
 	 * returns if the Message is sent by the user
 	 * @return
      */
-	public boolean isMine();
+	boolean isMine();
 
 	/**
 	 * Returns if the Message is verified (which means the signature is valid)
 	 */
-	public boolean isVerified();
+	boolean isVerified();
 
 	/**
 	 * Sets if Message is verified
 	 * @param verified
      */
-	public void setVerified(boolean verified);
+	void setVerified(boolean verified);
 
 	/**
 	 * Returns the Chat of the Message or constructs a new
 	 * @return
      */
-	public Chat getChat() throws SharkKBException;
+	Chat getChat() throws SharkKBException;
 
 	/**
 	 * Returns if the Message is already read
 	 * @return
      */
-	public boolean isRead();
+	boolean isRead();
 
 	/**
 	 * Sets boolean if message is read
 	 * @param read
      */
-	public void setRead(boolean read);
+	void setRead(boolean read);
 
 
 	/**
 	 * Set the Status of the Message as Signed
 	 * @param signed
      */
-	public void setSigned(boolean signed);
+	void setSigned(boolean signed);
 
 	/**
 	 * Set the Status of the  Message as Encrypted
 	 * @param encrypted
      */
-	public void setEncrypted(boolean encrypted);
+	void setEncrypted(boolean encrypted);
 
 	/**
-	 * Returns if the Message was recived through direct contact with sender
+	 * Returns if the Message was received through direct contact with sender
 	 * @return
      */
-	public boolean isDirectReceived();
+	boolean isDirectReceived();
 
 	/**
-	 * Sets if Message was recived through direct contact with sender
-	 * @param dierectRecived
+	 * Sets if Message was received through direct contact with sender
+	 * @param directReceived
      */
-	public void setDirectReceived(boolean dierectRecived);
+	void setDirectReceived(boolean directReceived);
 
 	void setContent(InputStream inputStream, String messageString, String mimeType) throws SharkKBException;
 }

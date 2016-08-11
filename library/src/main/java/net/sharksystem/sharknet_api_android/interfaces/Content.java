@@ -12,62 +12,62 @@ import java.io.*;
 public interface Content {
 
 	/**
-	 * Add a File to the Content, returns true if the Inputstream got saved, false if the Inputstream was bigger than maxfilesize
+	 * Add a File to the Content, returns true if the InputStream got saved, false if the InputStream was bigger than max files ize
 	 * @param f
 	 * @return
 	 */
 //	public boolean setFile(File f);
 
 	/**
-	 * Add a File as Inputstream to the Content, returns true if the Inputstream got saved, false if the Inputstream was bigger than maxfilesize
+	 * Add a File as InputStream to the Content, returns true if the InputStream got saved, false if the InputStream was bigger than maxfilesize
 	 * @param is
 	 */
-	public boolean setInputStream(InputStream is) throws IOException, SharkKBException;
+	boolean setInputStream(InputStream is) throws IOException, SharkKBException;
 
 	/**
-	 * Returns a Outputstream of the File
+	 * Returns a OutputStream of the File
 	 * @return
 	 */
-	public OutputStream getOutputStream() throws SharkKBException;
+	OutputStream getOutputStream() throws SharkKBException;
 
 	/**
-	 * Returns the Filetype as Mime
+	 * Returns the File type as Mime
 	 * @return
 	 */
-	public String getMimeType() throws SharkKBException;
+	String getMimeType() throws SharkKBException;
 
 	/**
 	 * Sets the Filetype (must be mime)
 	 * @param mimeType
 	 */
-	public void setMimeType(String mimeType) throws SharkKBException;
+	void setMimeType(String mimeType) throws SharkKBException;
 
 	/**
-	 *Returns the File as Inputstream
+	 *Returns the File as InputStream
 	 */
-	public InputStream getInputStream() throws SharkKBException;
+	InputStream getInputStream() throws SharkKBException;
 
 	/**
 	 * Returns the Message as String
 	 * @return
 	 */
-	public String getMessage() throws SharkKBException;
+	String getMessage() throws SharkKBException;
 
 	/**
 	 * Returns Filename as String
 	 * @return
 	 */
-//	public String getFileName();
+//	String getFileName();
 
 	/**
 	 * Setter for the Filename
 	 * @param filename
 	 */
-//	public void setFilename(String filename);
+//	void setFilename(String filename);
 	/**
 	 * Setter for the Message
 	 */
-	public void setMessage(String message) throws SharkKBException;
+	void setMessage(String message) throws SharkKBException;
 
 	/**
 	 * Adds a Voting to the Content if not already done and returns the Object
@@ -75,38 +75,38 @@ public interface Content {
 	 * @param singleqoice
 	 * @return
 	 */
-	public ImplVoting addVoting(String question, boolean singleqoice);
+	ImplVoting addVoting(String question, boolean singleqoice);
 
 	/**
 	 * Returns the Voting, if it`s not there returns null
 	 * @return
 	 */
-	public ImplVoting getVoting();
+	ImplVoting getVoting();
 
 	/**
-	 * Returns the InformationFile which is Part of the Sharkframework
+	 * Returns the InformationFile which is Part of the SharkFramework
 	 * @return
 	 */
-//	public InMemoInformation getInformationFile();
+//	InMemoInformation getInformationFile();
 
 	/**
-	 * Sets the InformationFile which is part of the Sharkframework
+	 * Sets the InformationFile which is part of the SharkFramework
 	 * @param file
 	 */
-//	public void setInformationFile(InMemoInformation file);
+//	void setInformationFile(InMemoInformation file);
 
 	/**
 	 * Getter for a Reminder (Bachelor Arbeit)
 	 * @return
 	 */
-	public Reminder getReminder();
+	Reminder getReminder();
 
 	/**
 	 * Setter for Reminder (Bechelor Arbeit)
 	 * @param reminder
 	 */
-	public void setReminder(Reminder reminder);
+	void setReminder(Reminder reminder);
 
-	public int getLength();
+	int getLength();
 
 }

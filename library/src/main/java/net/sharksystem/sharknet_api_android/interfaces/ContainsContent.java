@@ -5,5 +5,5 @@ package net.sharksystem.sharknet_api_android.interfaces;
  */
 public interface  ContainsContent {
 
-	public Content getContent();
+	Content getContent();
 }

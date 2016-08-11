@@ -44,7 +44,7 @@ public interface Chat extends Timeable {
 	void update();
 
 	/**
-	 * Returns a List of the Contact wich are included in the Chat
+	 * Returns a List of the Contact which are included in the Chat
 	 * If there is just one Recipient the Method returns a List of the Size one
 	 * @return
      */
@@ -56,7 +56,7 @@ public interface Chat extends Timeable {
 	void setPicture(Content picture);
 
 	/**
-	 * returns he chatpicture
+	 * returns he chat picture
 	 * @return
      */
 	Content getPicture();

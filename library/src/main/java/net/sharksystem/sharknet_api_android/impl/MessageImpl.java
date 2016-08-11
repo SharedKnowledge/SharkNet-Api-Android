@@ -179,7 +179,7 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public void setDirectReceived(boolean dierectRecived) {
+    public void setDirectReceived(boolean directReceived) {
 
     }
 }

@@ -221,12 +221,12 @@ public class SettingImpl implements Setting {
     }
 
     @Override
-    public boolean isSyncConctact() {
+    public boolean isSyncContact() {
         return false;
     }
 
     @Override
-    public void setSyncConctact(boolean syncConctact) {
+    public void setSyncContact(boolean syncContact) {
 
     }
 
@@ -241,52 +241,52 @@ public class SettingImpl implements Setting {
     }
 
     @Override
-    public boolean isSyncnfc() {
+    public boolean isSyncNfc() {
         return false;
     }
 
     @Override
-    public void setSyncnfc(boolean syncnfc) {
+    public void setSyncNfc(boolean syncNfc) {
 
     }
 
     @Override
-    public boolean isSyncbluetooth() {
+    public boolean isSyncBluetooth() {
         return false;
     }
 
     @Override
-    public void setSyncbluetooth(boolean syncbluetooth) {
+    public void setSyncBluetooth(boolean syncBluetooth) {
 
     }
 
     @Override
-    public boolean isSynctcp() {
+    public boolean isSyncTcp() {
         return false;
     }
 
     @Override
-    public void setSynctcp(boolean synctcp) {
+    public void setSyncTcp(boolean syncTcp) {
 
     }
 
     @Override
-    public boolean isSyncwifi() {
+    public boolean isSyncWifi() {
         return false;
     }
 
     @Override
-    public void setSyncwifi(boolean syncwifi) {
+    public void setSyncWifi(boolean syncWifi) {
 
     }
 
     @Override
-    public boolean isSyncmail() {
+    public boolean isSyncMail() {
         return false;
     }
 
     @Override
-    public void setSyncmail(boolean syncmail) {
+    public void setSyncMail(boolean syncMail) {
 
     }
 

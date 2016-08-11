@@ -33,7 +33,7 @@ public interface Contact {
 	void setUID(String uid) throws SharkKBException;
 
 	/**
-	 * Returns the profilepicture of a contact
+	 * Returns the profile picture of a contact
 	 * @return
      */
 

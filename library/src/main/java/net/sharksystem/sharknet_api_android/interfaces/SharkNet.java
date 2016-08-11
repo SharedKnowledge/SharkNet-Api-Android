@@ -16,54 +16,54 @@ public interface SharkNet {
 	 * Returns a List of all personal Profiles
 	 * @return
      */
-    public List<Profile> getProfiles() throws SharkKBException;
+    List<Profile> getProfiles() throws SharkKBException;
 
 	/**
 	 * Returns a list of all Feeds which should be displayed in the Timeline
 	 * @return
      */
-	public List<Feed> getFeeds(boolean descending);
-    public List<Feed> getFeeds(int start_index, int stop_index, boolean descending);
-	public List<Feed> getFeeds(Interest i, int start_index, int stop_index, boolean descending);
-	public List<Feed> getFeeds(String search, int start_index, int stop_index, boolean descending);
-	public List<Feed> getFeeds(Timestamp start, Timestamp end, int start_index, int stop_index, boolean descending);
+	List<Feed> getFeeds(boolean descending);
+    List<Feed> getFeeds(int start_index, int stop_index, boolean descending);
+	List<Feed> getFeeds(Interest i, int start_index, int stop_index, boolean descending);
+	List<Feed> getFeeds(String search, int start_index, int stop_index, boolean descending);
+	List<Feed> getFeeds(Timestamp start, Timestamp end, int start_index, int stop_index, boolean descending);
 
 	/**
 	 * returns a list of all safed contacts
 	 * @return
      */
-    public List<Contact> getContacts();
+    List<Contact> getContacts();
 
 	/**
 	 * returns a list of all chats
 	 * @return
      */
-    public List<Chat> getChats() throws SharkKBException;
+    List<Chat> getChats() throws SharkKBException;
 
 	/**
-	 * initializes a new Feed an Safes it in the Knowledgebase
+	 * Initializes a new Feed an Safes it in the KnowledgeBase
 	 */
-	public Feed newFeed(Content content, Interest interest, Contact sender);
+	Feed newFeed(Content content, Interest interest, Contact sender);
 
 
 	/**
-	 * Initilizes a Profile an Safes it in the Knowledgebase
+	 * Initializes a Profile an Safes it in the KnowledgeBase
 	 * @return
      */
-	public Profile newProfile(String nickname, String deviceID);
+	Profile newProfile(String nickname, String deviceID);
 
 	/**
 	 * Initializes a Chat and safes it in the KnowledgeBase
 	 * @param recipients
 	 */
-	public Chat newChat(List<Contact> recipients) throws SharkKBException;
+	Chat newChat(List<Contact> recipients) throws SharkKBException;
 
 	/**
 	 * Adds a Contact to the KnowledgeBase
 	 * @param nickname
 	 * @param uid
 	 */
-	public Contact newContact(String nickname, String uid, String publickey);
+	Contact newContact(String nickname, String uid, String publicKey);
 
 
 	/**
@@ -73,56 +73,56 @@ public interface SharkNet {
 	 * @return true if the authentification was sucessfull, false if not
      */
 
-	public boolean setProfile(Profile myProfile, String password);
+	boolean setProfile(Profile myProfile, String password);
 
 	/**
 	 * Returns the Profile which is active at the moment
 	 * @return
      */
-	public Profile getMyProfile();
+	Profile getMyProfile();
 
 	/**
 	 * Exchange Contact via NFC (just Method, not implemented)
      */
-	public void exchangeContactNFC();
+	void exchangeContactNFC();
 
 	/**
 	 * Adds Listener to the List of Listener
  	 * @param p
 	 * @param listener
      */
-	public void addListener(Profile p, GetEvents listener);
+	void addListener(Profile p, GetEvents listener);
 
 	/**
 	 * Removes a Listener
 	 * @param p
 	 * @param listener
      */
-	public void removeListener(Profile p, GetEvents listener);
+	void removeListener(Profile p, GetEvents listener);
 
 	/**
 	 * Methods calls all Methods of registered listeners when the profile matches a contact in the recipientslist of the message
 	 * @param m
      */
-	public void informMessage(Message m) throws SharkKBException;
+	void informMessage(Message m) throws SharkKBException;
 
 	/**
 	 * Methods calls all Methods of registered listeners and informs about feed
 	 * @param f
      */
-	public void informFeed(Feed f) throws SharkKBException;
+	void informFeed(Feed f) throws SharkKBException;
 
 	/**
 	 * Methods calls all Methods of registered listeners and informs about comment
 	 * @param c
      */
-	public void informComment(Comment c) throws SharkKBException;
+	void informComment(Comment c) throws SharkKBException;
 
 	/**
 	 * Methods calls all Methods of registered listeners and informs about contact (for example when exchanged via NFC)
 	 * @param c
 	 */
-	public void informContact(Contact c);
+	void informContact(Contact c);
 
 
 }
