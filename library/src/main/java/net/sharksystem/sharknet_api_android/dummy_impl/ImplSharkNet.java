@@ -147,8 +147,8 @@ public class ImplSharkNet implements SharkNet {
 	@Override
 	public Profile newProfile(String nickname, String deviceID) {
 		Profile p = new ImplProfile(nickname, deviceID);
-		ImplContact c = (ImplContact)p;
-		c.setOwner(p);
+//		ImplContact c = p;
+//		c.setOwner(p);
 		return p;
 	}
 
