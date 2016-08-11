@@ -19,8 +19,7 @@ public class ImplInterest implements net.sharksystem.sharknet_api_android.interf
 	public ImplInterest(Contact owner) throws SharkKBException {
 		kb = new InMemoSharkKB();
 		kb.setOwner(InMemoSharkKB.createInMemoPeerSemanticTag(owner.getName(),
-			owner.getUID(),
-			""));
+			owner.getUID(),""));
 		try {
 			tx = kb.getTopicsAsTaxonomy();
 		} catch (SharkKBException e) {

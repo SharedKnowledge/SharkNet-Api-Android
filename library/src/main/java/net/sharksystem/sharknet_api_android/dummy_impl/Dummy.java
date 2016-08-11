@@ -212,9 +212,9 @@ public class Dummy {
 		Interest i2 = new ImplInterest(bob);
 		TXSemanticTag si3 = i2.addInterest("shark", "www.sharknet.de");
 
-		bob.getInterests().addInterest(si1);
-		bob.getInterests().addInterest(si2);
-		bob.getInterests().addInterest(si3);
+//		bob.getInterests().addInterest(si1);
+//		bob.getInterests().addInterest(si2);
+//		bob.getInterests().addInterest(si3);
 
 
 		//Feeds anlegen
