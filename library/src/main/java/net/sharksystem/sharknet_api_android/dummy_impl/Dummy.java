@@ -23,12 +23,6 @@ import java.util.List;
 
 public class Dummy {
 
-
-	public static void main(String[] args) {
-		ImplSharkNet s = new ImplSharkNet();
-		s.fillWithDummyData();
-	}
-
 	public void fillWithDummyData(ImplSharkNet s) throws IOException, SharkKBException {
 
 		//Variables for MimeType
@@ -86,7 +80,6 @@ public class Dummy {
 ////		bobcon.setFile(filebob);
 //		bobcon.setMimeType(jpg);
 //		bob.setPicture(bobcon);
-
 
 		//Kontakte von Alice setzen
 		Contact alice_bob = s.newContact(bob.getNickname(), bob.getUID(), bob.getPublicKey());

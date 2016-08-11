@@ -36,7 +36,6 @@ public class ImplProfile implements Profile {
 		c = new ImplContact(nickname, gernateUID(nickname, deviceID), "", this);
 		setting = new ImplSetting(this);
 		save();
-
 	}
 
 	/**
@@ -61,27 +60,50 @@ public class ImplProfile implements Profile {
 
 	@Override
 	public PeerSemanticTag getPST() {
+		try {
+			return c.getPST();
+		} catch (SharkKBException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
 	@Override
 	public String getNickname() {
+		try {
+			return c.getNickname();
+		} catch (SharkKBException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
 	@Override
 	public void setNickname(String nickname) {
-
+		try {
+			c.setNickname(nickname);
+		} catch (SharkKBException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public String getUID() {
+		try {
+			return c.getUID();
+		} catch (SharkKBException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
 	@Override
 	public void setUID(String uid) {
-
+		try {
+			c.setUID(uid);
+		} catch (SharkKBException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -187,11 +209,20 @@ public class ImplProfile implements Profile {
 
 	@Override
 	public void setEmail(String email) {
-
+		try {
+			c.setEmail(email);
+		} catch (SharkKBException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public String getEmail() {
+		try {
+			return c.getEmail();
+		} catch (SharkKBException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
