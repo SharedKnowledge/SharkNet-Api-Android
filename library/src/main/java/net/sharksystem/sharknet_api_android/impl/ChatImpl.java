@@ -18,6 +18,7 @@ import net.sharksystem.sharknet_api_android.interfaces.Message;
 import net.sharksystem.sharknet_api_android.utils.SharkNetUtils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -44,12 +45,11 @@ public class ChatImpl implements Chat {
     // Chat Config Information Names
     private final String CHAT_RECIPIENTS = "CHAT_RECIPIENTS";
     private final String CHAT_OWNER = "CHAT_OWNER";
-    private final String CHAT_PICTURE = "CHAT_PICTURE";
+    private final String CHAT_ADMIN = "CHAT_ADMIN";
     private final String CHAT_TITLE = "CHAT_TITLE";
 
     private SharkNetEngine mSharkNetEngine;
     private SyncKB mChatKB;
-//    private List<Contact> mRecipients;
 
     // Called
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
@@ -59,25 +59,20 @@ public class ChatImpl implements Chat {
         mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
                 null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
 
-//        String property = sharkKB.getProperty(CHAT_RECIPIENTS);
-//
-//        PeerSTSet stSet = ASIPSerializer.deserializePeerSTSet(null, property);
-//
-//        Enumeration<PeerSemanticTag> enumeration = stSet.peerTags();
-//        while (enumeration.hasMoreElements()){
-//            PeerSemanticTag next = enumeration.nextElement();
-//            mRecipients.add(mSharkNetEngine.getContactByTag(next));
-//        }
     }
 
     // Called to create a chat
-    public ChatImpl(SharkKB sharkKB, List<Contact> recipients) throws SharkKBException, JSONException {
+    public ChatImpl(SharkKB sharkKB, List<Contact> recipients, Contact owner) throws SharkKBException, JSONException {
 
         mChatKB = new SyncKB(sharkKB);
         mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
                 null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
 
         setContacts(recipients);
+
+        String serializedTag = ASIPSerializer.serializeTag(owner.getPST()).toString();
+        ASIPInformation information = mChatKB.addInformation(serializedTag, mChatConfigSpace);
+        information.setName(CHAT_OWNER);
     }
 
     private ASIPSpace createMessageSpace() throws SharkKBException {
@@ -231,7 +226,13 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public Contact getOwner() {
+    public Contact getOwner() throws SharkKBException {
+        ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_OWNER);
+        if(information!=null){
+            String informationContentAsString = information.getContentAsString();
+            PeerSemanticTag peerSemanticTag = ASIPSerializer.deserializePeerTag(informationContentAsString);
+            return mSharkNetEngine.getContactByTag(peerSemanticTag);
+        }
         return null;
     }
 
@@ -241,12 +242,20 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public void setAdmin(Contact admin) {
-
+    public void setAdmin(Contact admin) throws SharkKBException, JSONException {
+        String serializedTag = ASIPSerializer.serializeTag(admin.getPST()).toString();
+        ASIPInformation information = mChatKB.addInformation(serializedTag, mChatConfigSpace);
+        information.setName(CHAT_ADMIN);
     }
 
     @Override
-    public Contact getAdmin() {
+    public Contact getAdmin() throws SharkKBException {
+        ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_ADMIN);
+        if(information!=null){
+            String informationContentAsString = information.getContentAsString();
+            PeerSemanticTag peerSemanticTag = ASIPSerializer.deserializePeerTag(informationContentAsString);
+            return mSharkNetEngine.getContactByTag(peerSemanticTag);
+        }
         return null;
     }
 }

@@ -80,7 +80,7 @@ public interface Chat extends Timeable {
 	/**
 	 * Returns the Profile of the owner of the Chat
 	 */
-	Contact getOwner();
+	Contact getOwner() throws SharkKBException;
 
 	/**
 	 * Returns the Timestamp of the most recent Message
@@ -104,13 +104,13 @@ public interface Chat extends Timeable {
 	 * sets the Admin of the Chat
 	 * @param admin
      */
-    void setAdmin(Contact admin);
+    void setAdmin(Contact admin) throws SharkKBException, JSONException;
 
 	/**
 	 * returns the Admin of the Chat
 	 * @return
      */
-	Contact getAdmin();
+	Contact getAdmin() throws SharkKBException;
 
 
 
