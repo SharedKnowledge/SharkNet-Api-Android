@@ -53,7 +53,7 @@ public interface Chat extends Timeable {
 	/**
 	 * Set the Picture of the Chat
 	 */
-	void setPicture(Content picture);
+	void setPicture(InputStream picture, String mimeType) throws SharkKBException;
 
 	/**
 	 * returns he chat picture
@@ -64,13 +64,13 @@ public interface Chat extends Timeable {
 	/**
 	 * Set Title of he Chat. By Default its a String of all Nicknames of the Contact in the Chat
 	 */
-	void setTitle(String title);
+	void setTitle(String title) throws SharkKBException;
 
 	/**
 	 * Returns Title of the Chat
 	 * @return
      */
-	String getTitle();
+	String getTitle() throws SharkKBException;
 
 	/**
 	 * Returns the ID of the Chat

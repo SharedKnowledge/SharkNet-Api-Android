@@ -15,6 +15,7 @@ import net.sharksystem.sharknet_api_android.interfaces.Chat;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Message;
+import net.sharksystem.sharknet_api_android.utils.SharkNetUtils;
 
 import org.json.JSONException;
 
@@ -195,22 +196,32 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public void setPicture(Content picture) {
-
+    public void setPicture(InputStream picture, String mimeType) throws SharkKBException {
+        ContentImpl content = new ContentImpl(mChatKB, mChatConfigSpace);
+        content.setInputStream(picture);
+        content.setMimeType(mimeType);
     }
 
     @Override
     public Content getPicture() {
-        return null;
+        return new ContentImpl(mChatKB, mChatConfigSpace);
     }
 
     @Override
-    public void setTitle(String title) {
-
+    public void setTitle(String title) throws SharkKBException {
+        if(title.isEmpty()){
+            return;
+        }
+        ASIPInformation information = mChatKB.addInformation(title, mChatConfigSpace);
+        information.setName(CHAT_TITLE);
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle() throws SharkKBException {
+        ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_TITLE);
+        if (information!=null){
+            return information.getContentAsString();
+        }
         return null;
     }
 
