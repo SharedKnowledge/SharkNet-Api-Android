@@ -89,16 +89,16 @@ public interface Chat extends Timeable {
 
 
 	/**
-	 * Adds Contacts to the Chat
-	 * @param cList
+	 * Adds Contact to the Chat
+	 * @param contact
 	 */
-	void addContact(List<Contact> cList);
+	void addContact(Contact contact) throws SharkKBException, JSONException;
 
 	/**
 	 * Removes the Contact from the chat
-	 * @param cList
+	 * @param contact
      */
-	void removeContact(List<Contact> cList);
+	void removeContact(Contact contact) throws SharkKBException, JSONException;
 
 	/**
 	 * sets the Admin of the Chat

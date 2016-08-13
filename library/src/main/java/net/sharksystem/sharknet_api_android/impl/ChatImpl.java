@@ -76,19 +76,7 @@ public class ChatImpl implements Chat {
         mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
                 null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
 
-
-        PeerSTSet peers = InMemoSharkKB.createInMemoPeerSTSet();
-
-        Iterator<Contact> iterator = recipients.iterator();
-        while (iterator.hasNext()){
-            Contact next = iterator.next();
-            peers.merge(next.getPST());
-        }
-
-        String serializedPeers = ASIPSerializer.serializeSTSet(peers).toString();
-
-        ASIPInformation information = mChatKB.addInformation(serializedPeers, mChatConfigSpace);
-        information.setName(CHAT_RECIPIENTS);
+        setContacts(recipients);
     }
 
     private ASIPSpace createMessageSpace() throws SharkKBException {
@@ -146,6 +134,21 @@ public class ChatImpl implements Chat {
 
     }
 
+    private void setContacts(List<Contact> contacts) throws SharkKBException, JSONException {
+        PeerSTSet peers = InMemoSharkKB.createInMemoPeerSTSet();
+
+        Iterator<Contact> iterator = contacts.iterator();
+        while (iterator.hasNext()){
+            Contact next = iterator.next();
+            peers.merge(next.getPST());
+        }
+
+        String serializedPeers = ASIPSerializer.serializeSTSet(peers).toString();
+
+        ASIPInformation information = mChatKB.addInformation(serializedPeers, mChatConfigSpace);
+        information.setName(CHAT_RECIPIENTS);
+    }
+
     @Override
     public List<Contact> getContacts() throws SharkKBException {
         if(mSharkNetEngine==null){
@@ -174,6 +177,21 @@ public class ChatImpl implements Chat {
         }
 
         return null;
+    }
+
+    @Override
+    public void addContact(Contact contact) throws SharkKBException, JSONException {
+        List<Contact> contacts = getContacts();
+        contacts.add(contact);
+        setContacts(contacts);
+
+    }
+
+    @Override
+    public void removeContact(Contact contact) throws SharkKBException, JSONException {
+        List<Contact> contacts = getContacts();
+        contacts.remove(contact);
+        setContacts(contacts);
     }
 
     @Override
@@ -209,16 +227,6 @@ public class ChatImpl implements Chat {
     @Override
     public Timestamp getTimestamp() {
         return null;
-    }
-
-    @Override
-    public void addContact(List<Contact> cList) {
-
-    }
-
-    @Override
-    public void removeContact(List<Contact> cList) {
-
     }
 
     @Override
