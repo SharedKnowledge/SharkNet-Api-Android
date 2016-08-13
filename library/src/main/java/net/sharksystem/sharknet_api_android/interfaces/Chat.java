@@ -48,7 +48,7 @@ public interface Chat extends Timeable {
 	 * If there is just one Recipient the Method returns a List of the Size one
 	 * @return
      */
-	List<Contact> getContacts();
+	List<Contact> getContacts() throws SharkKBException;
 
 	/**
 	 * Set the Picture of the Chat

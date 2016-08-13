@@ -55,7 +55,6 @@ public interface Feed extends Timeable, ContainsContent{
 	 * Deletes the Feed from the Database
 	 */
 	void delete();
-
 	/**
 	 * Marks this Feed as disliked, Shark will collect dislikes and after an special amount it will inform the author
 	 *

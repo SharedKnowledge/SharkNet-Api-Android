@@ -1,9 +1,11 @@
 package net.sharksystem.sharknet_api_android.impl;
 
+import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
 import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.TimeSemanticTag;
@@ -18,6 +20,7 @@ import org.json.JSONException;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -27,30 +30,52 @@ import java.util.List;
  */
 public class ChatImpl implements Chat {
 
-    public static final String SHARKNET_CHAT_RECIPIENTS = "SHARKNET_CHAT_RECIPIENTS";
-    
+    // Chat Types - for the different asipSpaces
+
+    private final SemanticTag mMessageType =
+            InMemoSharkKB.createInMemoSemanticTag("MESSAGE", "http://sharksystem.net/message");
+
+    private final SemanticTag mChatConfigurationType =
+            InMemoSharkKB.createInMemoSemanticTag("CHAT_CONFIG", "http://sharksystem.net/chat_config");
+
+    private ASIPSpace mChatConfigSpace = null;
+
+    // Chat Config Information Names
+    private final String CHAT_RECIPIENTS = "CHAT_RECIPIENTS";
+    private final String CHAT_OWNER = "CHAT_OWNER";
+    private final String CHAT_PICTURE = "CHAT_PICTURE";
+    private final String CHAT_TITLE = "CHAT_TITLE";
+
     private SharkNetEngine mSharkNetEngine;
     private SyncKB mChatKB;
-    private List<Contact> mRecipients;
+//    private List<Contact> mRecipients;
 
+    // Called
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
         mChatKB = new SyncKB(sharkKB);
         mSharkNetEngine = sharkNetEngine;
 
-        String property = sharkKB.getProperty(SHARKNET_CHAT_RECIPIENTS);
+        mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
+                null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
 
-        PeerSTSet stSet = ASIPSerializer.deserializePeerSTSet(null, property);
-
-        Enumeration<PeerSemanticTag> enumeration = stSet.peerTags();
-        while (enumeration.hasMoreElements()){
-            PeerSemanticTag next = enumeration.nextElement();
-            mRecipients.add(mSharkNetEngine.getContactByTag(next));
-        }
+//        String property = sharkKB.getProperty(CHAT_RECIPIENTS);
+//
+//        PeerSTSet stSet = ASIPSerializer.deserializePeerSTSet(null, property);
+//
+//        Enumeration<PeerSemanticTag> enumeration = stSet.peerTags();
+//        while (enumeration.hasMoreElements()){
+//            PeerSemanticTag next = enumeration.nextElement();
+//            mRecipients.add(mSharkNetEngine.getContactByTag(next));
+//        }
     }
 
-    public ChatImpl(SharkKB sharkKB, List<Contact> recipients) throws SharkKBException {
+    // Called to create a chat
+    public ChatImpl(SharkKB sharkKB, List<Contact> recipients) throws SharkKBException, JSONException {
 
         mChatKB = new SyncKB(sharkKB);
+        mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
+                null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
+
 
         PeerSTSet peers = InMemoSharkKB.createInMemoPeerSTSet();
 
@@ -60,29 +85,28 @@ public class ChatImpl implements Chat {
             peers.merge(next.getPST());
         }
 
-        String serializedPeers = ""; // TODO ASIPSerializer.serializeSTSet(peers);
+        String serializedPeers = ASIPSerializer.serializeSTSet(peers).toString();
 
-        mChatKB.setProperty(SHARKNET_CHAT_RECIPIENTS, serializedPeers);
-
-        mRecipients = recipients;
+        ASIPInformation information = mChatKB.addInformation(serializedPeers, mChatConfigSpace);
+        information.setName(CHAT_RECIPIENTS);
     }
 
-    private ASIPSpace createASIPSpace() throws SharkKBException {
+    private ASIPSpace createMessageSpace() throws SharkKBException {
         TimeSemanticTag timeSemanticTag =
                 mChatKB.getTimeSTSet().createTimeSemanticTag(System.currentTimeMillis(), 0);
-        return mChatKB.createASIPSpace(null, null, null, null, null, timeSemanticTag, null, ASIPSpace.DIRECTION_OUT);
+        return mChatKB.createASIPSpace(null, mMessageType, null, null, null, timeSemanticTag, null, ASIPSpace.DIRECTION_OUT);
     }
 
     @Override
     public void sendMessage(Content content) throws SharkKBException {
-//        ASIPSpace space = createASIPSpace();
+//        ASIPSpace space = createMessageSpace();
 //        new MessageImpl(space);
 //        mChatKB.addInformation(content.getInputStream(), content.getLength(), space);
     }
 
     @Override
     public void sendMessage(InputStream inputStream, String messageString, String mimeType) throws JSONException, SharkKBException {
-        ASIPSpace space = createASIPSpace();
+        ASIPSpace space = createMessageSpace();
         MessageImpl message = new MessageImpl(mSharkNetEngine, mChatKB, space);
         message.setContent(inputStream, messageString, mimeType);
     }
@@ -123,7 +147,32 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public List<Contact> getContacts() {
+    public List<Contact> getContacts() throws SharkKBException {
+        if(mSharkNetEngine==null){
+            return null;
+        }
+
+        ArrayList<Contact> list = new ArrayList<>();
+
+        Iterator<ASIPInformation> iterator = mChatKB.getInformation(mChatConfigSpace);
+        while(iterator.hasNext()){
+            ASIPInformation next = iterator.next();
+            // Check if we have an information with the serialized PSTSet as content
+            if(next.getName().equals(CHAT_RECIPIENTS)){
+                String contentAsString = next.getContentAsString();
+                // Deserialize the PSTSet and get the peerTags
+                PeerSTSet peerSTSet = ASIPSerializer.deserializePeerSTSet(null, contentAsString);
+                Enumeration<PeerSemanticTag> peerTags = peerSTSet.peerTags();
+                while (peerTags.hasMoreElements()){
+                    PeerSemanticTag peerSemanticTag = peerTags.nextElement();
+                    // Get the contact for the PST from the sharkNEtEngine and add it to the list.
+                    Contact contact = mSharkNetEngine.getContactByTag(peerSemanticTag);
+                    list.add(contact);
+                }
+                return list;
+            }
+        }
+
         return null;
     }
 

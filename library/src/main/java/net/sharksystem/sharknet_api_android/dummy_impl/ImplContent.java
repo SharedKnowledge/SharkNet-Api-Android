@@ -153,7 +153,7 @@ public class ImplContent implements Content {
 	}
 
 	@Override
-	public int getLength() {
+	public long getLength() {
 		return (int) this.sharkFile.getContentLength();
 	}
 

@@ -12,8 +12,6 @@ import net.sharksystem.sharknet_api_android.utils.SharkNetUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Iterator;
 
 /**
  * Created by j4rvis on 02.08.16.
@@ -42,12 +40,6 @@ public class ContentImpl implements Content {
             e.printStackTrace();
             return false;
         }
-    }
-
-    @Override
-    public OutputStream getOutputStream() throws SharkKBException {
-        // TODO
-        return null;
     }
 
     @Override
@@ -94,6 +86,15 @@ public class ContentImpl implements Content {
 
     }
 
+    @Override
+    public long getLength() throws SharkKBException {
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mASIPSpace, CONTENT_INFO);
+        if(information!=null){
+            return information.getContentLength();
+        }
+        return 0;
+    }
+
     // TODO
 
     @Override
@@ -113,10 +114,5 @@ public class ContentImpl implements Content {
 
     @Override
     public void setReminder(Reminder reminder) {
-    }
-
-    @Override
-    public int getLength() {
-        return 0;
     }
 }
