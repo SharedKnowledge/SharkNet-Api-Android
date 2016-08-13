@@ -32,10 +32,10 @@ public interface Chat extends Timeable {
 	 * @return
      */
     List<Message> getMessages(boolean descending) throws SharkKBException;
-	List<Message> getMessages(int startIndex, int stopIndex, boolean descending);
-	List<Message> getMessages(Timestamp start, Timestamp stop, boolean descending);
-	List<Message> getMessages(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending);
-	List<Message> getMessages(String search, int startIndex, int stopIndex, boolean descending);
+	List<Message> getMessages(int startIndex, int stopIndex, boolean descending) throws SharkKBException;
+	List<Message> getMessages(Timestamp start, Timestamp stop, boolean descending) throws SharkKBException;
+	List<Message> getMessages(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) throws SharkKBException;
+	List<Message> getMessages(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException;
 
 
 	/**
@@ -85,7 +85,7 @@ public interface Chat extends Timeable {
 	/**
 	 * Returns the Timestamp of the most recent Message
 	 */
-	Timestamp getTimestamp();
+	Timestamp getTimestamp() throws SharkKBException;
 
 
 	/**

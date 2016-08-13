@@ -55,6 +55,8 @@ public class ChatImpl implements Chat {
     private SharkNetEngine mSharkNetEngine;
     private SyncKB mChatKB;
 
+    private Comparator<Message> mComparator = new MessageComparator();
+
     // Called
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
         mChatKB = new SyncKB(sharkKB);
@@ -122,8 +124,7 @@ public class ChatImpl implements Chat {
         }
 
         if(!messages.isEmpty()){
-            MessageComparator comparator = new MessageComparator();
-            Collections.sort(messages, comparator);
+            Collections.sort(messages, mComparator);
             if(descending){
                 Collections.reverse(messages);
             }
@@ -133,23 +134,69 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public List<Message> getMessages(int startIndex, int stopIndex, boolean descending) {
-        return null;
+    public List<Message> getMessages(int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+        List<Message> messages = getMessages(false);
+        List<Message> subList = messages.subList(startIndex, stopIndex);
+        Collections.sort(subList, mComparator);
+        if(descending){
+            Collections.reverse(subList);
+        }
+        return subList;
     }
 
     @Override
-    public List<Message> getMessages(Timestamp start, Timestamp stop, boolean descending) {
-        return null;
+    public List<Message> getMessages(Timestamp start, Timestamp stop, boolean descending) throws SharkKBException {
+        List<Message> messages = getMessages(false);
+
+        int startIndex = -1;
+        int lastIndex = -1;
+
+        for (int i = 0; i < messages.size(); i++){
+            Message message = messages.get(i);
+            if(message.getTimestamp().after(start) && startIndex == -1){
+                startIndex = i;
+            } else if(message.getTimestamp().before(stop)){
+                lastIndex = i;
+            }
+        }
+
+        List<Message> subList = messages.subList(startIndex, lastIndex);
+        Collections.sort(subList, mComparator);
+        if(descending){
+            Collections.reverse(subList);
+        }
+        if(subList.isEmpty()){
+            return null;
+        } else {
+            return subList;
+        }
     }
 
     @Override
-    public List<Message> getMessages(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) {
-        return null;
+    public List<Message> getMessages(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+        List<Message> messages = getMessages(start, stop, descending);
+        return messages.subList(startIndex, stopIndex);
     }
 
+
+    // Checks if the string is within the Message'S content message :)
     @Override
-    public List<Message> getMessages(String search, int startIndex, int stopIndex, boolean descending) {
-        return null;
+    public List<Message> getMessages(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+        List<Message> messages = getMessages(startIndex, stopIndex, descending);
+
+        if(messages.isEmpty()){
+            return null;
+        } else {
+            ArrayList<Message> list = new ArrayList<>();
+            Iterator<Message> iterator = messages.iterator();
+            while (iterator.hasNext()){
+                Message next = iterator.next();
+                if (next.getContent().getMessage().contains(search)){
+                    list.add(next);
+                }
+            }
+            return list;
+        }
     }
 
     @Override
@@ -198,7 +245,6 @@ public class ChatImpl implements Chat {
                 return list;
             }
         }
-
         return null;
     }
 
@@ -207,7 +253,6 @@ public class ChatImpl implements Chat {
         List<Contact> contacts = getContacts();
         contacts.add(contact);
         setContacts(contacts);
-
     }
 
     @Override
@@ -264,8 +309,9 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public Timestamp getTimestamp() {
-        return null;
+    public Timestamp getTimestamp() throws SharkKBException {
+        List<Message> messages = getMessages(true);
+        return messages.get(0).getTimestamp();
     }
 
     @Override
