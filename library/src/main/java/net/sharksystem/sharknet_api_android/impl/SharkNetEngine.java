@@ -16,6 +16,8 @@ import net.sharksystem.sharknet_api_android.interfaces.Message;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.interfaces.SharkNet;
 
+import org.json.JSONException;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -116,11 +118,11 @@ public class SharkNetEngine implements SharkNet {
     }
 
     @Override
-    public Chat newChat(List<Contact> recipients) throws SharkKBException {
+    public Chat newChat(List<Contact> recipients) throws SharkKBException, JSONException {
         InMemoSharkKB inMemoSharkKB = (InMemoSharkKB) createKBFromRoot(this.rootKB);
         this.chatKBs.add(inMemoSharkKB);
 
-        return new ChatImpl(inMemoSharkKB, recipients);
+        return new ChatImpl(inMemoSharkKB, recipients, getMyProfile());
     }
 
     //

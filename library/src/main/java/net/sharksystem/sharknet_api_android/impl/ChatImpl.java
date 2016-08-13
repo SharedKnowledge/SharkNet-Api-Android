@@ -47,10 +47,10 @@ public class ChatImpl implements Chat {
     private ASIPSpace mChatConfigSpace = null;
 
     // Chat Config Information Names
-    private final String CHAT_RECIPIENTS = "CHAT_RECIPIENTS";
-    private final String CHAT_OWNER = "CHAT_OWNER";
-    private final String CHAT_ADMIN = "CHAT_ADMIN";
-    private final String CHAT_TITLE = "CHAT_TITLE";
+    public static final String CHAT_RECIPIENTS = "CHAT_RECIPIENTS";
+    public static final String CHAT_OWNER = "CHAT_OWNER";
+    public static final String CHAT_ADMIN = "CHAT_ADMIN";
+    public static final String CHAT_TITLE = "CHAT_TITLE";
 
     private SharkNetEngine mSharkNetEngine;
     private SyncKB mChatKB;
@@ -97,7 +97,7 @@ public class ChatImpl implements Chat {
     @Override
     public void sendMessage(InputStream inputStream, String messageString, String mimeType) throws JSONException, SharkKBException {
         ASIPSpace space = createMessageSpace();
-        MessageImpl message = new MessageImpl(mSharkNetEngine, mChatKB, space);
+        MessageImpl message = new MessageImpl(mSharkNetEngine, this, mChatKB, space);
         message.setContent(inputStream, messageString, mimeType);
     }
 
@@ -118,7 +118,7 @@ public class ChatImpl implements Chat {
             // checks if the infoSpace has an type SemanticTag with the SI from the mMessageType-Tag
             STSet types = next.getASIPSpace().getTypes();
             if(types.getSemanticTag(mMessageType.getSI())!=null){
-                MessageImpl message = new MessageImpl(mSharkNetEngine, mChatKB, next);
+                MessageImpl message = new MessageImpl(mSharkNetEngine, this, mChatKB, next);
                 messages.add(message);
             }
         }

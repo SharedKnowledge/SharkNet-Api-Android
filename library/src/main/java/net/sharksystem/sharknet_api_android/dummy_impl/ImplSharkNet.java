@@ -153,7 +153,7 @@ public class ImplSharkNet implements SharkNet {
 	}
 
 	@Override
-	public Chat newChat(List<Contact> recipients) {
+	public Chat newChat(List<Contact> recipients) throws SharkKBException {
 		if(myProfile == null) return null;
 
 		//ToDo: Shark - Lookup if a chat for the contacts already exists if yes return the chatobject of the existing chat, if no make a new chat

@@ -80,15 +80,6 @@ public class ImplContent implements Content {
 		else return false;
 	}
 
-	@Override
-	public OutputStream getOutputStream(){
-		try {
-			return sharkFile.getOutputStream();
-		} catch (SharkKBException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
 	@Override
 	public String getMimeType(){

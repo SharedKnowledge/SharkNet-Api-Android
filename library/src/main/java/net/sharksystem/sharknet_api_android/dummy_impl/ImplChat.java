@@ -194,6 +194,10 @@ public class ImplChat implements Chat {
 	}
 
 	@Override
+	public void setPicture(InputStream picture, String mimeType) throws SharkKBException {
+
+	}
+
 	public void setPicture(Content picture) {
 		this.picture = picture;
 	}
@@ -238,6 +242,15 @@ public class ImplChat implements Chat {
 	}
 
 	@Override
+	public void addContact(Contact contact) throws SharkKBException, JSONException {
+
+	}
+
+	@Override
+	public void removeContact(Contact contact) throws SharkKBException, JSONException {
+
+	}
+
 	public void addContact(List<Contact> cList) {
 		//ToDo: Shark - Implement that Contacts will added to the Chat in the Shark DB
 		List<Contact> contactList = DummyDB.getInstance().getChatContacts(this);
@@ -248,7 +261,6 @@ public class ImplChat implements Chat {
 		}
 	}
 
-	@Override
 	public void removeContact(List<Contact> cList){
 
 		//ToDo: Shark - Implement that Contacts will be removed from the Chat in the Shark DB

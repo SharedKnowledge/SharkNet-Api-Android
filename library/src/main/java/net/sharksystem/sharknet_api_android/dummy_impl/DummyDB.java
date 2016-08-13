@@ -282,7 +282,7 @@ public class DummyDB {
 
 	//Manage the Chat Lists
 
-	public Chat existChat(List<Contact> recipients){
+	public Chat existChat(List<Contact> recipients) throws SharkKBException {
 
 		for(Chat c : chat_list){
 			List<Contact> cs = c.getContacts();

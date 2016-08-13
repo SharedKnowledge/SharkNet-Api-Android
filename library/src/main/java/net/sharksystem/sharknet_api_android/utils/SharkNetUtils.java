@@ -22,4 +22,27 @@ public class SharkNetUtils {
         }
         return null;
     }
+
+    public static boolean getInfoAsBoolean(SharkKB kb, ASIPSpace space, String name) throws SharkKBException {
+        ASIPInformation information = getInfoByName(kb, space, name);
+        if(information!=null){
+            if (information.getContentAsString().equals("TRUE")){
+                return true;
+            } else if(information.getContentAsString().equals("FALSE")){
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static void setInfoAsBooleanString(SharkKB kb, ASIPSpace space, String name, boolean contentToSet) throws SharkKBException {
+        String booleanString;
+        if(contentToSet){
+            booleanString = "TRUE";
+        } else {
+            booleanString = "FALSE";
+        }
+        ASIPInformation information = kb.addInformation(booleanString, space);
+        information.setName(name);
+    }
 }

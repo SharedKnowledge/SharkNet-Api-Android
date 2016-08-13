@@ -79,7 +79,7 @@ public class ImplMessage implements Message {
 	/**
 	 * Saves Message to the Database, this is only used for incoming messages (no sending)
 	 */
-	private void save(Chat c){
+	private void save(Chat c) throws SharkKBException {
 		//ToDo: Shark - Save the Message to the Database
 		if(!c.getMessages(true).contains(this)){
 			DummyDB.getInstance().addMessage(this, c);

@@ -2,6 +2,8 @@ package net.sharksystem.sharknet_api_android.interfaces;
 
 import net.sharkfw.knowledgeBase.SharkKBException;
 
+import org.json.JSONException;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -56,7 +58,7 @@ public interface SharkNet {
 	 * Initializes a Chat and safes it in the KnowledgeBase
 	 * @param recipients
 	 */
-	Chat newChat(List<Contact> recipients) throws SharkKBException;
+	Chat newChat(List<Contact> recipients) throws SharkKBException, JSONException;
 
 	/**
 	 * Adds a Contact to the KnowledgeBase
