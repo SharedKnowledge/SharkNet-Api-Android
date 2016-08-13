@@ -1,10 +1,12 @@
 package net.sharksystem.sharknet_api_android.impl;
 
 import net.sharkfw.asip.ASIPInformation;
+import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
 import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
@@ -23,6 +25,8 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -101,7 +105,30 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public List<Message> getMessages(boolean descending) {
+    public List<Message> getMessages(boolean descending) throws SharkKBException {
+        ArrayList<Message> messages = new ArrayList<>();
+        Iterator<ASIPInformationSpace> informationSpaces = mChatKB.informationSpaces();
+        while (informationSpaces.hasNext()){
+            ASIPInformationSpace next = informationSpaces.next();
+            if(next == null){
+                continue;
+            }
+            // checks if the infoSpace has an type SemanticTag with the SI from the mMessageType-Tag
+            STSet types = next.getASIPSpace().getTypes();
+            if(types.getSemanticTag(mMessageType.getSI())!=null){
+                MessageImpl message = new MessageImpl(mSharkNetEngine, mChatKB, next);
+                messages.add(message);
+            }
+        }
+
+        if(!messages.isEmpty()){
+            MessageComparator comparator = new MessageComparator();
+            Collections.sort(messages, comparator);
+            if(descending){
+                Collections.reverse(messages);
+            }
+            return messages;
+        }
         return null;
     }
 

@@ -21,6 +21,7 @@ import org.json.JSONException;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -182,4 +183,5 @@ public class MessageImpl implements Message {
     public void setDirectReceived(boolean directReceived) {
 
     }
+
 }
