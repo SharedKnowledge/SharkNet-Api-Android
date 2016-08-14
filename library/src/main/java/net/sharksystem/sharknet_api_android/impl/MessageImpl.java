@@ -54,8 +54,7 @@ public class MessageImpl implements Message {
         // by setting the sender
         PeerSemanticTag owner = mChatKB.getOwner();
         String serializedOwner = ASIPSerializer.serializeTag(owner).toString();
-        ASIPInformation senderInformation = mChatKB.addInformation(serializedOwner, space);
-        senderInformation.setName(MESSAGE_SENDER);
+        SharkNetUtils.setInfoWithName(mChatKB, space, MESSAGE_SENDER, serializedOwner);
 
         // now search for the desired InformationSpace and set it.
         Iterator<ASIPInformationSpace> informationSpaces = mChatKB.informationSpaces(space, true);
@@ -100,11 +99,6 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public Content getContent() throws SharkKBException {
-        return new ContentImpl(mChatKB, mInformationSpace.getASIPSpace());
-    }
-
-    @Override
     public void setContent(InputStream inputStream, String messageString, String mimeType) throws SharkKBException {
         ContentImpl content = new ContentImpl(mChatKB, mInformationSpace.getASIPSpace());
         content.setMimeType(mimeType);
@@ -113,19 +107,39 @@ public class MessageImpl implements Message {
     }
 
     @Override
+    public Content getContent() throws SharkKBException {
+        return new ContentImpl(mChatKB, mInformationSpace.getASIPSpace());
+    }
+
+    @Override
+    public Chat getChat() {
+        return mChat;
+    }
+
+    @Override
+    public void deleteMessage() throws SharkKBException {
+        // TODO removing Information by Space is correct?
+        mChatKB.removeInformation(mInformationSpace.getASIPSpace());
+    }
+
+    @Override
+    public void setSigned(boolean signed) throws SharkKBException {
+        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_SIGNED, signed);
+    }
+
+    @Override
     public boolean isSigned() throws SharkKBException {
         return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_SIGNED);
     }
 
     @Override
-    public boolean isEncrypted() throws SharkKBException {
-        return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_ENCRYPTED);
+    public void setEncrypted(boolean encrypted) throws SharkKBException {
+        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_ENCRYPTED, encrypted);
     }
 
     @Override
-    public void deleteMessage() throws SharkKBException {
-        // TODO removving Information by Space is correct?
-        mChatKB.removeInformation(mInformationSpace.getASIPSpace());
+    public boolean isEncrypted() throws SharkKBException {
+        return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_ENCRYPTED);
     }
 
     @Override
@@ -145,23 +159,13 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public boolean isVerified() throws SharkKBException {
-        return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_VERIFIED);
-    }
-
-    @Override
     public void setVerified(boolean verified) throws SharkKBException {
         SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_VERIFIED, verified);
     }
 
     @Override
-    public Chat getChat() {
-        return mChat;
-    }
-
-    @Override
-    public boolean isRead() throws SharkKBException {
-        return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_READ);
+    public boolean isVerified() throws SharkKBException {
+        return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_VERIFIED);
     }
 
     @Override
@@ -170,23 +174,18 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public void setSigned(boolean signed) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_SIGNED, signed);
-    }
-
-    @Override
-    public void setEncrypted(boolean encrypted) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_ENCRYPTED, encrypted);
-    }
-
-    @Override
-    public boolean isDirectReceived() throws SharkKBException {
-        return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_DIRECT_RECEIVED);
+    public boolean isRead() throws SharkKBException {
+        return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_READ);
     }
 
     @Override
     public void setDirectReceived(boolean directReceived) throws SharkKBException {
         SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_DIRECT_RECEIVED, directReceived);
+    }
+
+    @Override
+    public boolean isDirectReceived() throws SharkKBException {
+        return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_DIRECT_RECEIVED);
     }
 
 }
