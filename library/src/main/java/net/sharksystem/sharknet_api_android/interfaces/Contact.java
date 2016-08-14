@@ -94,15 +94,15 @@ public interface Contact {
 	/**
 	 * spelling suggestion- addTelephoneNumber()
 	 * add a Telephonnumber to the Contact. The Contact has a List which can include more phone numbers (no validation included)
-	 * @param telephonnumber
+	 * @param telephoneNumber
      */
-	void addTelephonnumber(String telephonnumber) throws SharkKBException;
+	void addTelephoneNumber(String telephoneNumber) throws SharkKBException;
 
 	/**
 	 * Returns the List of Phone Numbers
 	 * @return
      */
-	List<String> getTelephonnumber() throws SharkKBException;
+	List<String> getTelephoneNumber() throws SharkKBException;
 
 	/**
 	 * Adds/Or overwrites the Note to a contact

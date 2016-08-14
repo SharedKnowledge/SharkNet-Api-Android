@@ -2,14 +2,12 @@ package net.sharksystem.sharknet_api_android.dummy_impl;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
-import net.sharksystem.sharknet_api_android.dummy_impl.utils.Resources;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.interfaces.StudentContact;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -28,7 +26,7 @@ public class ImplContact implements Contact, StudentContact {
     String notes;
     String uid;
     Interest interest;
-    List<String> telephonnumber_list = new LinkedList<>();
+    List<String> mTelephoneNumberList = new LinkedList<>();
     Profile owner;
     Content picture;
     Timestamp lastWifiContact = null;
@@ -141,14 +139,14 @@ public class ImplContact implements Contact, StudentContact {
     }
 
     @Override
-    public void addTelephonnumber(String telephonnumber) {
-        telephonnumber_list.add(telephonnumber);
+    public void addTelephoneNumber(String telephoneNumber) {
+        mTelephoneNumberList.add(telephoneNumber);
 
     }
 
     @Override
-    public List<String> getTelephonnumber() {
-        return telephonnumber_list;
+    public List<String> getTelephoneNumber() {
+        return mTelephoneNumberList;
     }
 
     @Override

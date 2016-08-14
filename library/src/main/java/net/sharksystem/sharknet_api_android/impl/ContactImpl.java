@@ -12,6 +12,7 @@ import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
+import net.sharksystem.sharknet_api_android.utils.SharkNetUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +45,7 @@ public class ContactImpl implements Contact {
         mSpace = createASIPSpace(tag);
 
         // SET FIRST INFO - NAME
-        setInfoWithName(INFONAME_NICKNAME, tag.getName());
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NICKNAME, tag.getName());
     }
 
     public ContactImpl(SharkKB sharkKB, String nickname, String deviceId) throws SharkKBException {
@@ -76,17 +77,6 @@ public class ContactImpl implements Contact {
         return null;
     }
 
-    private void setInfoWithName(String name, String content) throws SharkKBException {
-        ASIPInformation asipInformation = mSharkKB.addInformation(content, mSpace);
-        asipInformation.setName(name);
-    }
-
-
-    private void setInfoWithName(String name, InputStream content) throws SharkKBException, IOException {
-        ASIPInformation asipInformation = mSharkKB.addInformation(content, content.available(), mSpace);
-        asipInformation.setName(name);
-    }
-
 
     @Override
     public PeerSemanticTag getPST() throws SharkKBException {
@@ -101,7 +91,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setNickname(String nickname) throws SharkKBException {
-        setInfoWithName(INFONAME_NICKNAME, nickname);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NICKNAME, nickname);
     }
 
     @Override
@@ -112,7 +102,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setUID(String uid) throws SharkKBException {
-        setInfoWithName(INFONAME_NICKNAME, uid);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NICKNAME, uid);
     }
 
     @Override
@@ -136,7 +126,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setPublicKey(String publicKey) throws SharkKBException {
-        setInfoWithName(INFONAME_PUBLIC_KEY, publicKey);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_PUBLIC_KEY, publicKey);
     }
 
     @Override
@@ -181,7 +171,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void addName(String name) throws SharkKBException {
-        setInfoWithName(INFONAME_NAME, name);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NAME, name);
     }
 
     @Override
@@ -193,20 +183,20 @@ public class ContactImpl implements Contact {
 
     // SEPERATED BY ';'
     @Override
-    public void addTelephonnumber(String telephonnumber) throws SharkKBException {
-        if (getTelephonnumber().size() <= 0) {
-            setInfoWithName(INFONAME_TELEPHONE, telephonnumber);
+    public void addTelephoneNumber(String telephoneNumber) throws SharkKBException {
+        if (getTelephoneNumber().size() <= 0) {
+            SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_TELEPHONE, telephoneNumber);
         } else {
             ASIPInformation information = getInfoByName(INFONAME_TELEPHONE);
             if (information != null) {
                 String content = information.getContentAsString();
-                information.setContent(content + ";" + telephonnumber);
+                information.setContent(content + ";" + telephoneNumber);
             }
         }
     }
 
     @Override
-    public List<String> getTelephonnumber() throws SharkKBException {
+    public List<String> getTelephoneNumber() throws SharkKBException {
         ASIPInformation information = getInfoByName(INFONAME_TELEPHONE);
         if (information != null) {
             String contentAsString = information.getContentAsString();
@@ -218,7 +208,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void addNote(String note) throws SharkKBException {
-        setInfoWithName(INFONAME_NOTE, note);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NOTE, note);
     }
 
     @Override
@@ -229,7 +219,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setEmail(String email) throws SharkKBException {
-        setInfoWithName(INFONAME_EMAIL, email);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_EMAIL, email);
     }
 
     @Override

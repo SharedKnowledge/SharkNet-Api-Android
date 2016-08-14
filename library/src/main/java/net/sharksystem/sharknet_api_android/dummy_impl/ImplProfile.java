@@ -179,7 +179,6 @@ public class ImplProfile implements Profile {
 
 	@Override
 	public void addName(String name) {
-
 	}
 
 	@Override
@@ -188,12 +187,12 @@ public class ImplProfile implements Profile {
 	}
 
 	@Override
-	public void addTelephonnumber(String telephonnumber) {
+	public void addTelephoneNumber(String telephoneNumber) {
 
 	}
 
 	@Override
-	public List<String> getTelephonnumber() {
+	public List<String> getTelephoneNumber() {
 		return null;
 	}
 
