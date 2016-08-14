@@ -3,6 +3,7 @@ package net.sharksystem.sharknet_api_android.impl;
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
+import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
@@ -10,7 +11,6 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
-import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.utils.SharkNetUtils;
 

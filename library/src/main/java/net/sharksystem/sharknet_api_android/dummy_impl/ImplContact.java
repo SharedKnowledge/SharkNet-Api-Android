@@ -1,10 +1,10 @@
 package net.sharksystem.sharknet_api_android.dummy_impl;
 
+import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
-import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.interfaces.StudentContact;
 
@@ -50,11 +50,11 @@ public class ImplContact implements Contact, StudentContact {
         this.uid = uid;
         this.publickey = publickey;
         this.owner = owner;
-        try {
-            this.interest = new ImplInterest(this);
-        } catch (SharkKBException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            this.interest = new ImplInterest(this);
+//        } catch (SharkKBException e) {
+//            e.printStackTrace();
+//        }
 
         // Dummy public key generation
 
@@ -77,13 +77,13 @@ public class ImplContact implements Contact, StudentContact {
 
         // Dummy public key generation
 
-        if (interest == null) {
-            try {
-                this.interest = new ImplInterest(this);
-            } catch (SharkKBException e) {
-                e.printStackTrace();
-            }
-        } else this.interest = interest;
+//        if (interest == null) {
+//            try {
+//                this.interest = new ImplInterest(this);
+//            } catch (SharkKBException e) {
+//                e.printStackTrace();
+//            }
+//        } else this.interest = interest;
 
     }
 

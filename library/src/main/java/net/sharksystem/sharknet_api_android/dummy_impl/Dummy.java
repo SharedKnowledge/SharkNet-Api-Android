@@ -6,7 +6,6 @@ import net.sharksystem.sharknet_api_android.interfaces.Chat;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Feed;
-import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Message;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.interfaces.Voting;
@@ -196,14 +195,14 @@ public class Dummy {
 
 
 		// Interessen anlegen, Fussball wird unter Sport eingeordnet
-		Interest i1 = new ImplInterest(alice);
-		TXSemanticTag si1 = i1.addInterest("sport", "https://de.wikipedia.org/wiki/Sport");
-		TXSemanticTag si2 = i1.addInterest("fußball", "https://de.wikipedia.org/wiki/Fußball");
-		i1.moveInterest(si1, si2);
-
-		//Bob hat nur das interesse shark
-		Interest i2 = new ImplInterest(bob);
-		TXSemanticTag si3 = i2.addInterest("shark", "www.sharknet.de");
+//		Interest i1 = new ImplInterest(alice);
+//		TXSemanticTag si1 = i1.addInterest("sport", "https://de.wikipedia.org/wiki/Sport");
+//		TXSemanticTag si2 = i1.addInterest("fußball", "https://de.wikipedia.org/wiki/Fußball");
+//		i1.moveInterest(si1, si2);
+//
+//		//Bob hat nur das interesse shark
+//		Interest i2 = new ImplInterest(bob);
+//		TXSemanticTag si3 = i2.addInterest("shark", "www.sharknet.de");
 
 //		bob.getInterests().addInterest(si1);
 //		bob.getInterests().addInterest(si2);
@@ -211,17 +210,17 @@ public class Dummy {
 
 
 		//Feeds anlegen
-		Feed f1 = s.newFeed(new ImplContent("this is the fist feed of sharkNet", alice_p), i2, bob);
-		Feed f2 = s.newFeed(new ImplContent("i <3 football", alice_p), i1, alice);
-		Feed f3 = s.newFeed(new ImplContent("portugal is european champion", alice_p), i1, alice);
+//		Feed f1 = s.newFeed(new ImplContent("this is the fist feed of sharkNet", alice_p), i2, bob);
+//		Feed f2 = s.newFeed(new ImplContent("i <3 football", alice_p), i1, alice);
+//		Feed f3 = s.newFeed(new ImplContent("portugal is european champion", alice_p), i1, alice);
 
 		//Comments an die Fees anhängen
-		f1.newComment(new ImplContent("this is amazing", alice_p), alice);
-		f1.newComment(new ImplContent("i know", alice_p), bob);
-
-		// Dislike eines Comments
-		f1.getComments(true).get(0).setDisliked(true);
-
+//		f1.newComment(new ImplContent("this is amazing", alice_p), alice);
+//		f1.newComment(new ImplContent("i know", alice_p), bob);
+//
+//		// Dislike eines Comments
+//		f1.getComments(true).get(0).setDisliked(true);
+//
 		//Blacklist anlegen, Alice hat ihren Exfreund auf der Liste
 		alice_p.getBlacklist().add(new ImplContact("alice exboyfriend", "hotboy@elitepartner.com", "", alice_p));
 
@@ -237,9 +236,9 @@ public class Dummy {
 		bob_peter.sendMessage(new ImplContent("hallo peter", bob_p));
 
 
-		Feed bob_feed1 = s.newFeed(new ImplContent("bob thinks shark net is amazing", bob_p), i2, bob);
+//		Feed bob_feed1 = s.newFeed(new ImplContent("bob thinks shark net is amazing", bob_p), i2, bob);
 
-		bob_feed1.newComment(new ImplContent("Peter thinks so too", bob_p), peter);
+//		bob_feed1.newComment(new ImplContent("Peter thinks so too", bob_p), peter);
 		s.getFeeds(5, 10, true);
 
 		bob_p.getBlacklist().add(new ImplContact("bad hacker", "bad@hacker.com", "", bob_p));

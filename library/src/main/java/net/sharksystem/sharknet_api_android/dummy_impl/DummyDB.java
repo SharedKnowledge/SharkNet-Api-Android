@@ -1,13 +1,13 @@
 package net.sharksystem.sharknet_api_android.dummy_impl;
 
 
+import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharksystem.sharknet_api_android.interfaces.Chat;
 import net.sharksystem.sharknet_api_android.interfaces.Comment;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.ContainsContent;
 import net.sharksystem.sharknet_api_android.interfaces.Feed;
-import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Message;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 import net.sharksystem.sharknet_api_android.interfaces.Timeable;
@@ -63,7 +63,7 @@ public class DummyDB {
 
 		for (int i = swap_f_list.size() - 1; i >= 0; i--) {
 			Feed f = swap_f_list.get(i);
-			if (!f.getOwner().isEqual(owner)) swap_f_list.remove(f);
+//			if (!f.getOwner().isEqual(owner)) swap_f_list.remove(f);
 		}
 
 		return (List<Feed>) sortList(swap_f_list, descending);
@@ -86,7 +86,7 @@ public class DummyDB {
 		List <Feed> swaplist = (List<Feed>) sortList(getFeed_list(owner, descending), descending);
 		List<Feed> resultlist = new LinkedList<>();
 		for(Feed f : swaplist){
-			if(f.getInterest().contains(i)) resultlist.add(f);
+//			if(f.getInterest().contains(i)) resultlist.add(f);
 		}
 		resultlist = (List<Feed>) cutList(resultlist, startIndex, stopIndex);
 		return resultlist;

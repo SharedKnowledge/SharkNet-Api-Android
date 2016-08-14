@@ -1,13 +1,14 @@
 package net.sharksystem.sharknet_api_android.dummy_impl;
 
+import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharksystem.sharknet_api_android.interfaces.Comment;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Feed;
-import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +57,11 @@ public class ImplFeed implements Feed {
 	}
 
 	@Override
+	public void setInterest(Interest interest) {
+
+	}
+
+	@Override
 	public Interest getInterest() {
 		return interest;
 	}
@@ -63,6 +69,11 @@ public class ImplFeed implements Feed {
 	@Override
 	public Timestamp getTimestamp() {
 		return datetime;
+	}
+
+	@Override
+	public void setContent(InputStream inputStream, String messageString, String mimeType) throws SharkKBException {
+
 	}
 
 	@Override
@@ -137,11 +148,6 @@ public class ImplFeed implements Feed {
 	public void setDisliked(boolean disliked) {
 		isDisliked = disliked;
 		//ToDo: Shark - safe that the message was isDisliked
-	}
-
-	@Override
-	public Profile getOwner() {
-		return owner;
 	}
 
 	@Override

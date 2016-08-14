@@ -1,7 +1,7 @@
 package net.sharksystem.sharknet_api_android.impl;
 
+import net.sharkfw.knowledgeBase.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
-import net.sharksystem.sharknet_api_android.interfaces.Interest;
 import net.sharksystem.sharknet_api_android.interfaces.Setting;
 
 import java.util.List;

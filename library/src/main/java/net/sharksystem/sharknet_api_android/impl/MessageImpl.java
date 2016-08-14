@@ -31,7 +31,6 @@ import java.util.List;
 public class MessageImpl implements Message {
 
     final static String MESSAGE_SENDER = "MESSAGE_SENDER";
-    final static String MESSAGE_RECIPIENTS = "MESSAGE_RECIPIENTS";
     final static String MESSAGE_IS_SIGNED = "MESSAGE_IS_SIGNED";
     final static String MESSAGE_IS_ENCRYPTED = "MESSAGE_IS_SIGNED";
     final static String MESSAGE_IS_DISLIKED = "MESSAGE_IS_DISLIKED";

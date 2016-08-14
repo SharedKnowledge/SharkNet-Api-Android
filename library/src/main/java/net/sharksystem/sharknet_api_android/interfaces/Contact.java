@@ -1,5 +1,6 @@
 package net.sharksystem.sharknet_api_android.interfaces;
 
+import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 

@@ -1,5 +1,7 @@
 package net.sharksystem.sharknet_api_android.interfaces;
 
+import net.sharkfw.knowledgeBase.Interest;
+
 import java.util.List;
 
 /**
