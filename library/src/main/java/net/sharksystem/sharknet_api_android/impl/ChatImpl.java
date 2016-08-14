@@ -36,8 +36,13 @@ import java.util.List;
  */
 public class ChatImpl implements Chat {
 
-    // Chat Types - for the different asipSpaces
+    // Chat Config Information Names
+    public static final String CHAT_RECIPIENTS = "CHAT_RECIPIENTS";
+    public static final String CHAT_OWNER = "CHAT_OWNER";
+    public static final String CHAT_ADMIN = "CHAT_ADMIN";
+    public static final String CHAT_TITLE = "CHAT_TITLE";
 
+    // Chat Types - for the different asipSpaces
     private final SemanticTag mMessageType =
             InMemoSharkKB.createInMemoSemanticTag("MESSAGE", "http://sharksystem.net/message");
 
@@ -46,18 +51,13 @@ public class ChatImpl implements Chat {
 
     private ASIPSpace mChatConfigSpace = null;
 
-    // Chat Config Information Names
-    public static final String CHAT_RECIPIENTS = "CHAT_RECIPIENTS";
-    public static final String CHAT_OWNER = "CHAT_OWNER";
-    public static final String CHAT_ADMIN = "CHAT_ADMIN";
-    public static final String CHAT_TITLE = "CHAT_TITLE";
-
+    // Shark
     private SharkNetEngine mSharkNetEngine;
     private SyncKB mChatKB;
 
     private Comparator<Message> mComparator = new MessageComparator();
 
-    // Called
+
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
         mChatKB = new SyncKB(sharkKB);
         mSharkNetEngine = sharkNetEngine;
@@ -67,7 +67,6 @@ public class ChatImpl implements Chat {
 
     }
 
-    // Called to create a chat
     public ChatImpl(SharkKB sharkKB, List<Contact> recipients, Contact owner) throws SharkKBException, JSONException {
 
         mChatKB = new SyncKB(sharkKB);
@@ -103,6 +102,11 @@ public class ChatImpl implements Chat {
 
     @Override
     public void delete() {
+
+    }
+
+    @Override
+    public void update() {
 
     }
 
@@ -178,7 +182,6 @@ public class ChatImpl implements Chat {
         return messages.subList(startIndex, stopIndex);
     }
 
-
     // Checks if the string is within the Message'S content message :)
     @Override
     public List<Message> getMessages(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
@@ -199,11 +202,6 @@ public class ChatImpl implements Chat {
         }
     }
 
-    @Override
-    public void update() {
-
-    }
-
     private void setContacts(List<Contact> contacts) throws SharkKBException, JSONException {
         PeerSTSet peers = InMemoSharkKB.createInMemoPeerSTSet();
 
@@ -215,8 +213,7 @@ public class ChatImpl implements Chat {
 
         String serializedPeers = ASIPSerializer.serializeSTSet(peers).toString();
 
-        ASIPInformation information = mChatKB.addInformation(serializedPeers, mChatConfigSpace);
-        information.setName(CHAT_RECIPIENTS);
+        SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_RECIPIENTS, serializedPeers);
     }
 
     @Override
@@ -276,11 +273,7 @@ public class ChatImpl implements Chat {
 
     @Override
     public void setTitle(String title) throws SharkKBException {
-        if(title.isEmpty()){
-            return;
-        }
-        ASIPInformation information = mChatKB.addInformation(title, mChatConfigSpace);
-        information.setName(CHAT_TITLE);
+        SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_TITLE, title);
     }
 
     @Override
@@ -290,11 +283,6 @@ public class ChatImpl implements Chat {
             return information.getContentAsString();
         }
         return null;
-    }
-
-    @Override
-    public int getID() {
-        return 0;
     }
 
     @Override
@@ -309,16 +297,9 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public Timestamp getTimestamp() throws SharkKBException {
-        List<Message> messages = getMessages(true);
-        return messages.get(0).getTimestamp();
-    }
-
-    @Override
     public void setAdmin(Contact admin) throws SharkKBException, JSONException {
         String serializedTag = ASIPSerializer.serializeTag(admin.getPST()).toString();
-        ASIPInformation information = mChatKB.addInformation(serializedTag, mChatConfigSpace);
-        information.setName(CHAT_ADMIN);
+        SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_ADMIN, serializedTag);
     }
 
     @Override
@@ -330,5 +311,17 @@ public class ChatImpl implements Chat {
             return mSharkNetEngine.getContactByTag(peerSemanticTag);
         }
         return null;
+    }
+
+    //    TODO getID
+    @Override
+    public int getID() {
+        return 0;
+    }
+
+    @Override
+    public Timestamp getTimestamp() throws SharkKBException {
+        List<Message> messages = getMessages(true);
+        return messages.get(0).getTimestamp();
     }
 }
