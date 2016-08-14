@@ -124,7 +124,7 @@ public class MessageImpl implements Message {
 
     @Override
     public void deleteMessage() throws SharkKBException {
-        // TODO remoovviing Information by Space is correct?
+        // TODO removving Information by Space is correct?
         mChatKB.removeInformation(mInformationSpace.getASIPSpace());
     }
 

@@ -34,7 +34,7 @@ public interface SharkNet {
 	 * returns a list of all safed contacts
 	 * @return
      */
-    List<Contact> getContacts();
+    List<Contact> getContacts() throws SharkKBException;
 
 	/**
 	 * returns a list of all chats
@@ -52,7 +52,7 @@ public interface SharkNet {
 	 * Initializes a Profile an Safes it in the KnowledgeBase
 	 * @return
      */
-	Profile newProfile(String nickname, String deviceID);
+	Profile newProfile(String nickname, String deviceID) throws SharkKBException;
 
 	/**
 	 * Initializes a Chat and safes it in the KnowledgeBase
@@ -65,8 +65,14 @@ public interface SharkNet {
 	 * @param nickname
 	 * @param uid
 	 */
-	Contact newContact(String nickname, String uid, String publicKey);
+	Contact newContact(String nickname, String uid, String publicKey) throws SharkKBException;
 
+	/**
+	 * Adds a Contact to the KnowledgeBase
+	 * @param nickName
+	 * @param uId
+	 */
+	Contact newContact(String nickName, String uId) throws SharkKBException;
 
 	/**
 	 * Set the Profile the User want to use during the session
@@ -75,7 +81,7 @@ public interface SharkNet {
 	 * @return true if the authentification was sucessfull, false if not
      */
 
-	boolean setProfile(Profile myProfile, String password);
+	boolean setActiveProfile(Profile myProfile, String password);
 
 	/**
 	 * Returns the Profile which is active at the moment

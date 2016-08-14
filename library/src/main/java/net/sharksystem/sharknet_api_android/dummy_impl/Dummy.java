@@ -56,7 +56,7 @@ public class Dummy {
 		Profile alice_p  = s.newProfile("alice", "alicesDevice");
 
 		//Aktives Profil ist Alice
-		s.setProfile(alice_p, "");
+		s.setActiveProfile(alice_p, "");
 
 		//Kontakte von Alice und Bob laden
 		Contact alice = alice_p;
@@ -227,7 +227,7 @@ public class Dummy {
 
 
 //Bobs stuff
-		s.setProfile(bob_p, "");
+		s.setActiveProfile(bob_p, "");
 		Contact peter = s.newContact("peter", "dagobert@entenhausen.de", "foo");
 		List<Contact> recipients = new LinkedList<>();
 		recipients.add(peter);
@@ -289,7 +289,7 @@ public class Dummy {
 
 		//Set Default Profile to alice
 
-		s.setProfile(alice_p, "");
+		s.setActiveProfile(alice_p, "");
 	}
 }
 

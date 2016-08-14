@@ -173,7 +173,12 @@ public class ImplSharkNet implements SharkNet {
 	}
 
 	@Override
-	public boolean setProfile(Profile myProfile, String password) {
+	public Contact newContact(String nickName, String uId) {
+		return null;
+	}
+
+	@Override
+	public boolean setActiveProfile(Profile myProfile, String password) {
 		if(myProfile.login(password)){
 			this.myProfile = myProfile;
 			return true;

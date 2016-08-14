@@ -32,7 +32,6 @@ public class ProfileImpl extends ContactImpl implements Profile {
 
     @Override
     public void save() {
-
     }
 
     @Override
@@ -42,7 +41,6 @@ public class ProfileImpl extends ContactImpl implements Profile {
 
     @Override
     public void setPassword(String password) {
-
     }
 
     @Override

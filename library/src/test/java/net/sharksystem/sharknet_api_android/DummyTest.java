@@ -1,8 +1,7 @@
 package net.sharksystem.sharknet_api_android;
 
-import android.util.Log;
-
 import net.sharksystem.sharknet_api_android.dummy_impl.ImplSharkNet;
+import net.sharksystem.sharknet_api_android.impl.BaseTest;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 
 import org.junit.Assert;

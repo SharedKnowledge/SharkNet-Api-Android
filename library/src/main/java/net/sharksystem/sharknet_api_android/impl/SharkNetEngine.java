@@ -31,10 +31,12 @@ public class SharkNetEngine implements SharkNet {
     public static final String SHARKNET_DOMAIN = "sharkknet://";
 
     private static SharkNetEngine sInstance =  null;
+
     // Shark
-    private SharkKB profileKB = null;
-    private SharkKB rootKB = null;
-    private SharkKB contactKB = null;
+    private SharkKB mProfileKB = null;
+    private SharkKB mRootKB = null;
+    private SharkKB mContactKB = null;
+    private List<SharkKB> mChatKBs = new ArrayList<>();
 
     public static SharkNet getSharkNet() throws SharkKBException {
         if(SharkNetEngine.sInstance == null){
@@ -44,30 +46,106 @@ public class SharkNetEngine implements SharkNet {
     }
 
     private SharkNetEngine() throws SharkKBException {
-        this.rootKB = new InMemoSharkKB();
+        mRootKB = new InMemoSharkKB();
         // Create shared KB
-        this.profileKB = createKBFromRoot(this.rootKB);
+        mProfileKB = createKBFromRoot(mRootKB);
+        mContactKB = createKBFromRoot(mRootKB);
     }
+
+    // Profiles
+    //
+    //
 
     @Override
     public List<Profile> getProfiles() throws SharkKBException {
         ArrayList<Profile> profiles = new ArrayList<>();
 
-        Iterator<ASIPInformationSpace> asipInformationSpaceIterator = this.profileKB.informationSpaces();
+        Iterator<ASIPInformationSpace> asipInformationSpaceIterator = mProfileKB.informationSpaces();
         while (asipInformationSpaceIterator.hasNext()){
             ASIPInformationSpace next = asipInformationSpaceIterator.next();
-            ProfileImpl profile = new ProfileImpl(this.profileKB, next);
+            ProfileImpl profile = new ProfileImpl(mProfileKB, next);
             profiles.add(profile);
         }
         return profiles;
     }
 
     @Override
-    public Profile newProfile(String nickname, String deviceID) {
+    public Profile newProfile(String nickname, String deviceID) throws SharkKBException {
+        return new ProfileImpl(mProfileKB, nickname, deviceID);
+    }
 
+
+    // TODO setActiveProfile
+    @Override
+    public boolean setActiveProfile(Profile myProfile, String password) {
+        return false;
+    }
+
+//    TODO getMyProfile
+    @Override
+    public Profile getMyProfile() {
         return null;
     }
 
+    // Contacts
+    //
+    //
+
+    @Override
+    public List<Contact> getContacts() throws SharkKBException {
+        List<Contact> contactList = new ArrayList<>();
+        Iterator<ASIPInformationSpace> iterator = mContactKB.informationSpaces();
+        while (iterator.hasNext()){
+            ASIPInformationSpace next = iterator.next();
+            ContactImpl contact = new ContactImpl(mContactKB, next);
+            contactList.add(contact);
+        }
+        return contactList;
+    }
+
+    @Override
+    public Contact newContact(String nickname, String uid, String publicKey) throws SharkKBException {
+
+        ContactImpl contact = new ContactImpl(mContactKB, nickname, uid);
+        if(!publicKey.isEmpty()){
+            contact.setPublicKey(publicKey);
+        }
+        return contact;
+    }
+
+    @Override
+    public Contact newContact(String nickName, String uId) throws SharkKBException {
+        return newContact(nickName, uId, "");
+    }
+
+    // Chats
+    //
+    //
+
+    @Override
+    public List<Chat> getChats() throws SharkKBException {
+        Iterator<SharkKB> kbIterator = mChatKBs.iterator();
+        ArrayList<Chat> chats = new ArrayList<>();
+        while (kbIterator.hasNext()){
+            SharkKB next = kbIterator.next();
+            chats.add(new ChatImpl(this, next));
+        }
+        return chats;
+    }
+
+    @Override
+    public Chat newChat(List<Contact> recipients) throws SharkKBException, JSONException {
+        InMemoSharkKB inMemoSharkKB = (InMemoSharkKB) createKBFromRoot(mRootKB);
+        mChatKBs.add(inMemoSharkKB);
+
+        return new ChatImpl(inMemoSharkKB, recipients, getMyProfile());
+    }
+
+    // Feeds
+    //
+    //
+
+//    TODO getFeeds
     @Override
     public List<Feed> getFeeds(boolean descending) {
         return null;
@@ -93,70 +171,29 @@ public class SharkNetEngine implements SharkNet {
         return null;
     }
 
-    @Override
-    public List<Contact> getContacts() {
-        return null;
-    }
-
-    // Chat
-
-    private List<SharkKB> chatKBs = new ArrayList<>();
-
-    protected List<SharkKB> getChatKBs(){
-        return this.chatKBs;
-    }
-
-    @Override
-    public List<Chat> getChats() throws SharkKBException {
-        Iterator<SharkKB> kbIterator = getChatKBs().iterator();
-        ArrayList<Chat> chats = new ArrayList<>();
-        while (kbIterator.hasNext()){
-            SharkKB next = kbIterator.next();
-            chats.add(new ChatImpl(this, next));
-        }
-        return chats;
-    }
-
-    @Override
-    public Chat newChat(List<Contact> recipients) throws SharkKBException, JSONException {
-        InMemoSharkKB inMemoSharkKB = (InMemoSharkKB) createKBFromRoot(this.rootKB);
-        this.chatKBs.add(inMemoSharkKB);
-
-        return new ChatImpl(inMemoSharkKB, recipients, getMyProfile());
-    }
-
-    //
-
+//    TODO newFeed
     @Override
     public Feed newFeed(Content content, Interest interest, Contact sender) {
         return null;
     }
 
-    @Override
-    public Contact newContact(String nickname, String uid, String publickey) {
-        return null;
-    }
+    // Misc
+    //
+    //
 
-    @Override
-    public boolean setProfile(Profile myProfile, String password) {
-        return false;
-    }
-
-    @Override
-    public Profile getMyProfile() {
-        return null;
-    }
-
+//  TODO exchangeContactNFC
     @Override
     public void exchangeContactNFC() {
 
     }
 
+//    TODO addListener
     @Override
     public void addListener(Profile p, GetEvents listener) {
 
     }
 
+//    TODO inform
     @Override
     public void removeListener(Profile p, GetEvents listener) {
 
@@ -182,10 +219,10 @@ public class SharkNetEngine implements SharkNet {
 
     }
 
-    // Fassade Getter
+    // Facade Getter
 
     public Contact getContactByTag(PeerSemanticTag tag) throws SharkKBException {
-        return new ContactImpl(this.contactKB, tag);
+        return new ContactImpl(this.mContactKB, tag);
     }
 
     private SharkKB createKBFromRoot(SharkKB sharkKB) throws SharkKBException {
