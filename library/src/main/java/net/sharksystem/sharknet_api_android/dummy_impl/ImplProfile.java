@@ -183,7 +183,7 @@ public class ImplProfile implements Profile {
 	}
 
 	@Override
-	public void addName(String name) {
+	public void setName(String name) {
 	}
 
 	@Override

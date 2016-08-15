@@ -86,7 +86,7 @@ public interface Contact {
 	 * add a real name to the contact
 	 * @param name
      */
-	void addName(String name) throws SharkKBException;
+	void setName(String name) throws SharkKBException;
 
 	/**
 	 * Returns the real name of the contact

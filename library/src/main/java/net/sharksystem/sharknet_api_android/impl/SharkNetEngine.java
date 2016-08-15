@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class SharkNetEngine implements SharkNet {
 
-    public static final String SHARKNET_DOMAIN = "sharkknet://";
+    public static final String SHARKNET_DOMAIN = "sharknet://";
 
     private static SharkNetEngine sInstance =  null;
 

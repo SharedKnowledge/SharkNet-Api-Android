@@ -129,7 +129,7 @@ public class ImplContact implements Contact, StudentContact {
     }
 
     @Override
-    public void addName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

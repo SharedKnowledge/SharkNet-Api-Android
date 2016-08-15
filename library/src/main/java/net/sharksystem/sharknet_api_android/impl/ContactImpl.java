@@ -1,5 +1,7 @@
 package net.sharksystem.sharknet_api_android.impl;
 
+import android.util.Log;
+
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
@@ -10,13 +12,16 @@ import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.system.L;
 import net.sharksystem.sharknet_api_android.interfaces.Contact;
 import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
+import net.sharksystem.sharknet_api_android.utils.ClassHelper;
 import net.sharksystem.sharknet_api_android.utils.SharkNetUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -41,12 +46,18 @@ public class ContactImpl implements Contact {
     private final static String CONTACT_LAST_SEEN = "CONTACT_LAST_SEEN";
 
     public ContactImpl(SharkKB sharkKB, PeerSemanticTag tag) throws SharkKBException {
-
         mSharkKB = sharkKB;
         mSpace = createASIPSpace(tag);
 
+        System.out.println(L.semanticTag2String(tag));
+        System.out.println(L.asipSpace2String(mSpace));
+
+        System.out.println("Name: " + tag.getName());
+        System.out.println("SI: " + tag.getSI()[0]);
+        System.out.println("PST-Name: " + mSpace.getSender().getName());
+
         // SET FIRST INFO - NAME
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NICKNAME, tag.getName());
+        setName(tag.getName());
     }
 
     public ContactImpl(SharkKB sharkKB, String nickname, String deviceId) throws SharkKBException {
@@ -67,16 +78,16 @@ public class ContactImpl implements Contact {
         return mSharkKB.createASIPSpace((SemanticTag) null, null, null, tag, null, null, null, ASIPSpace.DIRECTION_NOTHING);
     }
 
-    private ASIPInformation getInfoByName(String name) throws SharkKBException {
-        Iterator<ASIPInformation> information = mSharkKB.getInformation(mSpace);
-        while (information.hasNext()) {
-            ASIPInformation next = information.next();
-            if (next.getName().equals(name)) {
-                return next;
-            }
-        }
-        return null;
-    }
+//    private ASIPInformation getInfoByName(String name) throws SharkKBException {
+//        Iterator<ASIPInformation> information = mSharkKB.getInformation(mSpace);
+//        while (information.hasNext()) {
+//            ASIPInformation next = information.next();
+//            if (next.getName().equals(name)) {
+//                return next;
+//            }
+//        }
+//        return null;
+//    }
 
 
     @Override
@@ -86,7 +97,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public String getNickname() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTACT_NICKNAME);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_NICKNAME);
         return information != null ? information.getContentAsString() : null;
     }
 
@@ -97,7 +108,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public String getUID() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTACT_UID);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_UID);
         return information != null ? information.getContentAsString() : null;
     }
 
@@ -121,7 +132,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public String getPublicKey() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTACT_PUBLIC_KEY);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_PUBLIC_KEY);
         return information != null ? information.getContentAsString() : null;
     }
 
@@ -183,13 +194,13 @@ public class ContactImpl implements Contact {
     }
 
     @Override
-    public void addName(String name) throws SharkKBException {
+    public void setName(String name) throws SharkKBException {
         SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NAME, name);
     }
 
     @Override
     public String getName() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTACT_NAME);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_NAME);
         return information != null ? information.getContentAsString() : null;
     }
 
@@ -200,7 +211,7 @@ public class ContactImpl implements Contact {
         if (getTelephoneNumber().size() <= 0) {
             SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_TELEPHONE, telephoneNumber);
         } else {
-            ASIPInformation information = getInfoByName(CONTACT_TELEPHONE);
+            ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_TELEPHONE);
             if (information != null) {
                 String content = information.getContentAsString();
                 information.setContent(content + ";" + telephoneNumber);
@@ -210,7 +221,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public List<String> getTelephoneNumber() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTACT_TELEPHONE);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_TELEPHONE);
         if (information != null) {
             String contentAsString = information.getContentAsString();
             String[] split = contentAsString.split(";");
@@ -226,7 +237,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public String getNote() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTACT_NOTE);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_NOTE);
         return information != null ? information.getContentAsString() : null;
     }
 
@@ -237,7 +248,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public String getEmail() throws SharkKBException {
-        ASIPInformation information = getInfoByName(CONTACT_EMAIL);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_EMAIL);
         return information != null ? information.getContentAsString() : null;
     }
 
@@ -261,98 +272,105 @@ public class ContactImpl implements Contact {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ContactImpl contact = (ContactImpl) o;
-
         try {
-            if(getEmail()==null && contact.getEmail()==null){
-                return true;
-            } else if(getEmail()!=null && contact.getEmail()!=null){
-                if(!getEmail().equals(contact.getEmail())) return false;
-            } else return false;
-
-            if(getInterests()==null && contact.getInterests()==null) {
-                return true;
-            } else if(getInterests()!=null && contact.getInterests()!=null){
-                if(!SharkCSAlgebra.identical(getInterests(), contact.getInterests())) return false;
-            } else return false;
-
-            if(getLastWifiContact()==null && contact.getLastWifiContact()==null){
-                return true;
-            } else if(getLastWifiContact()!=null && contact.getLastWifiContact()!=null){
-                if(!getLastWifiContact().equals(contact.getLastWifiContact())) return false;
-            } else return false;
-
-            if(getName()==null && contact.getName()==null){
-                return true;
-            } else if(getName()!=null && contact.getName()!=null){
-                if(!getName().equals(contact.getName())) return false;
-            } else return false;
-
-            if(getNickname()==null && contact.getNickname()==null){
-                return true;
-            } else if(getNickname()!=null && contact.getNickname()!=null){
-                if(!getNickname().equals(contact.getNickname())) return false;
-            } else return false;
-
-            if(getNote()==null && contact.getNote()==null){
-                return true;
-            } else if(getNote()!=null && contact.getNote()!=null){
-                if(!getNote().equals(contact.getNote())) return false;
-            } else return false;
-
-            if(getOwner()==null && contact.getOwner()==null){
-                return true;
-            } else if(getOwner()!=null && contact.getOwner()!=null){
-                if(!getOwner().equals(contact.getOwner())) return false;
-            } else return false;
-
-            if(getPicture()==null && contact.getPicture()==null){
-                return true;
-            } else if(getPicture()!=null && contact.getPicture()!=null){
-                if(!getPicture().equals(contact.getPicture())) return false;
-            } else return false;
-
-            if(getPST()==null && contact.getPST()==null){
-                return true;
-            } else if(getPST()!=null && contact.getPST()!=null){
-                if(!SharkCSAlgebra.identical(getPST(), contact.getPST())) return false;
-            } else return false;
-
-            if(getPublicKey()==null && contact.getPublicKey()==null){
-                return true;
-            } else if(getPublicKey()!=null && contact.getPublicKey()!=null){
-                if(!getPublicKey().equals(contact.getPublicKey())) return false;
-            } else return false;
-
-            if(getPublicKeyExpiration()==null && contact.getPublicKeyExpiration()==null){
-                return true;
-            } else if(getPublicKeyExpiration()!=null && contact.getPublicKeyExpiration()!=null){
-                if(!getPublicKeyExpiration().equals(contact.getPublicKeyExpiration())) return false;
-            } else return false;
-
-            if(getPublicKeyFingerprint()==null && contact.getPublicKeyFingerprint()==null){
-                return true;
-            } else if(getPublicKeyFingerprint()!=null && contact.getPublicKeyFingerprint()!=null){
-                if(!getPublicKeyFingerprint().equals(contact.getPublicKeyFingerprint())) return false;
-            } else return false;
-
-            if(getTelephoneNumber()==null && contact.getTelephoneNumber()==null){
-                return true;
-            } else if(getTelephoneNumber()!=null && contact.getTelephoneNumber()!=null){
-                if(!getTelephoneNumber().equals(contact.getTelephoneNumber())) return false;
-            } else return false;
-
-            if(getUID()==null && contact.getUID()==null){
-                return true;
-            } else if(getUID()!=null && contact.getUID()!=null){
-                if(!getUID().equals(contact.getUID())) return false;
-            } else return false;
-
-            return true;
-        } catch (SharkKBException e) {
+            return ClassHelper.equals(Contact.class, this, o);
+        } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return false;
+
+//        ContactImpl contact = (ContactImpl) o;
+//
+//        try {
+//            if(getEmail()==null && contact.getEmail()==null){
+//                return true;
+//            } else if(getEmail()!=null && contact.getEmail()!=null){
+//                if(!getEmail().equals(contact.getEmail())) return false;
+//            } else return false;
+//
+//            if(getInterests()==null && contact.getInterests()==null) {
+//                return true;
+//            } else if(getInterests()!=null && contact.getInterests()!=null){
+//                if(!SharkCSAlgebra.identical(getInterests(), contact.getInterests())) return false;
+//            } else return false;
+//
+//            if(getLastWifiContact()==null && contact.getLastWifiContact()==null){
+//                return true;
+//            } else if(getLastWifiContact()!=null && contact.getLastWifiContact()!=null){
+//                if(!getLastWifiContact().equals(contact.getLastWifiContact())) return false;
+//            } else return false;
+//
+//            if(getName()==null && contact.getName()==null){
+//                return true;
+//            } else if(getName()!=null && contact.getName()!=null){
+//                if(!getName().equals(contact.getName())) return false;
+//            } else return false;
+//
+//            if(getNickname()==null && contact.getNickname()==null){
+//                return true;
+//            } else if(getNickname()!=null && contact.getNickname()!=null){
+//                if(!getNickname().equals(contact.getNickname())) return false;
+//            } else return false;
+//
+//            if(getNote()==null && contact.getNote()==null){
+//                return true;
+//            } else if(getNote()!=null && contact.getNote()!=null){
+//                if(!getNote().equals(contact.getNote())) return false;
+//            } else return false;
+//
+//            if(getOwner()==null && contact.getOwner()==null){
+//                return true;
+//            } else if(getOwner()!=null && contact.getOwner()!=null){
+//                if(!getOwner().equals(contact.getOwner())) return false;
+//            } else return false;
+//
+//            if(getPicture()==null && contact.getPicture()==null){
+//                return true;
+//            } else if(getPicture()!=null && contact.getPicture()!=null){
+//                if(!getPicture().equals(contact.getPicture())) return false;
+//            } else return false;
+//
+//            if(getPST()==null && contact.getPST()==null){
+//                return true;
+//            } else if(getPST()!=null && contact.getPST()!=null){
+//                if(!SharkCSAlgebra.identical(getPST(), contact.getPST())) return false;
+//            } else return false;
+//
+//            if(getPublicKey()==null && contact.getPublicKey()==null){
+//                return true;
+//            } else if(getPublicKey()!=null && contact.getPublicKey()!=null){
+//                if(!getPublicKey().equals(contact.getPublicKey())) return false;
+//            } else return false;
+//
+//            if(getPublicKeyExpiration()==null && contact.getPublicKeyExpiration()==null){
+//                return true;
+//            } else if(getPublicKeyExpiration()!=null && contact.getPublicKeyExpiration()!=null){
+//                if(!getPublicKeyExpiration().equals(contact.getPublicKeyExpiration())) return false;
+//            } else return false;
+//
+//            if(getPublicKeyFingerprint()==null && contact.getPublicKeyFingerprint()==null){
+//                return true;
+//            } else if(getPublicKeyFingerprint()!=null && contact.getPublicKeyFingerprint()!=null){
+//                if(!getPublicKeyFingerprint().equals(contact.getPublicKeyFingerprint())) return false;
+//            } else return false;
+//
+//            if(getTelephoneNumber()==null && contact.getTelephoneNumber()==null){
+//                return true;
+//            } else if(getTelephoneNumber()!=null && contact.getTelephoneNumber()!=null){
+//                if(!getTelephoneNumber().equals(contact.getTelephoneNumber())) return false;
+//            } else return false;
+//
+//            if(getUID()==null && contact.getUID()==null){
+//                return true;
+//            } else if(getUID()!=null && contact.getUID()!=null){
+//                if(!getUID().equals(contact.getUID())) return false;
+//            } else return false;
+//
+//            return true;
+//        } catch (SharkKBException e) {
+//            e.printStackTrace();
+//        }
+//        return false;
     }
 
 //    TODO Implement hashCode, also for PST and Interest.
