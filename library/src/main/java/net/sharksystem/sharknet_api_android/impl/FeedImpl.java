@@ -57,11 +57,13 @@ public class FeedImpl implements Feed {
         mInformationSpace = informationSpace;
     }
 
+//    TODO setInterest - we just need the Topics, but always treat as ASIPInterest?
     @Override
     public void setInterest(Interest interest) {
 
     }
 
+//    TODO getInterest
     @Override
     public Interest getInterest() {
         return null;
@@ -104,15 +106,17 @@ public class FeedImpl implements Feed {
     }
 
     @Override
-    public void delete() {
-
+    public void delete() throws SharkKBException {
+        mKb.removeInformation(mInformationSpace.getASIPSpace());
     }
 
+//    TODO newComment
     @Override
     public void newComment(Content comment, Contact author) {
 
     }
 
+//    TODO getComments - use static helper methods in SharkNetUtils
     @Override
     public List<Comment> getComments(boolean descending) throws SharkKBException {
         return null;

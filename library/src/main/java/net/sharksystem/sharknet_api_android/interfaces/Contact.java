@@ -23,6 +23,7 @@ public interface Contact {
 	 * @return
      */
     String getNickname() throws SharkKBException;
+
 	void setNickname(String nickname) throws SharkKBException;
 
 
@@ -55,7 +56,7 @@ public interface Contact {
 	/**
 	 * Deletes the Contact from the Database
 	 */
-	void delete();
+	void delete() throws SharkKBException;
 
 	/**
 	 * updates a Contact in the Database
@@ -63,6 +64,7 @@ public interface Contact {
 	void update();
 
 
+	void setInterest(Interest interest);
 	/**
 	 * returns a List of all Interests the profile is interested in
 	 * @return
@@ -133,12 +135,12 @@ public interface Contact {
 	 * Returns the timestamp of the last direct wifi connection with the contact
 	 * @return
      */
-	Timestamp getLastWifiContact();
+	Timestamp getLastWifiContact() throws SharkKBException;
 
 	/**
 	 * Sets the timestamp of the last direct wifi connection with the contact
 	 * @param lastWifiContact
      */
-	void setLastWifiContact(Timestamp lastWifiContact);
+	void setLastWifiContact(Timestamp lastWifiContact) throws SharkKBException;
 
 }

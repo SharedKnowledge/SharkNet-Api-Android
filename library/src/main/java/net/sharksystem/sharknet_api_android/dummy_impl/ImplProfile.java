@@ -163,6 +163,11 @@ public class ImplProfile implements Profile {
 	}
 
 	@Override
+	public void setInterest(Interest interest) {
+
+	}
+
+	@Override
 	public Interest getInterests() {
 		return null;
 	}

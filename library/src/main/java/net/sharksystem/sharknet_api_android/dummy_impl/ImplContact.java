@@ -233,6 +233,11 @@ public class ImplContact implements Contact, StudentContact {
 
     }
 
+    @Override
+    public void setInterest(Interest interest) {
+
+    }
+
     /**
      * Save the Contact to the Database
      */

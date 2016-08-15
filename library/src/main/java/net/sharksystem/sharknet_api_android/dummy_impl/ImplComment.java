@@ -6,6 +6,7 @@ import net.sharksystem.sharknet_api_android.interfaces.Content;
 import net.sharksystem.sharknet_api_android.interfaces.Feed;
 import net.sharksystem.sharknet_api_android.interfaces.Profile;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
@@ -72,6 +73,11 @@ public class ImplComment implements Comment {
 	}
 
 	@Override
+	public void setContent(InputStream stream, String message, String mimeType) {
+		
+	}
+
+	@Override
 	public Content getContent() {
 		return comment;
 	}
@@ -96,7 +102,7 @@ public class ImplComment implements Comment {
 	}
 
 	@Override
-	public boolean isdisliked() {
+	public boolean isDisliked() {
 		return disliked;
 	}
 }

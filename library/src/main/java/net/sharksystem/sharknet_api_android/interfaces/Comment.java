@@ -1,5 +1,6 @@
 package net.sharksystem.sharknet_api_android.interfaces;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 
 /**
@@ -26,11 +27,13 @@ public interface Comment extends Timeable, ContainsContent {
 	 * @return
      */
     Feed getRefFeed();
+
+	void setContent(InputStream stream, String message, String mimeType);
+
 	/**
 	 * returns the content of a comment
 	 * @return
 	 */
-
     Content getContent();
 
 	/**
@@ -47,7 +50,7 @@ public interface Comment extends Timeable, ContainsContent {
 	/**
 	 * Returns if the Comment is isDisliked
 	 */
-	boolean isdisliked();
+	boolean isDisliked();
 
 }
 

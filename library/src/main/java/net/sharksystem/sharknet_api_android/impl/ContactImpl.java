@@ -28,16 +28,16 @@ public class ContactImpl implements Contact {
 
     private SharkKB mSharkKB;
     private ASIPSpace mSpace;
-    public final static String INFONAME_NAME = "INFONAME_NAME";
+    public final static String CONTACT_NAME = "CONTACT_NAME";
 
-    public final static String INFONAME_NICKNAME = "INFONAME_NICKNAME";
-    public final static String INFONAME_UID = "INFONAME_UID";
-    public final static String INFONAME_PICTURE = "INFONAME_PICTURE";
-    public final static String INFONAME_PUBLIC_KEY = "INFONAME_PUBLIC_KEY";
-    public final static String INFONAME_INTEREST = "INFONAME_INTEREST";
-    public final static String INFONAME_TELEPHONE = "INFONAME_TELEPHONE";
-    public final static String INFONAME_EMAIL = "INFONAME_EMAIL";
-    public final static String INFONAME_NOTE = "INFONAME_NOTE";
+    private final static String CONTACT_NICKNAME = "CONTACT_NICKNAME";
+    private final static String CONTACT_UID = "CONTACT_UID";
+    private final static String CONTACT_PUBLIC_KEY = "CONTACT_PUBLIC_KEY";
+    private final static String CONTACT_INTEREST = "CONTACT_INTEREST";
+    private final static String CONTACT_TELEPHONE = "CONTACT_TELEPHONE";
+    private final static String CONTACT_EMAIL = "CONTACT_EMAIL";
+    private final static String CONTACT_NOTE = "CONTACT_NOTE";
+    private final static String CONTACT_LAST_SEEN = "CONTACT_LAST_SEEN";
 
     public ContactImpl(SharkKB sharkKB, PeerSemanticTag tag) throws SharkKBException {
 
@@ -45,7 +45,7 @@ public class ContactImpl implements Contact {
         mSpace = createASIPSpace(tag);
 
         // SET FIRST INFO - NAME
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NICKNAME, tag.getName());
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NICKNAME, tag.getName());
     }
 
     public ContactImpl(SharkKB sharkKB, String nickname, String deviceId) throws SharkKBException {
@@ -85,24 +85,24 @@ public class ContactImpl implements Contact {
 
     @Override
     public String getNickname() throws SharkKBException {
-        ASIPInformation information = getInfoByName(INFONAME_NICKNAME);
+        ASIPInformation information = getInfoByName(CONTACT_NICKNAME);
         return information != null ? information.getContentAsString() : null;
     }
 
     @Override
     public void setNickname(String nickname) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NICKNAME, nickname);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NICKNAME, nickname);
     }
 
     @Override
     public String getUID() throws SharkKBException {
-        ASIPInformation information = getInfoByName(INFONAME_UID);
+        ASIPInformation information = getInfoByName(CONTACT_UID);
         return information != null ? information.getContentAsString() : null;
     }
 
     @Override
     public void setUID(String uid) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NICKNAME, uid);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NICKNAME, uid);
     }
 
     @Override
@@ -120,33 +120,36 @@ public class ContactImpl implements Contact {
 
     @Override
     public String getPublicKey() throws SharkKBException {
-        ASIPInformation information = getInfoByName(INFONAME_PUBLIC_KEY);
+        ASIPInformation information = getInfoByName(CONTACT_PUBLIC_KEY);
         return information != null ? information.getContentAsString() : null;
     }
 
     @Override
     public void setPublicKey(String publicKey) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_PUBLIC_KEY, publicKey);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_PUBLIC_KEY, publicKey);
     }
 
+//    TODO getPublicKeyExpiration
     @Override
     public Timestamp getPublicKeyExpiration() {
         return null;
     }
 
+//    TODO getPublicKeyFingerprint
     @Override
     public String getPublicKeyFingerprint() {
         return null;
     }
 
+//    TODO deleteKey
     @Override
     public void deleteKey() {
 
     }
 
     @Override
-    public void delete() {
-
+    public void delete() throws SharkKBException {
+        mSharkKB.removeInformation(mSpace);
     }
 
     @Override
@@ -155,15 +158,24 @@ public class ContactImpl implements Contact {
     }
 
     @Override
+    public void setInterest(Interest interest) {
+
+    }
+
+    //    TODO getInterests
+    @Override
     public Interest getInterests() {
         return null;
     }
 
+//    TODO isEqual
     @Override
     public boolean isEqual(Contact c) {
         return false;
     }
 
+
+//    TODO getOwner
     @Override
     public Profile getOwner() {
         return null;
@@ -171,12 +183,12 @@ public class ContactImpl implements Contact {
 
     @Override
     public void addName(String name) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NAME, name);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NAME, name);
     }
 
     @Override
     public String getName() throws SharkKBException {
-        ASIPInformation information = getInfoByName(INFONAME_NAME);
+        ASIPInformation information = getInfoByName(CONTACT_NAME);
         return information != null ? information.getContentAsString() : null;
     }
 
@@ -185,9 +197,9 @@ public class ContactImpl implements Contact {
     @Override
     public void addTelephoneNumber(String telephoneNumber) throws SharkKBException {
         if (getTelephoneNumber().size() <= 0) {
-            SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_TELEPHONE, telephoneNumber);
+            SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_TELEPHONE, telephoneNumber);
         } else {
-            ASIPInformation information = getInfoByName(INFONAME_TELEPHONE);
+            ASIPInformation information = getInfoByName(CONTACT_TELEPHONE);
             if (information != null) {
                 String content = information.getContentAsString();
                 information.setContent(content + ";" + telephoneNumber);
@@ -197,7 +209,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public List<String> getTelephoneNumber() throws SharkKBException {
-        ASIPInformation information = getInfoByName(INFONAME_TELEPHONE);
+        ASIPInformation information = getInfoByName(CONTACT_TELEPHONE);
         if (information != null) {
             String contentAsString = information.getContentAsString();
             String[] split = contentAsString.split(";");
@@ -208,33 +220,38 @@ public class ContactImpl implements Contact {
 
     @Override
     public void addNote(String note) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_NOTE, note);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NOTE, note);
     }
 
     @Override
     public String getNote() throws SharkKBException {
-        ASIPInformation information = getInfoByName(INFONAME_NOTE);
+        ASIPInformation information = getInfoByName(CONTACT_NOTE);
         return information != null ? information.getContentAsString() : null;
     }
 
     @Override
     public void setEmail(String email) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, INFONAME_EMAIL, email);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_EMAIL, email);
     }
 
     @Override
     public String getEmail() throws SharkKBException {
-        ASIPInformation information = getInfoByName(INFONAME_EMAIL);
+        ASIPInformation information = getInfoByName(CONTACT_EMAIL);
         return information != null ? information.getContentAsString() : null;
     }
 
     @Override
-    public Timestamp getLastWifiContact() {
+    public Timestamp getLastWifiContact() throws SharkKBException {
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_LAST_SEEN);
+        if(information!=null){
+            String string = information.getContentAsString();
+            return new Timestamp(Long.getLong(string));
+        }
         return null;
     }
 
     @Override
-    public void setLastWifiContact(Timestamp lastWifiContact) {
-
+    public void setLastWifiContact(Timestamp lastWifiContact) throws SharkKBException {
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_LAST_SEEN, String.valueOf(lastWifiContact.getTime()));
     }
 }

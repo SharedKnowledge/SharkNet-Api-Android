@@ -13,11 +13,6 @@ public interface Profile extends Contact{
     Setting getSettings();
 
 	/**
-	 * deletes a Profile
-	 */
-	void delete();
-
-	/**
 	 * Saves the Profile in the KB
 	 */
 	void save();

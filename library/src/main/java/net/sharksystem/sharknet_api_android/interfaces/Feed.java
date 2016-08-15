@@ -44,7 +44,7 @@ public interface Feed extends Timeable, ContainsContent{
 	/**
 	 * Deletes the Feed from the Database
 	 */
-	void delete();
+	void delete() throws SharkKBException;
 
 	/**
 	 * adds and safes a comment to a feed
