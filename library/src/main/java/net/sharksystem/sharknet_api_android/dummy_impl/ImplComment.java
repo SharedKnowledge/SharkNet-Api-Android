@@ -74,7 +74,7 @@ public class ImplComment implements Comment {
 
 	@Override
 	public void setContent(InputStream stream, String message, String mimeType) {
-		
+
 	}
 
 	@Override
