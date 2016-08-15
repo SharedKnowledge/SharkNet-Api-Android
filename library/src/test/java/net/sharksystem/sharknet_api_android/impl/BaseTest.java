@@ -14,21 +14,21 @@ public class BaseTest {
 
     // Member initiation
 
-    private SharkNet mSharkNet;
+    protected SharkNet mSharkNet;
 
     // Creating contacts
 
     // Alice
 
-    private String aliceName = "Alice";
-    private String aliceNickName = "Ali";
-    private String aliceSI = "www.facebook.com/alice";
-    private String aliceMail = "mail://alice.com";
-    private String aliceTelephoneHome = "030 123456789";
-    private String aliceTelephoneMobile = "01177 123456789";
-    private String aliceNote = "This is just a simple note";
+    protected String aliceName = "Alice";
+    protected String aliceNickName = "Ali";
+    protected String aliceSI = "www.facebook.com/alice";
+    protected String aliceMail = "mail://alice.com";
+    protected String aliceTelephoneHome = "030 123456789";
+    protected String aliceTelephoneMobile = "01177 123456789";
+    protected String aliceNote = "This is just a simple note";
 
-    private PeerSemanticTag aliceTag = InMemoSharkKB.createInMemoPeerSemanticTag(aliceName, aliceSI, aliceMail);
+    protected PeerSemanticTag aliceTag = InMemoSharkKB.createInMemoPeerSemanticTag(aliceName, aliceSI, aliceMail);
 
     @Before
     public void init() throws SharkKBException {
