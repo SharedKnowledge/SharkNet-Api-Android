@@ -5,6 +5,7 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 
 import org.json.JSONException;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -46,8 +47,9 @@ public interface SharkNet {
 	/**
 	 * Initializes a new Feed an Safes it in the KnowledgeBase
 	 */
-	Feed newFeed(Content content, Interest interest, Contact sender);
+	Feed newFeed(Content content, Interest interest, Contact sender) throws SharkKBException, JSONException;
 
+	Feed newFeed(InputStream stream, String mimeType, String message, Interest interest, Contact sender) throws SharkKBException, JSONException;
 
 	/**
 	 * Initializes a Profile an Safes it in the KnowledgeBase

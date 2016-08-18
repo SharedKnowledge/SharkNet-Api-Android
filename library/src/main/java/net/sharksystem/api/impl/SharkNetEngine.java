@@ -1,8 +1,10 @@
 package net.sharksystem.api.impl;
 
 import net.sharkfw.asip.ASIPInformationSpace;
+import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
@@ -15,9 +17,11 @@ import net.sharksystem.api.interfaces.GetEvents;
 import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.SharkNet;
+import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,12 +34,17 @@ public class SharkNetEngine implements SharkNet {
 
     public static final String SHARKNET_DOMAIN = "sharknet://";
 
+    private static final SemanticTag mFeedType =
+            InMemoSharkKB.createInMemoSemanticTag("MESSAGE", "http://sharksystem.net/message");
+
     private static SharkNetEngine sInstance =  null;
 
     // Shark
     private SharkKB mProfileKB = null;
     private SharkKB mRootKB = null;
     private SharkKB mContactKB = null;
+    private SharkKB mFeedKB = null;
+    private SharkKB mCommentKB = null;
     private List<SharkKB> mChatKBs = new ArrayList<>();
 
     public static SharkNet getSharkNet() throws SharkKBException {
@@ -50,6 +59,8 @@ public class SharkNetEngine implements SharkNet {
         // Create shared KB
         mProfileKB = createKBFromRoot(mRootKB);
         mContactKB = createKBFromRoot(mRootKB);
+        mFeedKB = createKBFromRoot(mRootKB);
+        mCommentKB = createKBFromRoot(mRootKB);
     }
 
     // Profiles
@@ -173,8 +184,18 @@ public class SharkNetEngine implements SharkNet {
 
 //    TODO newFeed
     @Override
-    public Feed newFeed(Content content, Interest interest, Contact sender) {
+    public Feed newFeed(Content content, Interest interest, Contact sender) throws SharkKBException, JSONException {
         return null;
+    }
+
+    @Override
+    public Feed newFeed(InputStream stream, String mimeType, String message, Interest interest, Contact sender) throws SharkKBException, JSONException {
+        ASIPSpace currentTimeSpace = SharkNetUtils.createCurrentTimeSpace(mFeedKB, mFeedType);
+        Feed feed = new FeedImpl(this, mFeedKB, currentTimeSpace);
+        feed.setContent(stream, message, mimeType);
+        feed.setInterest(interest);
+        feed.setSender(sender);
+        return feed;
     }
 
     // Misc
@@ -223,6 +244,10 @@ public class SharkNetEngine implements SharkNet {
 
     public Contact getContactByTag(PeerSemanticTag tag) throws SharkKBException {
         return new ContactImpl(this.mContactKB, tag);
+    }
+
+    public List<Comment> getCommentsByFeed(Feed feed){
+        return null;
     }
 
     private SharkKB createKBFromRoot(SharkKB sharkKB) throws SharkKBException {

@@ -82,6 +82,11 @@ public class ImplFeed implements Feed {
 	}
 
 	@Override
+	public void setSender(Contact sender) {
+
+	}
+
+	@Override
 	public Contact getSender() {
 		return sender;
 	}

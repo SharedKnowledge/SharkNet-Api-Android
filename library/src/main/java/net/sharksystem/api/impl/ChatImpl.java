@@ -79,12 +79,6 @@ public class ChatImpl implements Chat {
         information.setName(CHAT_OWNER);
     }
 
-    private ASIPSpace createMessageSpace() throws SharkKBException {
-        TimeSemanticTag timeSemanticTag =
-                mChatKB.getTimeSTSet().createTimeSemanticTag(System.currentTimeMillis(), 0);
-        return mChatKB.createASIPSpace(null, mMessageType, null, null, null, timeSemanticTag, null, ASIPSpace.DIRECTION_OUT);
-    }
-
     @Override
     public void sendMessage(Content content) throws SharkKBException {
 //        ASIPSpace space = createMessageSpace();
@@ -94,7 +88,7 @@ public class ChatImpl implements Chat {
 
     @Override
     public void sendMessage(InputStream inputStream, String messageString, String mimeType) throws JSONException, SharkKBException {
-        ASIPSpace space = createMessageSpace();
+        ASIPSpace space = SharkNetUtils.createCurrentTimeSpace(mChatKB, mMessageType);
         MessageImpl message = new MessageImpl(mSharkNetEngine, this, mChatKB, space);
         message.setContent(inputStream, messageString, mimeType);
     }

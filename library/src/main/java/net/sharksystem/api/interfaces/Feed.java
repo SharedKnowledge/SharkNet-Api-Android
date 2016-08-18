@@ -3,6 +3,8 @@ package net.sharksystem.api.interfaces;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SharkKBException;
 
+import org.json.JSONException;
+
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
@@ -35,6 +37,9 @@ public interface Feed extends Timeable, ContainsContent{
 	 * @return
 	 */
     Content getContent() throws SharkKBException;
+
+	void setSender(Contact sender) throws SharkKBException, JSONException;
+
 	/**
 	 * returns the Author of a Feed
 	 * @return
@@ -51,7 +56,6 @@ public interface Feed extends Timeable, ContainsContent{
 	 * @param comment
 	 */
 	void newComment(Content comment, Contact author);
-
 	/**
 	 * Returns a List of comments referencing the feed
 	 * @return
@@ -60,6 +64,7 @@ public interface Feed extends Timeable, ContainsContent{
 	List<Comment> getComments(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) throws SharkKBException;
 	List<Comment> getComments(int startIndex, int stopIndex, boolean descending) throws SharkKBException;
 	List<Comment> getComments(Timestamp start, Timestamp stop, boolean descending) throws SharkKBException;
+
 	List<Comment> getComments(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException;
 
 	/**
@@ -69,10 +74,9 @@ public interface Feed extends Timeable, ContainsContent{
 	 */
 	void setDisliked(boolean disliked) throws SharkKBException;
 
+
 	/**
 	 * Returns if the Comment is isDisliked
 	 */
 	boolean isDisliked() throws SharkKBException;
-
-
 }

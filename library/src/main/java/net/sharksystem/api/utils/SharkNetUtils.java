@@ -2,8 +2,10 @@ package net.sharksystem.api.utils;
 
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPSpace;
+import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.knowledgeBase.TimeSemanticTag;
 import net.sharksystem.api.interfaces.ContainsContent;
 import net.sharksystem.api.interfaces.Timeable;
 
@@ -19,6 +21,12 @@ import java.util.List;
  * Created by j4rvis on 09.08.16.
  */
 public class SharkNetUtils {
+
+    public static ASIPSpace createCurrentTimeSpace(SharkKB kb, SemanticTag type) throws SharkKBException {
+        TimeSemanticTag timeSemanticTag =
+                kb.getTimeSTSet().createTimeSemanticTag(System.currentTimeMillis(), 0);
+        return kb.createASIPSpace(null, type, null, null, null, timeSemanticTag, null, ASIPSpace.DIRECTION_OUT);
+    }
 
     public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, String content) throws SharkKBException {
         ASIPInformation information = kb.addInformation(content, space);

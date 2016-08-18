@@ -94,6 +94,13 @@ public class FeedImpl implements Feed {
     }
 
     @Override
+    public void setSender(Contact sender) throws SharkKBException, JSONException {
+        PeerSemanticTag tag = sender.getPST();
+        String s = ASIPSerializer.serializeTag(tag).toString();
+        SharkNetUtils.setInfoWithName(mKb, mInformationSpace.getASIPSpace(), FEED_SENDER, s);
+    }
+
+    @Override
     public Contact getSender() throws SharkKBException {
         ASIPInformation information = SharkNetUtils.getInfoByName(mKb, mInformationSpace.getASIPSpace(), FEED_SENDER);
         if(information!=null){

@@ -12,7 +12,10 @@ import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.SharkNet;
 
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -142,6 +145,11 @@ public class ImplSharkNet implements SharkNet {
 		if(myProfile == null) return null;
 		Feed f = new ImplFeed(content, interest, sender, myProfile);
 		return f;
+	}
+
+	@Override
+	public Feed newFeed(InputStream stream, String mimeType, String message, Interest interest, Contact sender) throws SharkKBException, JSONException {
+		return null;
 	}
 
 	@Override
