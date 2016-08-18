@@ -28,31 +28,31 @@ public interface Comment extends Timeable, ContainsContent {
 	 * Returns the Feed the comment is referencing
 	 * @return
      */
-    Feed getRefFeed();
+    Feed getRefFeed() throws SharkKBException;
 
-	void setContent(InputStream stream, String message, String mimeType);
+	void setContent(InputStream stream, String message, String mimeType) throws SharkKBException;
 
 	/**
 	 * returns the content of a comment
 	 * @return
 	 */
-    Content getContent();
+    Content getContent() throws SharkKBException;
 
 	/**
 	 * Deletes Comment from DB
 	 */
-	void delete();
+	void delete() throws SharkKBException;
 
 	/**
 	 * marks the Comment as is disliked. Shark will collect dislikes and after an special amount it will inform the author
 	 * @param isDisliked
 	 */
-	void setDisliked(boolean isDisliked);
+	void setDisliked(boolean isDisliked) throws SharkKBException;
 
 	/**
 	 * Returns if the Comment is isDisliked
 	 */
-	boolean isDisliked();
+	boolean isDisliked() throws SharkKBException;
 
 }
 

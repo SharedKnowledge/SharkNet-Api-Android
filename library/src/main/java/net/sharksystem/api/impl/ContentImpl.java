@@ -87,7 +87,7 @@ public class ContentImpl implements Content {
         return 0;
     }
 
-    // TODO
+    // TODO Voting and Reminder
 
     @Override
     public ImplVoting addVoting(String question, boolean singleqoice) {

@@ -57,7 +57,9 @@ public interface Feed extends Timeable, ContainsContent{
 	 * adds and safes a comment to a feed
 	 * @param comment
 	 */
-	void newComment(Content comment, Contact author);
+	Comment newComment(Content comment, Contact author);
+
+	Comment newComment(InputStream stream, String message, String mimeType) throws SharkKBException, JSONException;
 	/**
 	 * Returns a List of comments referencing the feed
 	 * @return

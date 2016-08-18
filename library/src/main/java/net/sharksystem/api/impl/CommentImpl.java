@@ -28,16 +28,15 @@ public class CommentImpl implements Comment {
 
     private static final String COMMENT_SENDER = "COMMENT_SENDER";
     private static final String COMMENT_REF_FEED = "COMMENT_REF_FEED";
+    private static final String COMMENT_IS_DISLIKED = "COMMENT_IS_DISLIKED";
 
     private final SharkNetEngine mEngine;
     private final SharkKB mSharkKB;
-    private final Feed mFeed;
     private ASIPInformationSpace mInformationSpace;
 
     CommentImpl(SharkNetEngine engine, SharkKB kb, ASIPSpace space, Feed feed) throws JSONException, SharkKBException {
         mEngine = engine;
         mSharkKB = kb;
-        mFeed = feed;
 
         // There should not be an InformationSpace yet, so create one by adding the first information
         // by setting the sender
@@ -50,13 +49,14 @@ public class CommentImpl implements Comment {
         if(informationSpaces.hasNext()){
             mInformationSpace = informationSpaces.next();
         }
+
+        SharkNetUtils.setInfoWithName(mSharkKB, mInformationSpace.getASIPSpace(), COMMENT_REF_FEED, feed.getId());
     }
 
-    CommentImpl(SharkNetEngine engine, SharkKB kb, ASIPInformationSpace informationSpace, Feed feed){
+    CommentImpl(SharkNetEngine engine, SharkKB kb, ASIPInformationSpace informationSpace){
         mEngine = engine;
         mSharkKB = kb;
         mInformationSpace = informationSpace;
-        mFeed = feed;
     }
 
     @Override
@@ -83,32 +83,38 @@ public class CommentImpl implements Comment {
     }
 
     @Override
-    public Feed getRefFeed() {
+    public Feed getRefFeed() throws SharkKBException {
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mInformationSpace.getASIPSpace(), COMMENT_REF_FEED);
+        if(information!=null){
+            return mEngine.getFeedById(information.getContentAsString());
+        }
         return null;
     }
 
     @Override
-    public void setContent(InputStream stream, String message, String mimeType) {
-
+    public void setContent(InputStream stream, String message, String mimeType) throws SharkKBException {
+        ContentImpl content = new ContentImpl(mSharkKB, mInformationSpace.getASIPSpace());
+        content.setMimeType(mimeType);
+        content.setInputStream(stream);
+        content.setMessage(message);
     }
 
     @Override
-    public Content getContent() {
-        return null;
+    public Content getContent() throws SharkKBException {
+        return new ContentImpl(mSharkKB, mInformationSpace.getASIPSpace());
     }
 
     @Override
-    public void delete() {
-
+    public void delete() throws SharkKBException {
+        mSharkKB.removeInformation(mInformationSpace.getASIPSpace());
+    }
+    @Override
+    public void setDisliked(boolean disliked) throws SharkKBException {
+        SharkNetUtils.setInfoAsBooleanString(mSharkKB, mInformationSpace.getASIPSpace(), COMMENT_IS_DISLIKED, disliked);
     }
 
     @Override
-    public void setDisliked(boolean isDisliked) {
-
-    }
-
-    @Override
-    public boolean isDisliked() {
-        return false;
+    public boolean isDisliked() throws SharkKBException {
+        return SharkNetUtils.getInfoAsBoolean(mSharkKB, mInformationSpace.getASIPSpace(), COMMENT_IS_DISLIKED);
     }
 }

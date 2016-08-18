@@ -133,8 +133,13 @@ public class ImplFeed implements Feed {
 
 
 	@Override
-	public void newComment(Content comment, Contact author) {
-		Comment c = new ImplComment(comment, author, this, owner);
+	public Comment newComment(Content comment, Contact author) {
+		return new ImplComment(comment, author, this, owner);
+	}
+
+	@Override
+	public Comment newComment(InputStream stream, String message, String mimeType) {
+		return null;
 	}
 
 	/**

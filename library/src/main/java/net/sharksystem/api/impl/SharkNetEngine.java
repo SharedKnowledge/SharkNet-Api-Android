@@ -37,7 +37,7 @@ public class SharkNetEngine implements SharkNet {
     public static final String SHARKNET_DOMAIN = "sharknet://";
 
     private static final SemanticTag mFeedType =
-            InMemoSharkKB.createInMemoSemanticTag("MESSAGE", "http://sharksystem.net/message");
+            InMemoSharkKB.createInMemoSemanticTag("FEED", "http://sharksystem.net/feed");
 
     private static SharkNetEngine sInstance =  null;
 
@@ -158,7 +158,6 @@ public class SharkNetEngine implements SharkNet {
     //
     //
 
-//    TODO getFeeds
     private List<Feed> getFeeds() throws SharkKBException {
         List<Feed> feeds = new ArrayList<>();
         Iterator<ASIPInformationSpace> iterator = mFeedKB.informationSpaces();
@@ -208,7 +207,7 @@ public class SharkNetEngine implements SharkNet {
         return (List<Feed>) SharkNetUtils.sortList(listCuted, ascending);
     }
 
-//    TODO newFeed
+//    TODO newFeed with Content
     @Override
     public Feed newFeed(Content content, Interest interest, Contact sender) throws SharkKBException, JSONException {
         return null;

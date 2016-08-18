@@ -6,10 +6,13 @@ import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.STSet;
+import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.TimeSTSet;
 import net.sharkfw.knowledgeBase.TimeSemanticTag;
+import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharksystem.api.interfaces.Comment;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
@@ -20,6 +23,7 @@ import org.json.JSONException;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,6 +36,10 @@ public class FeedImpl implements Feed {
     private static final String FEED_IS_DISLIKED = "FEED_IS_DISLIKED";
     private static final String FEED_INTEREST = "FEED_INTEREST";
     private static final String FEED_UID = "FEED_UID";
+
+
+    private static final SemanticTag mCommentType =
+            InMemoSharkKB.createInMemoSemanticTag("COMMENT", "http://sharksystem.net/comment");
 
     private final SharkNetEngine mEngine;
     private final SharkKB mKb;
@@ -149,36 +157,66 @@ public class FeedImpl implements Feed {
         mKb.removeInformation(mInformationSpace.getASIPSpace());
     }
 
-//    TODO newComment
+//    TODO newComment with Content
     @Override
-    public void newComment(Content comment, Contact author) {
-
+    public Comment newComment(Content comment, Contact author) {
+        return null;
     }
 
-//    TODO getComments - use static helper methods in SharkNetUtils
+    public Comment newComment(InputStream stream, String message, String mimeType) throws SharkKBException, JSONException {
+        ASIPSpace currentTimeSpace = SharkNetUtils.createCurrentTimeSpace(mEngine.getCommentsKB(), mCommentType);
+        CommentImpl comment = new CommentImpl(mEngine, mEngine.getCommentsKB(), currentTimeSpace, this);
+        comment.setContent(stream, message, mimeType);
+        return comment;
+    }
+
+    public List<Comment> getComments() throws SharkKBException {
+        List<Comment> comments = new ArrayList<>();
+        Iterator<ASIPInformationSpace> iterator = mEngine.getCommentsKB().informationSpaces();
+        while (iterator.hasNext()){
+            ASIPInformationSpace next = iterator.next();
+            if(next == null){
+                continue;
+            }
+            // checks if the infoSpace has an type SemanticTag with the SI from the mMessageType-Tag
+            STSet types = next.getASIPSpace().getTypes();
+            if(types.getSemanticTag(mCommentType.getSI())!=null){
+                CommentImpl comment = new CommentImpl(mEngine, mEngine.getCommentsKB(), next);
+                comments.add(comment);
+            }
+        }
+        return comments;
+    }
+
     @Override
     public List<Comment> getComments(boolean ascending) throws SharkKBException {
-        return null;
+        return (List<Comment>) SharkNetUtils.sortList(getComments(), ascending);
     }
 
     @Override
     public List<Comment> getComments(int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
-        return null;
+        List<Comment> list = (List<Comment>) SharkNetUtils.cutList(getComments(), startIndex, stopIndex);
+        return (List<Comment>) SharkNetUtils.sortList(list, ascending);
     }
 
     @Override
     public List<Comment> getComments(Timestamp start, Timestamp stop, boolean ascending) throws SharkKBException {
-        return null;
+        List<Comment> list = (List<Comment>) SharkNetUtils.cutList(getComments(), start, stop);
+        return (List<Comment>) SharkNetUtils.sortList(list, ascending);
     }
 
     @Override
     public List<Comment> getComments(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
-        return null;
+        List<Comment> listTimestamp = (List<Comment>) SharkNetUtils.cutList(getComments(), start, stop);
+        List<Comment> listCuted = (List<Comment>) SharkNetUtils.cutList(listTimestamp, startIndex, stopIndex);
+        return (List<Comment>) SharkNetUtils.sortList(listCuted, ascending);
     }
 
     @Override
     public List<Comment> getComments(String search, int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
-        return null;
+        List<Comment> listTimestamp = (List<Comment>) SharkNetUtils.cutList(getComments(), startIndex, stopIndex);
+        List<Comment> searched = (List<Comment>) SharkNetUtils.search(search, listTimestamp);
+        return (List<Comment>) SharkNetUtils.sortList(searched, ascending);
     }
 
     @Override
