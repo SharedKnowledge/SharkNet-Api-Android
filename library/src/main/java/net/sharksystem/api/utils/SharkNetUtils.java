@@ -141,7 +141,7 @@ public class SharkNetUtils {
      * @return
      */
 
-    private List<? extends Timeable> cutList(List<? extends Timeable> cutList, Timestamp start, Timestamp stop) throws SharkKBException {
+    public static List<? extends Timeable> cutList(List<? extends Timeable> cutList, Timestamp start, Timestamp stop) throws SharkKBException {
 
         List<Timeable> swapList = new LinkedList<>();
         if (start.before(stop)) {
@@ -179,7 +179,7 @@ public class SharkNetUtils {
      * @param stopIndex
      * @return
      */
-    private List<? extends Timeable> cutList(List<? extends Timeable> cutList, int startIndex, int stopIndex) {
+    public static List<? extends Timeable> cutList(List<? extends Timeable> cutList, int startIndex, int stopIndex) {
         List<Timeable> swapList = new LinkedList<>();
         if (startIndex <= stopIndex && startIndex >= 0 && stopIndex >= 0) {
             if (stopIndex >= cutList.size()) {

@@ -4,6 +4,7 @@ import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
@@ -17,6 +18,7 @@ import net.sharksystem.api.interfaces.GetEvents;
 import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.SharkNet;
+import net.sharksystem.api.interfaces.Timeable;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
@@ -157,29 +159,53 @@ public class SharkNetEngine implements SharkNet {
     //
 
 //    TODO getFeeds
+    private List<Feed> getFeeds() throws SharkKBException {
+        List<Feed> feeds = new ArrayList<>();
+        Iterator<ASIPInformationSpace> iterator = mFeedKB.informationSpaces();
+        while (iterator.hasNext()){
+            ASIPInformationSpace next = iterator.next();
+            if(next == null){
+                continue;
+            }
+            // checks if the infoSpace has an type SemanticTag with the SI from the mMessageType-Tag
+            STSet types = next.getASIPSpace().getTypes();
+            if(types.getSemanticTag(mFeedType.getSI())!=null){
+                Feed feed = new FeedImpl(this, mFeedKB, next);
+                feeds.add(feed);
+            }
+        }
+        return feeds;
+    }
+
     @Override
-    public List<Feed> getFeeds(boolean descending) {
+    public List<Feed> getFeeds(boolean ascending) throws SharkKBException {
+        return (List<Feed>) SharkNetUtils.sortList(getFeeds(), ascending);
+    }
+
+    @Override
+    public List<Feed> getFeeds(int start_index, int stop_index, boolean ascending) throws SharkKBException {
+        List<Feed> list = (List<Feed>) SharkNetUtils.cutList(getFeeds(), start_index, stop_index);
+        return (List<Feed>) SharkNetUtils.sortList(list, ascending);
+    }
+
+    // TODO - getFeeds by Interest
+    @Override
+    public List<Feed> getFeeds(Interest i, int start_index, int stop_index, boolean ascending) {
         return null;
     }
 
     @Override
-    public List<Feed> getFeeds(int start_index, int stop_index, boolean descending) {
-        return null;
+    public List<Feed> getFeeds(String search, int start_index, int stop_index, boolean ascending) throws SharkKBException {
+        List<Feed> listTimestamp = (List<Feed>) SharkNetUtils.cutList(getFeeds(), start_index, stop_index);
+        List<Feed> searched = (List<Feed>) SharkNetUtils.search(search, listTimestamp);
+        return (List<Feed>) SharkNetUtils.sortList(searched, ascending);
     }
 
     @Override
-    public List<Feed> getFeeds(Interest i, int start_index, int stop_index, boolean descending) {
-        return null;
-    }
-
-    @Override
-    public List<Feed> getFeeds(String search, int start_index, int stop_index, boolean descending) {
-        return null;
-    }
-
-    @Override
-    public List<Feed> getFeeds(Timestamp start, Timestamp end, int start_index, int stop_index, boolean descending) {
-        return null;
+    public List<Feed> getFeeds(Timestamp start, Timestamp end, int start_index, int stop_index, boolean ascending) throws SharkKBException {
+        List<Feed> listTimestamp = (List<Feed>) SharkNetUtils.cutList(getFeeds(), start, end);
+        List<Feed> listCuted = (List<Feed>) SharkNetUtils.cutList(listTimestamp, start_index, stop_index);
+        return (List<Feed>) SharkNetUtils.sortList(listCuted, ascending);
     }
 
 //    TODO newFeed
@@ -242,12 +268,12 @@ public class SharkNetEngine implements SharkNet {
 
     // Facade Getter
 
-    public Contact getContactByTag(PeerSemanticTag tag) throws SharkKBException {
-        return new ContactImpl(this.mContactKB, tag);
+    public SharkKB getCommentsKB(){
+        return mCommentKB;
     }
 
-    public List<Comment> getCommentsByFeed(Feed feed){
-        return null;
+    public Contact getContactByTag(PeerSemanticTag tag) throws SharkKBException {
+        return new ContactImpl(this.mContactKB, tag);
     }
 
     private SharkKB createKBFromRoot(SharkKB sharkKB) throws SharkKBException {

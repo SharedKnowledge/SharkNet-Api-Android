@@ -60,12 +60,12 @@ public interface Feed extends Timeable, ContainsContent{
 	 * Returns a List of comments referencing the feed
 	 * @return
      */
-    List<Comment> getComments(boolean descending) throws SharkKBException;
-	List<Comment> getComments(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) throws SharkKBException;
-	List<Comment> getComments(int startIndex, int stopIndex, boolean descending) throws SharkKBException;
-	List<Comment> getComments(Timestamp start, Timestamp stop, boolean descending) throws SharkKBException;
+    List<Comment> getComments(boolean ascending) throws SharkKBException;
+	List<Comment> getComments(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean ascending) throws SharkKBException;
+	List<Comment> getComments(int startIndex, int stopIndex, boolean ascending) throws SharkKBException;
+	List<Comment> getComments(Timestamp start, Timestamp stop, boolean ascending) throws SharkKBException;
 
-	List<Comment> getComments(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException;
+	List<Comment> getComments(String search, int startIndex, int stopIndex, boolean ascending) throws SharkKBException;
 
 	/**
 	 * Marks this Feed as disliked, Shark will collect dislikes and after an special amount it will inform the author

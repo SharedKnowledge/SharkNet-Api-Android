@@ -15,8 +15,11 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
+import net.sharksystem.api.interfaces.ContainsContent;
 import net.sharksystem.api.interfaces.Content;
+import net.sharksystem.api.interfaces.Feed;
 import net.sharksystem.api.interfaces.Message;
+import net.sharksystem.api.interfaces.Timeable;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
@@ -53,9 +56,6 @@ public class ChatImpl implements Chat {
     // Shark
     private SharkNetEngine mSharkNetEngine;
     private SyncKB mChatKB;
-
-    private Comparator<Message> mComparator = new MessageComparator();
-
 
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
         mChatKB = new SyncKB(sharkKB);
@@ -103,8 +103,7 @@ public class ChatImpl implements Chat {
 
     }
 
-    @Override
-    public List<Message> getMessages(boolean descending) throws SharkKBException {
+    private List<Message> getMessages() throws SharkKBException {
         ArrayList<Message> messages = new ArrayList<>();
         Iterator<ASIPInformationSpace> informationSpaces = mChatKB.informationSpaces();
         while (informationSpaces.hasNext()){
@@ -119,80 +118,38 @@ public class ChatImpl implements Chat {
                 messages.add(message);
             }
         }
-
-        if(!messages.isEmpty()){
-            Collections.sort(messages, mComparator);
-            if(descending){
-                Collections.reverse(messages);
-            }
-            return messages;
-        }
-        return null;
+        return messages;
     }
 
     @Override
-    public List<Message> getMessages(int startIndex, int stopIndex, boolean descending) throws SharkKBException {
-        List<Message> messages = getMessages(false);
-        List<Message> subList = messages.subList(startIndex, stopIndex);
-        Collections.sort(subList, mComparator);
-        if(descending){
-            Collections.reverse(subList);
-        }
-        return subList;
+    public List<Message> getMessages(boolean ascending) throws SharkKBException {
+        return (List<Message>) SharkNetUtils.sortList(getMessages(), ascending);
     }
 
     @Override
-    public List<Message> getMessages(Timestamp start, Timestamp stop, boolean descending) throws SharkKBException {
-        List<Message> messages = getMessages(false);
-
-        int startIndex = -1;
-        int lastIndex = -1;
-
-        for (int i = 0; i < messages.size(); i++){
-            Message message = messages.get(i);
-            if(message.getTimestamp().after(start) && startIndex == -1){
-                startIndex = i;
-            } else if(message.getTimestamp().before(stop)){
-                lastIndex = i;
-            }
-        }
-
-        List<Message> subList = messages.subList(startIndex, lastIndex);
-        Collections.sort(subList, mComparator);
-        if(descending){
-            Collections.reverse(subList);
-        }
-        if(subList.isEmpty()){
-            return null;
-        } else {
-            return subList;
-        }
+    public List<Message> getMessages(int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
+        List<Feed> list = (List<Feed>) SharkNetUtils.cutList(getMessages(), startIndex, stopIndex);
+        return (List<Message>) SharkNetUtils.sortList(list, ascending);
     }
 
     @Override
-    public List<Message> getMessages(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
-        List<Message> messages = getMessages(start, stop, descending);
+    public List<Message> getMessages(Timestamp start, Timestamp stop, boolean ascending) throws SharkKBException {
+        List<Feed> list = (List<Feed>) SharkNetUtils.cutList(getMessages(), start, stop);
+        return (List<Message>) SharkNetUtils.sortList(list, ascending);
+    }
+
+    @Override
+    public List<Message> getMessages(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
+        List<Message> messages = getMessages(start, stop, ascending);
         return messages.subList(startIndex, stopIndex);
     }
 
-    // Checks if the string is within the Message'S content message :)
+    // Checks if the string is within the Message's content message :)
     @Override
-    public List<Message> getMessages(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
-        List<Message> messages = getMessages(startIndex, stopIndex, descending);
-
-        if(messages.isEmpty()){
-            return null;
-        } else {
-            ArrayList<Message> list = new ArrayList<>();
-            Iterator<Message> iterator = messages.iterator();
-            while (iterator.hasNext()){
-                Message next = iterator.next();
-                if (next.getContent().getMessage().contains(search)){
-                    list.add(next);
-                }
-            }
-            return list;
-        }
+    public List<Message> getMessages(String search, int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
+        List<Feed> containsContents = (List<Feed>) SharkNetUtils.search(search, getMessages());
+        List<Feed> cutList = (List<Feed>) SharkNetUtils.cutList(containsContents, startIndex, stopIndex);
+        return (List<Message>) SharkNetUtils.sortList(cutList, ascending);
     }
 
     private void setContacts(List<Contact> contacts) throws SharkKBException, JSONException {

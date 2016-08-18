@@ -26,11 +26,11 @@ public interface SharkNet {
 	 * Returns a list of all Feeds which should be displayed in the Timeline
 	 * @return
      */
-	List<Feed> getFeeds(boolean descending);
-    List<Feed> getFeeds(int start_index, int stop_index, boolean descending);
-	List<Feed> getFeeds(Interest i, int start_index, int stop_index, boolean descending);
-	List<Feed> getFeeds(String search, int start_index, int stop_index, boolean descending);
-	List<Feed> getFeeds(Timestamp start, Timestamp end, int start_index, int stop_index, boolean descending);
+	List<Feed> getFeeds(boolean ascending) throws SharkKBException;
+    List<Feed> getFeeds(int start_index, int stop_index, boolean ascending) throws SharkKBException;
+	List<Feed> getFeeds(Interest i, int start_index, int stop_index, boolean ascending);
+	List<Feed> getFeeds(String search, int start_index, int stop_index, boolean ascending) throws SharkKBException;
+	List<Feed> getFeeds(Timestamp start, Timestamp end, int start_index, int stop_index, boolean ascending) throws SharkKBException;
 
 	/**
 	 * returns a list of all safed contacts

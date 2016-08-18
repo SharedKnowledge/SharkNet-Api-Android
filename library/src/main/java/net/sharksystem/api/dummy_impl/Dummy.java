@@ -63,8 +63,6 @@ public class Dummy {
 		//Profilbilder von Alice und Bob setzen
 
 
-
-
 //		File filealice = Resources.get("Alice.jpg");
 //		Content alicecon = new ImplContent(alice_p);
 ////		alicecon.setFile(filealice);

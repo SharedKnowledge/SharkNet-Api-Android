@@ -98,6 +98,7 @@ public class FeedImpl implements Feed {
         return new ContentImpl(mKb, mInformationSpace.getASIPSpace());
     }
 
+//    TODO setSender unnecessary
     @Override
     public void setSender(Contact sender) throws SharkKBException, JSONException {
         PeerSemanticTag tag = sender.getPST();
@@ -129,27 +130,27 @@ public class FeedImpl implements Feed {
 
 //    TODO getComments - use static helper methods in SharkNetUtils
     @Override
-    public List<Comment> getComments(boolean descending) throws SharkKBException {
+    public List<Comment> getComments(boolean ascending) throws SharkKBException {
         return null;
     }
 
     @Override
-    public List<Comment> getComments(int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+    public List<Comment> getComments(int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
         return null;
     }
 
     @Override
-    public List<Comment> getComments(Timestamp start, Timestamp stop, boolean descending) throws SharkKBException {
+    public List<Comment> getComments(Timestamp start, Timestamp stop, boolean ascending) throws SharkKBException {
         return null;
     }
 
     @Override
-    public List<Comment> getComments(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+    public List<Comment> getComments(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
         return null;
     }
 
     @Override
-    public List<Comment> getComments(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+    public List<Comment> getComments(String search, int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
         return null;
     }
 

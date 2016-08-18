@@ -36,7 +36,7 @@ public class ImplSharkNet implements SharkNet {
 	}
 
 	@Override
-	public List<Feed> getFeeds(boolean descending) {
+	public List<Feed> getFeeds(boolean ascending) {
 		//ToDo: Shark - Search in KB for Feeds and return a list of them - sorted by Time
 
 		if(myProfile == null) return null;
@@ -44,7 +44,7 @@ public class ImplSharkNet implements SharkNet {
 		//Implementation of DummyDB
 		List<Feed> feed_list = null;
 		try {
-			feed_list = DummyDB.getInstance().getFeed_list(myProfile, descending);
+			feed_list = DummyDB.getInstance().getFeed_list(myProfile, ascending);
 		} catch (SharkKBException e) {
 			e.printStackTrace();
 		}
@@ -52,14 +52,14 @@ public class ImplSharkNet implements SharkNet {
 	}
 
 	@Override
-	public List<Feed> getFeeds(int start_index, int stop_index, boolean descending) {
+	public List<Feed> getFeeds(int start_index, int stop_index, boolean ascending) {
 		//ToDo: Shark - Search in KB for Feeds and return a list of them within the given intervall - sorted by time
 
 		//Implementation of DummyDB
 		if(myProfile == null) return null;
 		List<Feed> feed_list = null;
 		try {
-			feed_list = DummyDB.getInstance().getFeed_list(myProfile, start_index, stop_index, descending);
+			feed_list = DummyDB.getInstance().getFeed_list(myProfile, start_index, stop_index, ascending);
 		} catch (SharkKBException e) {
 			e.printStackTrace();
 		}
@@ -67,13 +67,13 @@ public class ImplSharkNet implements SharkNet {
 	}
 
 	@Override
-	public List<Feed> getFeeds(Interest i, int start_index, int stop_index, boolean descending) {
+	public List<Feed> getFeeds(Interest i, int start_index, int stop_index, boolean ascending) {
 
 		//ToDo: Shark - return feeds with interest i from start to stop, sorted by time
 		if(myProfile == null) return null;
 		List<Feed> feed_list = null;
 		try {
-			feed_list = DummyDB.getInstance().getFeed_list(myProfile, i, start_index, stop_index, descending);
+			feed_list = DummyDB.getInstance().getFeed_list(myProfile, i, start_index, stop_index, ascending);
 		} catch (SharkKBException e) {
 			e.printStackTrace();
 		}
@@ -81,13 +81,13 @@ public class ImplSharkNet implements SharkNet {
 	}
 
 	@Override
-	public List<Feed> getFeeds(String search, int start_index, int stop_index, boolean descending) {
+	public List<Feed> getFeeds(String search, int start_index, int stop_index, boolean ascending) {
 		//ToDo: Shark - Search in KB for Feeds and return a list of them within the given intervall and containing the search string - sorted by time
 		//Implementation of DummyDB
 		if(myProfile == null) return null;
 		List<Feed> feed_list = null;
 		try {
-			feed_list = DummyDB.getInstance().getFeed_list(myProfile,search, start_index, stop_index, descending);
+			feed_list = DummyDB.getInstance().getFeed_list(myProfile,search, start_index, stop_index, ascending);
 		} catch (SharkKBException e) {
 			e.printStackTrace();
 		}
@@ -96,7 +96,7 @@ public class ImplSharkNet implements SharkNet {
 	}
 
 	@Override
-	public List<Feed> getFeeds(Timestamp start, Timestamp end, int start_index, int stop_index, boolean descending) {
+	public List<Feed> getFeeds(Timestamp start, Timestamp end, int start_index, int stop_index, boolean ascending) {
 
 		//ToDo: Shark - Search in KB for Feeds and return a list of them within the given intervall and timerange - sorted by time
 
@@ -104,7 +104,7 @@ public class ImplSharkNet implements SharkNet {
 		if(myProfile == null) return null;
 		List<Feed> feed_list = null;
 		try {
-			feed_list = DummyDB.getInstance().getFeed_list(myProfile, start_index, stop_index, start, end, descending);
+			feed_list = DummyDB.getInstance().getFeed_list(myProfile, start_index, stop_index, start, end, ascending);
 		} catch (SharkKBException e) {
 			e.printStackTrace();
 		}

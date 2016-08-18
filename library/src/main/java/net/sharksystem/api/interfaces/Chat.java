@@ -31,11 +31,11 @@ public interface Chat extends Timeable {
 	 * returns a List of all Messages within the Chat
 	 * @return
      */
-    List<Message> getMessages(boolean descending) throws SharkKBException;
-	List<Message> getMessages(int startIndex, int stopIndex, boolean descending) throws SharkKBException;
-	List<Message> getMessages(Timestamp start, Timestamp stop, boolean descending) throws SharkKBException;
-	List<Message> getMessages(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) throws SharkKBException;
-	List<Message> getMessages(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException;
+    List<Message> getMessages(boolean ascending) throws SharkKBException;
+	List<Message> getMessages(int startIndex, int stopIndex, boolean ascending) throws SharkKBException;
+	List<Message> getMessages(Timestamp start, Timestamp stop, boolean ascending) throws SharkKBException;
+	List<Message> getMessages(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean ascending) throws SharkKBException;
+	List<Message> getMessages(String search, int startIndex, int stopIndex, boolean ascending) throws SharkKBException;
 
 
 	/**

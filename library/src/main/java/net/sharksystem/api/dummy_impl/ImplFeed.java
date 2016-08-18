@@ -92,37 +92,37 @@ public class ImplFeed implements Feed {
 	}
 
 	@Override
-	public List<Comment> getComments(boolean descending) throws SharkKBException {
+	public List<Comment> getComments(boolean ascending) throws SharkKBException {
 		//ToDo: Shark - search for comments construct the objects and fill the list - sorted by time
-		List<Comment> commentlist = DummyDB.getInstance().getComments(this, descending);
+		List<Comment> commentlist = DummyDB.getInstance().getComments(this, ascending);
 		return commentlist;
 	}
 
 	@Override
-	public List<Comment> getComments(int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+	public List<Comment> getComments(int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
 		//ToDo: Shark - search for comments within the intervall - sorted by time
-		List<Comment> commentlist = DummyDB.getInstance().getComments(this, startIndex, stopIndex, descending);
+		List<Comment> commentlist = DummyDB.getInstance().getComments(this, startIndex, stopIndex, ascending);
 		return commentlist;
 	}
 
 	@Override
-	public List<Comment> getComments(Timestamp start, Timestamp stop, boolean descending) throws SharkKBException {
+	public List<Comment> getComments(Timestamp start, Timestamp stop, boolean ascending) throws SharkKBException {
 		//ToDo: Shark - search for comments within the timerange  - sorted by time
-		List<Comment> commentlist = DummyDB.getInstance().getComments(this, start, stop, descending);
+		List<Comment> commentlist = DummyDB.getInstance().getComments(this, start, stop, ascending);
 		return commentlist;
 	}
 
 	@Override
-	public List<Comment> getComments(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+	public List<Comment> getComments(Timestamp start, Timestamp stop, int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
 		//ToDo: Shark - search for comments within the timerange and intervall - sorted by time
-		List<Comment> commentlist = DummyDB.getInstance().getComments(this, startIndex, stopIndex, start, stop, descending);
+		List<Comment> commentlist = DummyDB.getInstance().getComments(this, startIndex, stopIndex, start, stop, ascending);
 		return commentlist;
 	}
 
 	@Override
-	public List<Comment> getComments(String search, int startIndex, int stopIndex, boolean descending) throws SharkKBException {
+	public List<Comment> getComments(String search, int startIndex, int stopIndex, boolean ascending) throws SharkKBException {
 		//ToDo: Shark - search for comments within the intervall containing the searchstring - sorted by time
-		List<Comment> commentlist = DummyDB.getInstance().getComments(this, search,  startIndex, stopIndex, descending);
+		List<Comment> commentlist = DummyDB.getInstance().getComments(this, search,  startIndex, stopIndex, ascending);
 		return commentlist;
 	}
 
