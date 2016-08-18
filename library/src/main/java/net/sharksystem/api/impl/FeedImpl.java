@@ -28,8 +28,9 @@ import java.util.List;
  */
 public class FeedImpl implements Feed {
 
-    public static final String FEED_SENDER = "FEED_SENDER";
-    public static final String FEED_IS_DISLIKED = "FEED_IS_DISLIKED";
+    private static final String FEED_SENDER = "FEED_SENDER";
+    private static final String FEED_IS_DISLIKED = "FEED_IS_DISLIKED";
+    private static final String FEED_INTEREST = "FEED_INTEREST";
 
     private final SharkNetEngine mEngine;
     private final SharkKB mKb;
@@ -56,15 +57,19 @@ public class FeedImpl implements Feed {
         mInformationSpace = informationSpace;
     }
 
-//    TODO setInterest - we just need the Topics, but always treat as ASIPInterest?
     @Override
-    public void setInterest(Interest interest) {
-
+    public void setInterest(Interest interest) throws SharkKBException {
+        String s = ASIPSerializer.serializeASIPSpace((ASIPSpace) interest).toString();
+        SharkNetUtils.setInfoWithName(mKb, mInformationSpace.getASIPSpace(), FEED_INTEREST, s);
     }
 
-//    TODO getInterest
     @Override
-    public Interest getInterest() {
+    public Interest getInterest() throws SharkKBException {
+        ASIPInformation information =
+                SharkNetUtils.getInfoByName(mKb, mInformationSpace.getASIPSpace(), FEED_INTEREST);
+        if(information!=null){
+            return (Interest) ASIPSerializer.deserializeASIPInterest(information.getContentAsString());
+        }
         return null;
     }
 

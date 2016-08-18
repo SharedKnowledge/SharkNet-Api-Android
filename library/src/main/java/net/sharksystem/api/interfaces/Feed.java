@@ -16,13 +16,13 @@ import java.util.List;
  */
 public interface Feed extends Timeable, ContainsContent{
 
-	void setInterest(Interest interest);
+	void setInterest(Interest interest) throws SharkKBException;
 
 	/**
 	 * Returns the name of the interest the feed references to
 	 * @return
      */
-    Interest getInterest();
+    Interest getInterest() throws SharkKBException;
 
 	/**
 	 * Returns Date and Time when the feed was created
