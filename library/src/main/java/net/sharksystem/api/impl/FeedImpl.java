@@ -31,6 +31,7 @@ public class FeedImpl implements Feed {
     private static final String FEED_SENDER = "FEED_SENDER";
     private static final String FEED_IS_DISLIKED = "FEED_IS_DISLIKED";
     private static final String FEED_INTEREST = "FEED_INTEREST";
+    private static final String FEED_UID = "FEED_UID";
 
     private final SharkNetEngine mEngine;
     private final SharkKB mKb;
@@ -49,12 +50,17 @@ public class FeedImpl implements Feed {
         if(informationSpaces.hasNext()){
             mInformationSpace = informationSpaces.next();
         }
+        setId();
     }
 
-    FeedImpl(SharkNetEngine engine, SharkKB kb, ASIPInformationSpace informationSpace){
+    FeedImpl(SharkNetEngine engine, SharkKB kb, ASIPInformationSpace informationSpace) throws SharkKBException {
         mEngine = engine;
         mKb = kb;
         mInformationSpace = informationSpace;
+
+        if(getId().isEmpty()){
+            setId();
+        }
     }
 
     @Override
@@ -69,6 +75,27 @@ public class FeedImpl implements Feed {
                 SharkNetUtils.getInfoByName(mKb, mInformationSpace.getASIPSpace(), FEED_INTEREST);
         if(information!=null){
             return (Interest) ASIPSerializer.deserializeASIPInterest(information.getContentAsString());
+        }
+        return null;
+    }
+
+    private void setId() throws SharkKBException {
+        String name = getSender().getName();
+        String si = getSender().getPST().getSI()[0];
+        int timestamp = getTimestamp().getNanos();
+
+        SharkNetUtils.setInfoWithName(
+                mKb,
+                mInformationSpace.getASIPSpace(),
+                FEED_UID,
+                name + "_" + si + "_" + timestamp
+        );
+    }
+
+    public String getId() throws SharkKBException {
+        ASIPInformation information = SharkNetUtils.getInfoByName(mKb, mInformationSpace.getASIPSpace(), FEED_UID);
+        if(information!=null){
+            return information.getContentAsString();
         }
         return null;
     }

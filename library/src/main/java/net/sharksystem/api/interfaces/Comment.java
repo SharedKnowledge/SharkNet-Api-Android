@@ -1,5 +1,7 @@
 package net.sharksystem.api.interfaces;
 
+import net.sharkfw.knowledgeBase.SharkKBException;
+
 import java.io.InputStream;
 import java.sql.Timestamp;
 
@@ -14,13 +16,13 @@ public interface Comment extends Timeable, ContainsContent {
 	 * Returns the author of a comment
 	 * @return
      */
-    Contact getSender();
+    Contact getSender() throws SharkKBException;
 
 	/**
 	 * Returns the Date and Time a comment was created
 	 * @return
      */
-    Timestamp getTimestamp();
+    Timestamp getTimestamp() throws SharkKBException;
 
 	/**
 	 * Returns the Feed the comment is referencing

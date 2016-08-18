@@ -268,6 +268,18 @@ public class SharkNetEngine implements SharkNet {
 
     // Facade Getter
 
+    public Feed getFeedById(String id) throws SharkKBException {
+        List<Feed> list = getFeeds();
+        Iterator<Feed> iterator = list.iterator();
+        while (iterator.hasNext()){
+            Feed next = iterator.next();
+            if(next.getId().equals(id)){
+                return next;
+            }
+        }
+        return null;
+    }
+
     public SharkKB getCommentsKB(){
         return mCommentKB;
     }

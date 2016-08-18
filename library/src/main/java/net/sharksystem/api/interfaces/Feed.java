@@ -16,6 +16,8 @@ import java.util.List;
  */
 public interface Feed extends Timeable, ContainsContent{
 
+	String getId() throws SharkKBException;
+
 	void setInterest(Interest interest) throws SharkKBException;
 
 	/**

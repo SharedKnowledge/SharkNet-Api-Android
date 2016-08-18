@@ -57,6 +57,11 @@ public class ImplFeed implements Feed {
 	}
 
 	@Override
+	public String getId() throws SharkKBException {
+		return null;
+	}
+
+	@Override
 	public void setInterest(Interest interest) {
 
 	}
