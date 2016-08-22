@@ -20,9 +20,6 @@ public class ContactTest extends BaseTest {
         List<Contact> contacts = mSharkNet.getContacts();
         Contact next = contacts.iterator().next();
 
-        System.out.println("Next: " + next.getName());
-        System.out.println("Contact: " + contact.getName());
-
         Assert.assertTrue(contact.equals(next));
     }
 }

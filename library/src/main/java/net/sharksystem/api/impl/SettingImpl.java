@@ -1,14 +1,18 @@
 package net.sharksystem.api.impl;
 
+import com.google.common.hash.HashCode;
+
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Setting;
+import net.sharksystem.api.utils.ClassHelper;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -52,6 +56,19 @@ public class SettingImpl implements Setting {
     SettingImpl(SharkKB kb, ASIPSpace space){
         mKb = kb;
         mSpace = space;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        try {
+            return ClassHelper.equals(Setting.class, this, o);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override

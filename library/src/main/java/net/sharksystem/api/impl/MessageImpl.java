@@ -13,11 +13,13 @@ import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
 import net.sharksystem.api.interfaces.Message;
+import net.sharksystem.api.utils.ClassHelper;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
@@ -182,6 +184,19 @@ public class MessageImpl implements Message {
     @Override
     public boolean isDirectReceived() throws SharkKBException {
         return SharkNetUtils.getInfoAsBoolean(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_DIRECT_RECEIVED);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        try {
+            return ClassHelper.equals(Message.class, this, o);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

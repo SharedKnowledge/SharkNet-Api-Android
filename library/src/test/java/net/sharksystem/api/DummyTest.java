@@ -1,5 +1,6 @@
 package net.sharksystem.api;
 
+import net.sharksystem.api.impl.ContactImpl;
 import net.sharksystem.api.interfaces.Contact;
 
 import org.junit.Test;

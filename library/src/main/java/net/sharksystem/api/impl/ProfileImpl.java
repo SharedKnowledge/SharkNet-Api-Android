@@ -5,8 +5,12 @@ import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharksystem.api.interfaces.Blacklist;
+import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.Setting;
+import net.sharksystem.api.utils.ClassHelper;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by j4rvis on 01.08.16.
@@ -27,7 +31,7 @@ public class ProfileImpl extends ContactImpl implements Profile {
 
     @Override
     public Setting getSettings() {
-        return null;
+        return new SettingImpl(mSharkKB, mSpace);
     }
 
     @Override
@@ -56,5 +60,18 @@ public class ProfileImpl extends ContactImpl implements Profile {
     @Override
     public void renewKeys() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        try {
+            return ClassHelper.equals(Profile.class, this, o);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

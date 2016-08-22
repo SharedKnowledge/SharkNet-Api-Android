@@ -4,14 +4,17 @@ import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
 import net.sharksystem.api.dummy_impl.ImplVoting;
 import net.sharksystem.api.dummy_impl.Reminder;
+import net.sharksystem.api.utils.ClassHelper;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by j4rvis on 02.08.16.
@@ -106,5 +109,17 @@ public class ContentImpl implements Content {
 
     @Override
     public void setReminder(Reminder reminder) {
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        try {
+            return ClassHelper.equals(Content.class, this, o);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

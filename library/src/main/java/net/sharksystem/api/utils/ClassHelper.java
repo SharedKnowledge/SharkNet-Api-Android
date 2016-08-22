@@ -5,6 +5,8 @@ import org.reflections.ReflectionUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 
 import static org.reflections.ReflectionUtils.withModifier;
@@ -15,14 +17,11 @@ import static org.reflections.ReflectionUtils.withPrefix;
  */
 public class ClassHelper {
 
-    public static <T> boolean equals(Class<T> classToCheck, Object lhs, Object rhs) throws InvocationTargetException, IllegalAccessException {
+    public static boolean equals(Class classToCheck, Object lhs, Object rhs) throws InvocationTargetException, IllegalAccessException {
         if(!classToCheck.isInstance(lhs)) return false;
         classToCheck.cast(lhs);
         if(!classToCheck.isInstance(rhs)) return false;
         classToCheck.cast(rhs);
-
-//        if(!lhs.getClass().equals(classToCheck)) return false;
-//        if(!rhs.getClass().equals(classToCheck)) return false;
 
         boolean equals = false;
 
@@ -40,5 +39,21 @@ public class ClassHelper {
         }
 
         return equals;
+    }
+
+    public static int hashCode(Class classToCheck, Object object) throws InvocationTargetException, IllegalAccessException {
+        if (classToCheck.isInstance(object)) {
+            classToCheck.cast(object);
+        }
+
+        Set<Method> getters = ReflectionUtils.getAllMethods(classToCheck,
+                withModifier(Modifier.PUBLIC), withPrefix("get"));
+
+        ArrayList list = new ArrayList();
+        for (Method next : getters) {
+            list.add(next.invoke(object));
+        }
+
+        return Arrays.hashCode(list.toArray());
     }
 }

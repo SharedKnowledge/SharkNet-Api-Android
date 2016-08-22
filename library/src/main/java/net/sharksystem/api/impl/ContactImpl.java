@@ -22,14 +22,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by j4rvis on 01.08.16.
  */
 public class ContactImpl implements Contact {
 
-    private SharkKB mSharkKB;
-    private ASIPSpace mSpace;
+    protected SharkKB mSharkKB;
+    protected ASIPSpace mSpace;
 
     private final static String CONTACT_NAME = "CONTACT_NAME";
     private final static String CONTACT_NICKNAME = "CONTACT_NICKNAME";
@@ -274,113 +275,16 @@ public class ContactImpl implements Contact {
             e.printStackTrace();
         }
         return false;
-
-//        ContactImpl contact = (ContactImpl) o;
-//
-//        try {
-//            if(getEmail()==null && contact.getEmail()==null){
-//                return true;
-//            } else if(getEmail()!=null && contact.getEmail()!=null){
-//                if(!getEmail().equals(contact.getEmail())) return false;
-//            } else return false;
-//
-//            if(getInterests()==null && contact.getInterests()==null) {
-//                return true;
-//            } else if(getInterests()!=null && contact.getInterests()!=null){
-//                if(!SharkCSAlgebra.identical(getInterests(), contact.getInterests())) return false;
-//            } else return false;
-//
-//            if(getLastWifiContact()==null && contact.getLastWifiContact()==null){
-//                return true;
-//            } else if(getLastWifiContact()!=null && contact.getLastWifiContact()!=null){
-//                if(!getLastWifiContact().equals(contact.getLastWifiContact())) return false;
-//            } else return false;
-//
-//            if(getName()==null && contact.getName()==null){
-//                return true;
-//            } else if(getName()!=null && contact.getName()!=null){
-//                if(!getName().equals(contact.getName())) return false;
-//            } else return false;
-//
-//            if(getNickname()==null && contact.getNickname()==null){
-//                return true;
-//            } else if(getNickname()!=null && contact.getNickname()!=null){
-//                if(!getNickname().equals(contact.getNickname())) return false;
-//            } else return false;
-//
-//            if(getNote()==null && contact.getNote()==null){
-//                return true;
-//            } else if(getNote()!=null && contact.getNote()!=null){
-//                if(!getNote().equals(contact.getNote())) return false;
-//            } else return false;
-//
-//            if(getOwner()==null && contact.getOwner()==null){
-//                return true;
-//            } else if(getOwner()!=null && contact.getOwner()!=null){
-//                if(!getOwner().equals(contact.getOwner())) return false;
-//            } else return false;
-//
-//            if(getPicture()==null && contact.getPicture()==null){
-//                return true;
-//            } else if(getPicture()!=null && contact.getPicture()!=null){
-//                if(!getPicture().equals(contact.getPicture())) return false;
-//            } else return false;
-//
-//            if(getPST()==null && contact.getPST()==null){
-//                return true;
-//            } else if(getPST()!=null && contact.getPST()!=null){
-//                if(!SharkCSAlgebra.identical(getPST(), contact.getPST())) return false;
-//            } else return false;
-//
-//            if(getPublicKey()==null && contact.getPublicKey()==null){
-//                return true;
-//            } else if(getPublicKey()!=null && contact.getPublicKey()!=null){
-//                if(!getPublicKey().equals(contact.getPublicKey())) return false;
-//            } else return false;
-//
-//            if(getPublicKeyExpiration()==null && contact.getPublicKeyExpiration()==null){
-//                return true;
-//            } else if(getPublicKeyExpiration()!=null && contact.getPublicKeyExpiration()!=null){
-//                if(!getPublicKeyExpiration().equals(contact.getPublicKeyExpiration())) return false;
-//            } else return false;
-//
-//            if(getPublicKeyFingerprint()==null && contact.getPublicKeyFingerprint()==null){
-//                return true;
-//            } else if(getPublicKeyFingerprint()!=null && contact.getPublicKeyFingerprint()!=null){
-//                if(!getPublicKeyFingerprint().equals(contact.getPublicKeyFingerprint())) return false;
-//            } else return false;
-//
-//            if(getTelephoneNumber()==null && contact.getTelephoneNumber()==null){
-//                return true;
-//            } else if(getTelephoneNumber()!=null && contact.getTelephoneNumber()!=null){
-//                if(!getTelephoneNumber().equals(contact.getTelephoneNumber())) return false;
-//            } else return false;
-//
-//            if(getUID()==null && contact.getUID()==null){
-//                return true;
-//            } else if(getUID()!=null && contact.getUID()!=null){
-//                if(!getUID().equals(contact.getUID())) return false;
-//            } else return false;
-//
-//            return true;
-//        } catch (SharkKBException e) {
-//            e.printStackTrace();
-//        }
-//        return false;
     }
 
 //    TODO Implement hashCode, also for PST and Interest.
     @Override
     public int hashCode() {
-        int result = 13;
-        int hash = 0;
-
         try {
-            hash += (getEmail() != null) ? getEmail().hashCode() : 0;
-        } catch (SharkKBException e) {
+            return ClassHelper.hashCode(ContactImpl.class, this);
+        } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-
-        return mSpace != null ? mSpace.hashCode() : 0;
+        return (int) Math.random();
     }
 }
