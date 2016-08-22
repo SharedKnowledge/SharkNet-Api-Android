@@ -8,7 +8,4 @@ import java.io.File;
 public class ContentConverter {
 
     // Convert the content to the File-type described in mimeType
-    static final File content2Type(){
-        return null;
-    }
 }

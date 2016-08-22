@@ -68,6 +68,16 @@ public class SharkNetEngine implements SharkNet {
         mCommentKB = createKBFromRoot(mRootKB);
     }
 
+    public void clearData() throws SharkKBException {
+        mRootKB = new InMemoSharkKB();
+        // Create shared KB
+        mProfileKB = createKBFromRoot(mRootKB);
+        mContactKB = createKBFromRoot(mRootKB);
+        mFeedKB = createKBFromRoot(mRootKB);
+        mCommentKB = createKBFromRoot(mRootKB);
+        mChatKBs.clear();
+    }
+
     // Profiles
     //
     //
