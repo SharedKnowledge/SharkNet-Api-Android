@@ -39,6 +39,9 @@ public class SharkNetEngine implements SharkNet {
     private static final SemanticTag mFeedType =
             InMemoSharkKB.createInMemoSemanticTag("FEED", "http://sharksystem.net/feed");
 
+    private static final SemanticTag mSettingsType =
+            InMemoSharkKB.createInMemoSemanticTag("SETTINGS", "http://sharksystem.net/settings");
+
     private static SharkNetEngine sInstance =  null;
 
     // Shark

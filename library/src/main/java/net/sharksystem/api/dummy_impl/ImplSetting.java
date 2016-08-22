@@ -1,10 +1,12 @@
 package net.sharksystem.api.dummy_impl;
 
 import net.sharkfw.knowledgeBase.Interest;
+import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.Setting;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -420,13 +422,15 @@ public class ImplSetting implements Setting {
 	public void setRadarON(boolean radarON) {
 		this.radarON = radarON;
 	}
+
 	@Override
-	public int getWifiON() {
-		return wifiON;
+	public boolean getWifiON() {
+		return false;
 	}
+
 	@Override
-	public void setWifiON(int wifiON) {
-		this.wifiON = wifiON;
+	public void setWifiON(boolean wifiON) throws SharkKBException, IOException {
+
 	}
 	@Override
 	public int getMaxFileSize() {

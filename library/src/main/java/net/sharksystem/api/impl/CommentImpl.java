@@ -110,7 +110,7 @@ public class CommentImpl implements Comment {
     }
     @Override
     public void setDisliked(boolean disliked) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mSharkKB, mInformationSpace.getASIPSpace(), COMMENT_IS_DISLIKED, disliked);
+        SharkNetUtils.setInfoWithName(mSharkKB, mInformationSpace.getASIPSpace(), COMMENT_IS_DISLIKED, disliked);
     }
 
     @Override

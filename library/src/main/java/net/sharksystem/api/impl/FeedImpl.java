@@ -221,7 +221,7 @@ public class FeedImpl implements Feed {
 
     @Override
     public void setDisliked(boolean disliked) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mKb, mInformationSpace.getASIPSpace(), FEED_IS_DISLIKED, disliked);
+        SharkNetUtils.setInfoWithName(mKb, mInformationSpace.getASIPSpace(), FEED_IS_DISLIKED, disliked);
     }
 
     @Override

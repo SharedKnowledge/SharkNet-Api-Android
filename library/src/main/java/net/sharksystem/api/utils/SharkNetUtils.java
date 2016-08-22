@@ -46,6 +46,27 @@ public class SharkNetUtils {
         }
     }
 
+    public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, int content) throws SharkKBException{
+        String s = String.valueOf(content);
+        SharkNetUtils.setInfoWithName(kb, space, name, s);
+    }
+
+
+    public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, long content) throws SharkKBException{
+        String s = String.valueOf(content);
+        SharkNetUtils.setInfoWithName(kb, space, name, s);
+    }
+
+    public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, boolean content) throws SharkKBException{
+        String booleanString;
+        if(content){
+            booleanString = "TRUE";
+        } else {
+            booleanString = "FALSE";
+        }
+        SharkNetUtils.setInfoWithName(kb, space, name, booleanString);
+    }
+
     public static ASIPInformation getInfoByName(SharkKB kb, ASIPSpace space, String name) throws SharkKBException {
         Iterator<ASIPInformation> information = kb.getInformation(space);
         while(information.hasNext()){
@@ -69,16 +90,41 @@ public class SharkNetUtils {
         return false;
     }
 
-    public static void setInfoAsBooleanString(SharkKB kb, ASIPSpace space, String name, boolean contentToSet) throws SharkKBException {
-        String booleanString;
-        if(contentToSet){
-            booleanString = "TRUE";
-        } else {
-            booleanString = "FALSE";
+    public static String getInfoAsString(SharkKB kb, ASIPSpace space, String name) throws SharkKBException {
+        ASIPInformation information = getInfoByName(kb, space, name);
+        if(information!=null){
+            return information.getContentAsString();
         }
-        ASIPInformation information = kb.addInformation(booleanString, space);
-        information.setName(name);
+        return null;
     }
+
+    public static int getInfoAsInteger(SharkKB kb, ASIPSpace space, String name) throws SharkKBException {
+        ASIPInformation information = getInfoByName(kb, space, name);
+        if(information!=null){
+            return Integer.getInteger(information.getContentAsString());
+        }
+        return 0;
+    }
+
+
+    public static Long getInfoAsLong(SharkKB kb, ASIPSpace space, String name) throws SharkKBException {
+        ASIPInformation information = getInfoByName(kb, space, name);
+        if(information!=null){
+            return Long.getLong(information.getContentAsString());
+        }
+        return 0L;
+    }
+
+//    public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, boolean contentToSet) throws SharkKBException {
+//        String booleanString;
+//        if(contentToSet){
+//            booleanString = "TRUE";
+//        } else {
+//            booleanString = "FALSE";
+//        }
+//        ASIPInformation information = kb.addInformation(booleanString, space);
+//        information.setName(name);
+//    }
 
     public static List<? extends ContainsContent> search(String searchTerm, List<? extends  ContainsContent> searchList) throws SharkKBException {
         List<ContainsContent> swapList = new LinkedList<>();

@@ -52,11 +52,13 @@ public class ImplContent implements Content {
 				}else return false;
 			} catch (IOException e) {
 				return false;
-			}
-
+			} catch (SharkKBException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
-	public boolean setFile(File f){
+	public boolean setFile(File f) throws SharkKBException {
 		FileInputStream fileInputStream=null;
 		byte[] bFile = new byte[(int) f.length()];
 		try {

@@ -120,7 +120,7 @@ public class MessageImpl implements Message {
 
     @Override
     public void setSigned(boolean signed) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_SIGNED, signed);
+        SharkNetUtils.setInfoWithName(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_SIGNED, signed);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class MessageImpl implements Message {
 
     @Override
     public void setEncrypted(boolean encrypted) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_ENCRYPTED, encrypted);
+        SharkNetUtils.setInfoWithName(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_ENCRYPTED, encrypted);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class MessageImpl implements Message {
 
     @Override
     public void setDisliked(boolean isDisliked) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_DISLIKED, isDisliked);
+        SharkNetUtils.setInfoWithName(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_DISLIKED, isDisliked);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class MessageImpl implements Message {
 
     @Override
     public void setVerified(boolean verified) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_VERIFIED, verified);
+        SharkNetUtils.setInfoWithName(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_VERIFIED, verified);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class MessageImpl implements Message {
 
     @Override
     public void setRead(boolean read) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_READ, read);
+        SharkNetUtils.setInfoWithName(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_READ, read);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class MessageImpl implements Message {
 
     @Override
     public void setDirectReceived(boolean directReceived) throws SharkKBException {
-        SharkNetUtils.setInfoAsBooleanString(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_DIRECT_RECEIVED, directReceived);
+        SharkNetUtils.setInfoWithName(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_IS_DIRECT_RECEIVED, directReceived);
     }
 
     @Override
