@@ -19,6 +19,7 @@ import net.sharksystem.api.interfaces.ContainsContent;
 import net.sharksystem.api.interfaces.Content;
 import net.sharksystem.api.interfaces.Feed;
 import net.sharksystem.api.interfaces.Message;
+import net.sharksystem.api.interfaces.SharkNet;
 import net.sharksystem.api.interfaces.Timeable;
 import net.sharksystem.api.utils.SharkNetUtils;
 
@@ -66,17 +67,16 @@ public class ChatImpl implements Chat {
 
     }
 
-    public ChatImpl(SharkKB sharkKB, List<Contact> recipients, Contact owner) throws SharkKBException, JSONException {
-
-        mChatKB = new SyncKB(sharkKB);
-        mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
-                null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
+    public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB, List<Contact> recipients, Contact owner) throws SharkKBException, JSONException {
+        this(sharkNetEngine, sharkKB);
 
         setContacts(recipients);
 
-        String serializedTag = ASIPSerializer.serializeTag(owner.getPST()).toString();
-        ASIPInformation information = mChatKB.addInformation(serializedTag, mChatConfigSpace);
-        information.setName(CHAT_OWNER);
+        if(owner!=null){
+            String serializedTag = ASIPSerializer.serializeTag(owner.getPST()).toString();
+            ASIPInformation information = mChatKB.addInformation(serializedTag, mChatConfigSpace);
+            information.setName(CHAT_OWNER);
+        }
     }
 
     @Override

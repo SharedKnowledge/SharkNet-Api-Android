@@ -163,7 +163,7 @@ public class SharkNetEngine implements SharkNet {
         InMemoSharkKB inMemoSharkKB = (InMemoSharkKB) createKBFromRoot(mRootKB);
         mChatKBs.add(inMemoSharkKB);
 
-        return new ChatImpl(inMemoSharkKB, recipients, getMyProfile());
+        return new ChatImpl(this, inMemoSharkKB, recipients, getMyProfile());
     }
 
     // Feeds

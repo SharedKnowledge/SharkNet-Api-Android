@@ -25,7 +25,6 @@ android {
 
 
 configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
@@ -33,9 +32,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
-//    compile 'com.github.SharedKnowledge:SharkFW:master-2.9.4-gec2c088-22'
-
-    compile 'com.github.SharedKnowledge:SharkFW:master-SNAPSHOT'
+//    compile 'com.github.SharedKnowledge:SharkFW:master-SNAPSHOT'
+    compile 'net.sharksystem:sharkfw-core:1.0-SNAPSHOT'
 //    compile 'com.github.SharedKnowledge:SharkFW-Android:master-SNAPSHOT'
     compile 'org.reflections:reflections:0.9.10'
 }
