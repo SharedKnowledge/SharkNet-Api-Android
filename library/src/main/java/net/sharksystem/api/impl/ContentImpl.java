@@ -45,17 +45,21 @@ public class ContentImpl implements Content {
     }
 
     @Override
+    public void setMimeType(String mimeType) throws SharkKBException {
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTENT_INFO);
+        if(information!=null){
+            information.setContentType(mimeType);
+        }
+//        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTENT_INFO, mimeType);
+    }
+
+    @Override
     public String getMimeType() throws SharkKBException {
         ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTENT_INFO);
         if(information!=null){
             return information.getContentType();
         }
         return null;
-    }
-
-    @Override
-    public void setMimeType(String mimeType) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTENT_INFO, mimeType);
     }
 
     @Override
