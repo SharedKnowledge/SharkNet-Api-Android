@@ -3,7 +3,6 @@ package net.sharksystem.api.impl;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
-import net.sharksystem.api.interfaces.SharkNet;
 
 import org.junit.Before;
 
@@ -14,7 +13,7 @@ public class BaseTest {
 
     // Member initiation
 
-    protected SharkNet mSharkNet;
+    protected SharkNetEngine mSharkNet;
 
     // Creating contacts
 
@@ -32,7 +31,7 @@ public class BaseTest {
 
     @Before
     public void init() throws SharkKBException {
-        mSharkNet = SharkNetEngine.getSharkNet();
+        mSharkNet = (SharkNetEngine) SharkNetEngine.getSharkNet();
     }
 
 

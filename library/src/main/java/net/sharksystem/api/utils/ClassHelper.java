@@ -29,7 +29,8 @@ public class ClassHelper {
                 withModifier(Modifier.PUBLIC), withPrefix("get"));
 
         for (Method next : getters) {
-            System.out.println("Testing " + classToCheck.getName() + "." + next.getName());
+            System.out.println("------------------------------------------------------------------");
+            System.out.println(classToCheck.getName() + "." + next.getName());
             System.out.println(next.invoke(lhs));
             if (next.invoke(lhs) == null && next.invoke(rhs) == null) {
                 equals = true;

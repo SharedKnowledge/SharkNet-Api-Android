@@ -131,7 +131,6 @@ public class SharkNetEngine implements SharkNet {
 
     @Override
     public Contact newContact(String nickname, String uid, String publicKey) throws SharkKBException {
-
         ContactImpl contact = new ContactImpl(mContactKB, nickname, uid);
         if(!publicKey.isEmpty()){
             contact.setPublicKey(publicKey);

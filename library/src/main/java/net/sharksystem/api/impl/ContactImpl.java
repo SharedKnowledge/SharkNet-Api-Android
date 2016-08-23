@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -46,12 +47,12 @@ public class ContactImpl implements Contact {
         mSharkKB = sharkKB;
         mSpace = createASIPSpace(tag);
 
-        System.out.println(L.semanticTag2String(tag));
-        System.out.println(L.asipSpace2String(mSpace));
+//        System.out.println(L.semanticTag2String(tag));
+//        System.out.println(L.asipSpace2String(mSpace));
 
-        System.out.println("Name: " + tag.getName());
-        System.out.println("SI: " + tag.getSI()[0]);
-        System.out.println("PST-Name: " + mSpace.getSender().getName());
+//        System.out.println("Name: " + tag.getName());
+//        System.out.println("SI: " + tag.getSI()[0]);
+//        System.out.println("PST-Name: " + mSpace.getSender().getName());
 
         // SET FIRST INFO - NAME
         setName(tag.getName());
@@ -205,7 +206,7 @@ public class ContactImpl implements Contact {
     // SEPERATED BY ';'
     @Override
     public void addTelephoneNumber(String telephoneNumber) throws SharkKBException {
-        if (getTelephoneNumber().size() <= 0) {
+        if (getTelephoneNumber().isEmpty()) {
             SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_TELEPHONE, telephoneNumber);
         } else {
             ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_TELEPHONE);
@@ -224,7 +225,7 @@ public class ContactImpl implements Contact {
             String[] split = contentAsString.split(";");
             return Arrays.asList(split);
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -254,7 +255,7 @@ public class ContactImpl implements Contact {
         ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_LAST_SEEN);
         if(information!=null){
             String string = information.getContentAsString();
-            return new Timestamp(Long.getLong(string));
+            return new Timestamp(Long.parseLong(string));
         }
         return null;
     }
