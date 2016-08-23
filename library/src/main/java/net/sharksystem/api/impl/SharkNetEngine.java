@@ -1,7 +1,9 @@
 package net.sharksystem.api.impl;
 
+import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
+import net.sharkfw.asip.engine.ASIPSerializer;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
@@ -22,6 +24,7 @@ import net.sharksystem.api.interfaces.Timeable;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -34,6 +37,9 @@ import java.util.List;
  */
 public class SharkNetEngine implements SharkNet {
 
+    private static final String ACTIVE_PROFILE = "ACTIVE_PROFILE";
+    private static final String ACTIVE_PROFILE_PASSWORD = "ACTIVE_PROFILE_PASSWORD";
+
     public static final String SHARKNET_DOMAIN = "sharknet://";
 
     private static final SemanticTag mFeedType =
@@ -41,6 +47,8 @@ public class SharkNetEngine implements SharkNet {
 
     private static final SemanticTag mSettingsType =
             InMemoSharkKB.createInMemoSemanticTag("SETTINGS", "http://sharksystem.net/settings");
+
+    private ASIPSpace mSettingsSpace = null;
 
     private static SharkNetEngine sInstance =  null;
 
@@ -103,14 +111,21 @@ public class SharkNetEngine implements SharkNet {
 
     // TODO setActiveProfile
     @Override
-    public boolean setActiveProfile(Profile myProfile, String password) {
-        return false;
+    public boolean setActiveProfile(Profile myProfile, String password) throws SharkKBException, JSONException {
+        myProfile.setPassword(password);
+        PeerSemanticTag tag = myProfile.getPST();
+        String string = ASIPSerializer.serializeTag(tag).toString();
+        mSettingsSpace = SharkNetUtils.createCurrentTimeSpace(mProfileKB, mSettingsType);
+        SharkNetUtils.setInfoWithName(mProfileKB, mSettingsSpace, ACTIVE_PROFILE, string);
+        return true;
     }
 
 //    TODO getMyProfile
     @Override
-    public Profile getMyProfile() {
-        return null;
+    public Profile getMyProfile() throws SharkKBException {
+        String string = SharkNetUtils.getInfoAsString(mProfileKB, mSettingsSpace, ACTIVE_PROFILE);
+        PeerSemanticTag tag = ASIPSerializer.deserializePeerTag(string);
+        return getProfileByTag(tag);
     }
 
     // Contacts
@@ -297,6 +312,10 @@ public class SharkNetEngine implements SharkNet {
 
     public Contact getContactByTag(PeerSemanticTag tag) throws SharkKBException {
         return new ContactImpl(this.mContactKB, tag);
+    }
+
+    public Profile getProfileByTag(PeerSemanticTag tag) throws SharkKBException {
+        return new ProfileImpl(this.mProfileKB, tag);
     }
 
     private SharkKB createKBFromRoot(SharkKB sharkKB) throws SharkKBException {

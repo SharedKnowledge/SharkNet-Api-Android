@@ -3,7 +3,9 @@ package net.sharksystem.api.impl;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharksystem.api.interfaces.Profile;
 
+import org.json.JSONException;
 import org.junit.After;
 import org.junit.Before;
 
@@ -58,8 +60,10 @@ public class BaseTest {
     InputStream stream;
 
     @Before
-    public void init() throws SharkKBException {
+    public void init() throws SharkKBException, JSONException {
         mSharkNet = (SharkNetEngine) SharkNetEngine.getSharkNet();
+        Profile profile = mSharkNet.newProfile("mii", "0123456789");
+        mSharkNet.setActiveProfile(profile, "pw");
         new Random().nextBytes(randomByte);
         stream = new ByteArrayInputStream(randomByte);
     }

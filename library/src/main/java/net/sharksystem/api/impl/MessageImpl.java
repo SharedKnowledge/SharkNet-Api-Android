@@ -50,7 +50,7 @@ public class MessageImpl implements Message {
 
         // There should not be an InformationSpace yet, so create one by adding the first information
         // by setting the sender
-        PeerSemanticTag owner = mChatKB.getOwner();
+        PeerSemanticTag owner = mEngine.getMyProfile().getPST();
         String serializedOwner = ASIPSerializer.serializeTag(owner).toString();
         SharkNetUtils.setInfoWithName(mChatKB, space, MESSAGE_SENDER, serializedOwner);
 

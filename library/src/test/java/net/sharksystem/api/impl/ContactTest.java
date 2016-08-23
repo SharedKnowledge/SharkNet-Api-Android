@@ -36,7 +36,5 @@ public class ContactTest extends BaseTest {
         Contact next = contacts.iterator().next();
 
         Assert.assertTrue(contact.equals(next));
-
-        mSharkNet.clearData();
     }
 }

@@ -84,13 +84,13 @@ public interface SharkNet {
 	 * @return true if the authentification was sucessfull, false if not
      */
 
-	boolean setActiveProfile(Profile myProfile, String password);
+	boolean setActiveProfile(Profile myProfile, String password) throws SharkKBException, JSONException;
 
 	/**
 	 * Returns the Profile which is active at the moment
 	 * @return
      */
-	Profile getMyProfile();
+	Profile getMyProfile() throws SharkKBException;
 
 	/**
 	 * Exchange Contact via NFC (just Method, not implemented)
