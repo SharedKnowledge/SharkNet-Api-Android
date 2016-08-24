@@ -101,6 +101,16 @@ public class ChatImpl implements Chat {
     }
 
     @Override
+    public void sendMessage(String message) throws JSONException, SharkKBException {
+        this.sendMessage(null, message, null);
+    }
+
+    @Override
+    public void sendMessage(String message, Contact sender) throws JSONException, SharkKBException {
+        this.sendMessage(null, message, null, sender);
+    }
+
+    @Override
     public void delete() {
 
     }

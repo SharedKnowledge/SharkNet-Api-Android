@@ -25,6 +25,10 @@ public interface Chat extends Timeable {
 
 	void sendMessage(InputStream inputStream, String message, String mimetype, Contact sender) throws JSONException, SharkKBException;
 
+	void sendMessage(String message) throws JSONException, SharkKBException;
+
+	void sendMessage(String message, Contact sender) throws JSONException, SharkKBException;
+
 
 	/**
 	 * deletes the Chat from the KnowledgeBase
