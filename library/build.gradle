@@ -23,9 +23,13 @@ android {
     }
 }
 
-
 configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    resolutionStrategy {
+        // cache dynamic versions for 10 minutes
+        cacheDynamicVersionsFor 60, 'seconds'
+        // don't cache changing modules at all
+        cacheChangingModulesFor 0, 'seconds'
+    }
 }
 
 dependencies {
