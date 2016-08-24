@@ -13,6 +13,7 @@ import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
 import net.sharksystem.api.interfaces.Message;
+import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.utils.ClassHelper;
 import net.sharksystem.api.utils.SharkNetUtils;
 
@@ -162,8 +163,9 @@ public class MessageImpl implements Message {
 
     @Override
     public boolean isMine() throws SharkKBException {
-        // TODO getOwner and myself
-        return false;
+        Contact sender = getSender();
+        Contact myProfile = mEngine.getMyProfile();
+        return sender.equals(myProfile);
     }
 
     @Override
