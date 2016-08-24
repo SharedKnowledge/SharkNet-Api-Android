@@ -53,6 +53,8 @@ public class ChatImpl implements Chat {
     private SharkNetEngine mSharkNetEngine;
     private SyncKB mChatKB;
 
+
+
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
         mChatKB = new SyncKB(sharkKB);
         mSharkNetEngine = sharkNetEngine;
@@ -60,10 +62,9 @@ public class ChatImpl implements Chat {
         mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
                 null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
 
-        int size = mSharkNetEngine.getChats().size();
-        long time = System.currentTimeMillis();
-
-        SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_ID, String.valueOf(size + time));
+        if(getID()==null){
+            SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_ID, String.valueOf(System.currentTimeMillis()));
+        }
     }
 
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB, List<Contact> recipients, Contact owner) throws SharkKBException, JSONException {
