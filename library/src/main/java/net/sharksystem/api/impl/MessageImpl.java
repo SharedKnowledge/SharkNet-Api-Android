@@ -5,6 +5,7 @@ import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.TimeSTSet;
@@ -164,8 +165,11 @@ public class MessageImpl implements Message {
     @Override
     public boolean isMine() throws SharkKBException {
         Contact sender = getSender();
-        Contact myProfile = mEngine.getMyProfile();
-        return sender.equals(myProfile);
+        PeerSemanticTag senderPST = sender.getPST();
+        Profile myProfile = mEngine.getMyProfile();
+        PeerSemanticTag myProfilePST = myProfile.getPST();
+        if(myProfilePST == null || senderPST == null) return false;
+        return SharkCSAlgebra.identical(myProfilePST, senderPST);
     }
 
     @Override
