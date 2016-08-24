@@ -46,13 +46,22 @@ public class MessageImpl implements Message {
 
     // Create a new Message from scratch -> I am the owner!
     MessageImpl(SharkNetEngine engine, Chat chat, SharkKB chatKB, ASIPSpace space) throws JSONException, SharkKBException {
+        this(engine, chat, chatKB, space, null);
+    }
+
+    // Create a new Message from scratch with another given sender.
+    MessageImpl(SharkNetEngine engine, Chat chat, SharkKB chatKB, ASIPSpace space, Contact sender) throws JSONException, SharkKBException {
         mEngine = engine;
         mChatKB = chatKB;
         mChat = chat;
 
-        // There should not be an InformationSpace yet, so create one by adding the first information
-        // by setting the sender
-        PeerSemanticTag owner = mEngine.getMyProfile().getPST();
+        PeerSemanticTag owner;
+        if(sender==null){
+            owner = mEngine.getMyProfile().getPST();
+        } else {
+            owner = sender.getPST();
+        }
+
         String serializedOwner = ASIPSerializer.serializeTag(owner).toString();
         SharkNetUtils.setInfoWithName(mChatKB, space, MESSAGE_SENDER, serializedOwner);
 
@@ -61,15 +70,6 @@ public class MessageImpl implements Message {
         if(informationSpaces.hasNext()){
             mInformationSpace = informationSpaces.next();
         }
-    }
-
-    // Create a new Message from scratch with another given sender.
-    MessageImpl(SharkNetEngine engine, Chat chat, SharkKB chatKB, ASIPSpace space, Contact sender) throws JSONException, SharkKBException {
-        this(engine, chat, chatKB, space);
-
-        PeerSemanticTag owner = sender.getPST();
-        String serializedOwner = ASIPSerializer.serializeTag(owner).toString();
-        SharkNetUtils.setInfoWithName(mChatKB, space, MESSAGE_SENDER, serializedOwner);
     }
 
 
