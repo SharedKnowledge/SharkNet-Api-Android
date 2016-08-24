@@ -4,10 +4,8 @@ import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
-import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
-import net.sharksystem.api.dummy_impl.ImplVoting;
-import net.sharksystem.api.dummy_impl.Reminder;
+import net.sharksystem.api.interfaces.Voting;
 import net.sharksystem.api.utils.ClassHelper;
 import net.sharksystem.api.utils.SharkNetUtils;
 
@@ -97,26 +95,16 @@ public class ContentImpl implements Content {
         return 0;
     }
 
-    // TODO Voting and Reminder
-
     @Override
-    public ImplVoting addVoting(String question, boolean singleqoice) {
+    public Voting addVoting(String question, boolean singleqoice) {
         return null;
     }
 
     @Override
-    public ImplVoting getVoting() {
+    public Voting getVoting() {
         return null;
     }
 
-    @Override
-    public Reminder getReminder() {
-        return null;
-    }
-
-    @Override
-    public void setReminder(Reminder reminder) {
-    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

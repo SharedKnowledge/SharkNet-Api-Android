@@ -1,9 +1,9 @@
 package net.sharksystem.api.interfaces;
-import net.sharkfw.knowledgeBase.SharkKBException;
-import net.sharksystem.api.dummy_impl.ImplVoting;
-import net.sharksystem.api.dummy_impl.Reminder;
 
-import java.io.*;
+import net.sharkfw.knowledgeBase.SharkKBException;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by timol on 01.06.2016.
@@ -52,24 +52,11 @@ public interface Content {
 	 * @param singleqoice
 	 * @return
 	 */
-	ImplVoting addVoting(String question, boolean singleqoice);
+	Voting addVoting(String question, boolean singleqoice);
 
 	/**
 	 * Returns the Voting, if it`s not there returns null
 	 * @return
 	 */
-	ImplVoting getVoting();
-
-	/**
-	 * Getter for a Reminder (Bachelor Arbeit)
-	 * @return
-	 */
-	Reminder getReminder();
-
-	/**
-	 * Setter for Reminder (Bechelor Arbeit)
-	 * @param reminder
-	 */
-	void setReminder(Reminder reminder);
-
+	Voting getVoting();
 }
