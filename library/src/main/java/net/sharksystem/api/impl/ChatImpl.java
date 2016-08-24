@@ -94,6 +94,13 @@ public class ChatImpl implements Chat {
     }
 
     @Override
+    public void sendMessage(InputStream inputStream, String messageString, String mimetype, Contact sender) throws JSONException, SharkKBException {
+        ASIPSpace space = SharkNetUtils.createCurrentTimeSpace(mChatKB, mMessageType);
+        MessageImpl message = new MessageImpl(mSharkNetEngine, this, mChatKB, space, sender);
+        message.setContent(inputStream, messageString, mimetype);
+    }
+
+    @Override
     public void delete() {
 
     }

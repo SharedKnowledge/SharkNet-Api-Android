@@ -100,6 +100,11 @@ public class ImplChat implements Chat {
 	}
 
 	@Override
+	public void sendMessage(InputStream inputStream, String message, String mimetype, Contact sender) throws JSONException, SharkKBException {
+
+	}
+
+	@Override
 	public void delete() {
 		//ToDo: Shark - delete Chat from Database
 		//DummyDB implementation

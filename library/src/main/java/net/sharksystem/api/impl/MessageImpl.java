@@ -61,6 +61,16 @@ public class MessageImpl implements Message {
         }
     }
 
+    // Create a new Message from scratch with another given sender.
+    MessageImpl(SharkNetEngine engine, Chat chat, SharkKB chatKB, ASIPSpace space, Contact sender) throws JSONException, SharkKBException {
+        this(engine, chat, chatKB, space);
+
+        PeerSemanticTag owner = sender.getPST();
+        String serializedOwner = ASIPSerializer.serializeTag(owner).toString();
+        SharkNetUtils.setInfoWithName(mChatKB, space, MESSAGE_SENDER, serializedOwner);
+    }
+
+
     MessageImpl(SharkNetEngine engine, Chat chat, SharkKB chatKB, ASIPInformationSpace informationSpace) throws SharkKBException {
         mEngine = engine;
         mChatKB = chatKB;

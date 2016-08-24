@@ -60,7 +60,7 @@ public class SharkNetEngine implements SharkNet {
     private SharkKB mCommentKB = null;
     private List<SharkKB> mChatKBs = new ArrayList<>();
 
-    public static SharkNet getSharkNet() throws SharkKBException {
+    public static SharkNetEngine getSharkNet() throws SharkKBException {
         if(SharkNetEngine.sInstance == null){
             sInstance = new SharkNetEngine();
         }

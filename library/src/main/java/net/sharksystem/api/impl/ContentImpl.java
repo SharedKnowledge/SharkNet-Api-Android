@@ -35,6 +35,7 @@ public class ContentImpl implements Content {
 
     @Override
     public boolean setInputStream(InputStream is) throws SharkKBException {
+        if(is==null) return false;
         try {
             SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTENT_INFO, is);
             return true;
@@ -46,6 +47,7 @@ public class ContentImpl implements Content {
 
     @Override
     public void setMimeType(String mimeType) throws SharkKBException {
+        if(mimeType== null) return;
         ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTENT_INFO);
         if(information!=null){
             information.setContentType(mimeType);
@@ -73,6 +75,7 @@ public class ContentImpl implements Content {
 
     @Override
     public void setMessage(String message) throws SharkKBException {
+        if(message==null) return;
         SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTENT_MESSAGE, message);
     }
 

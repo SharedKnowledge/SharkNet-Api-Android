@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -242,6 +243,11 @@ public class ContactImpl implements Contact {
     @Override
     public void setEmail(String email) throws SharkKBException {
         SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_EMAIL, email);
+        String[] addresses = mSpace.getSender().getAddresses();
+        ArrayList<String> stringList = new ArrayList<>();
+        Collections.addAll(stringList, addresses);
+        stringList.add(email);
+        mSpace.getSender().setAddresses(stringList.toArray(new String[stringList.size()]));
     }
 
     @Override
