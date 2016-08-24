@@ -10,17 +10,13 @@ import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
-import net.sharkfw.knowledgeBase.TimeSemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
-import net.sharksystem.api.interfaces.ContainsContent;
 import net.sharksystem.api.interfaces.Content;
 import net.sharksystem.api.interfaces.Feed;
 import net.sharksystem.api.interfaces.Message;
-import net.sharksystem.api.interfaces.SharkNet;
-import net.sharksystem.api.interfaces.Timeable;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
@@ -28,8 +24,6 @@ import org.json.JSONException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +38,7 @@ public class ChatImpl implements Chat {
     public static final String CHAT_OWNER = "CHAT_OWNER";
     public static final String CHAT_ADMIN = "CHAT_ADMIN";
     public static final String CHAT_TITLE = "CHAT_TITLE";
+    public static final String CHAT_ID = "CHAT_ID";
 
     // Chat Types - for the different asipSpaces
     private final SemanticTag mMessageType =
@@ -65,6 +60,10 @@ public class ChatImpl implements Chat {
         mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
                 null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
 
+        int size = mSharkNetEngine.getChats().size();
+        long time = System.currentTimeMillis();
+
+        SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_ID, String.valueOf(size + time));
     }
 
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB, List<Contact> recipients, Contact owner) throws SharkKBException, JSONException {
@@ -280,10 +279,9 @@ public class ChatImpl implements Chat {
         return null;
     }
 
-    //    TODO getID
     @Override
-    public int getID() {
-        return 0;
+    public String getID() throws SharkKBException {
+        return SharkNetUtils.getInfoAsString(mChatKB, mChatConfigSpace, CHAT_ID);
     }
 
     @Override

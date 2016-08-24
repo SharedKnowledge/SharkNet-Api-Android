@@ -83,7 +83,7 @@ public interface Chat extends Timeable {
 	/**
 	 * Returns the ID of the Chat
 	 */
-	int getID();
+	String getID() throws SharkKBException;
 
 	/**
 	 * Returns the Profile of the owner of the Chat
