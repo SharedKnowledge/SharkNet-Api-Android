@@ -69,6 +69,8 @@ public class SharkNetUtils {
 
     public static ASIPInformation getInfoByName(SharkKB kb, ASIPSpace space, String name) throws SharkKBException {
         Iterator<ASIPInformation> information = kb.getInformation(space);
+        if(information==null) return null;
+
         while(information.hasNext()){
             ASIPInformation next = information.next();
             if(next.getName().equals(name)){
