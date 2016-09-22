@@ -111,8 +111,8 @@ public class MessageImpl implements Message {
     @Override
     public void setContent(InputStream inputStream, String messageString, String mimeType) throws SharkKBException {
         ContentImpl content = new ContentImpl(mChatKB, mInformationSpace.getASIPSpace());
-        content.setMimeType(mimeType);
         content.setInputStream(inputStream);
+        content.setMimeType(mimeType);
         content.setMessage(messageString);
     }
 

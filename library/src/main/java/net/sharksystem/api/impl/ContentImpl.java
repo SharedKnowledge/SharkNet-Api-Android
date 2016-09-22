@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 public class ContentImpl implements Content {
 
     public final static String CONTENT_INFO = "CONTENT_INFO";
+    public final static String CONTENT_TYPE = "CONTENT_TYPE";
     public final static String CONTENT_MESSAGE = "CONTENT_MESSAGE";
 
     private final SharkKB mSharkKB;
@@ -45,19 +46,20 @@ public class ContentImpl implements Content {
 
     @Override
     public void setMimeType(String mimeType) throws SharkKBException {
-        if(mimeType== null) return;
-        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTENT_INFO);
-        if(information!=null){
-            information.setContentType(mimeType);
-        }
+        if(mimeType == null) return;
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTENT_TYPE, mimeType);
+//        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTENT_INFO);
+//        if(information!=null){
+//            information.setContentType(mimeType);
+//        }
 //        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTENT_INFO, mimeType);
     }
 
     @Override
     public String getMimeType() throws SharkKBException {
-        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTENT_INFO);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTENT_TYPE);
         if(information!=null){
-            return information.getContentType();
+            return information.getContentAsString();
         }
         return null;
     }
