@@ -1,0 +1,3 @@
+[submodule "SharkFW-Android"]
+	path = SharkFW-Android
+	url = git@github.com:SharedKnowledge/SharkFW-Android.git
