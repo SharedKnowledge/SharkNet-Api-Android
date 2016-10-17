@@ -1,1 +1,2 @@
-include ':library'
+include ':api', ':library'
+project(':library').projectDir = new File('SharkFW-Android/library')
