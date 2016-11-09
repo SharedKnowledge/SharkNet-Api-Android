@@ -1,6 +1,5 @@
 package net.sharksystem.api.impl;
 
-import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
@@ -11,6 +10,8 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharksystem.android.Application;
+import net.sharksystem.android.peer.SharkServiceController;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Comment;
 import net.sharksystem.api.interfaces.Contact;
@@ -19,12 +20,11 @@ import net.sharksystem.api.interfaces.Feed;
 import net.sharksystem.api.interfaces.GetEvents;
 import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
+import net.sharksystem.api.interfaces.RadarListener;
 import net.sharksystem.api.interfaces.SharkNet;
-import net.sharksystem.api.interfaces.Timeable;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Created by j4rvis on 01.08.16.
  */
-public class SharkNetEngine implements SharkNet {
+public class SharkNetEngine extends Application implements SharkNet {
 
     private static final String ACTIVE_PROFILE = "ACTIVE_PROFILE";
     private static final String ACTIVE_PROFILE_PASSWORD = "ACTIVE_PROFILE_PASSWORD";
@@ -74,6 +74,11 @@ public class SharkNetEngine implements SharkNet {
         mContactKB = createKBFromRoot(mRootKB);
         mFeedKB = createKBFromRoot(mRootKB);
         mCommentKB = createKBFromRoot(mRootKB);
+
+        // TODO Start engine etc!!!
+        SharkServiceController serviceController = SharkServiceController.getInstance(getApplicationContext());
+        serviceController.startShark();
+
     }
 
     public void clearData() throws SharkKBException {
@@ -85,6 +90,26 @@ public class SharkNetEngine implements SharkNet {
         mCommentKB = createKBFromRoot(mRootKB);
         mChatKBs.clear();
     }
+
+    // Radar
+    //
+    //
+
+    @Override
+    public List<Contact> getRadarContacts() {
+        return null;
+    }
+
+    @Override
+    public void addRadarListener(RadarListener listener) {
+
+    }
+
+    @Override
+    public void removeRadarListtener(RadarListener listener) {
+
+    }
+
 
     // Profiles
     //
