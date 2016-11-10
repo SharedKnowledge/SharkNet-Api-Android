@@ -18,6 +18,7 @@ import net.sharksystem.api.interfaces.Feed;
 import net.sharksystem.api.interfaces.GetEvents;
 import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
+import net.sharksystem.api.interfaces.RadarListener;
 import net.sharksystem.api.interfaces.SharkNet;
 import net.sharksystem.api.utils.SharkNetUtils;
 
@@ -71,7 +72,6 @@ public class SharkNetEngine implements SharkNet {
         mContactKB = createKBFromRoot(mRootKB);
         mFeedKB = createKBFromRoot(mRootKB);
         mCommentKB = createKBFromRoot(mRootKB);
-
     }
 
     public void clearData() throws SharkKBException {
@@ -83,6 +83,26 @@ public class SharkNetEngine implements SharkNet {
         mCommentKB = createKBFromRoot(mRootKB);
         mChatKBs.clear();
     }
+
+    // Radar
+    //
+    //
+
+    @Override
+    public List<Contact> getRadarContacts() {
+        return null;
+    }
+
+    @Override
+    public void addRadarListener(RadarListener listener) {
+
+    }
+
+    @Override
+    public void removeRadarListtener(RadarListener listener) {
+
+    }
+
 
     // Profiles
     //
