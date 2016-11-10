@@ -52,12 +52,12 @@ public class WifiDirectStreamStub
 
     private final WifiDirectStreamStub that = this;
 
-    private final AndroidSharkEngine _engine;
-    private final WifiDirectManager _wifiDirectManager;
-    private final WifiDirectBroadcastManager _wifiDirectBroadcastManager;
+    private final AndroidSharkEngine mEngine;
+    private final WifiDirectManager mWifiDirectManager;
+    private final WifiDirectBroadcastManager mWifiDirectBroadcastManager;
 
-    private Context _context;
-    private WifiP2pManager _manager;
+    private Context mContext;
+    private WifiP2pManager mManager;
     private boolean _isStarted = false;
     private HashMap<ASIPKnowledge, ArrayList<WifiDirectPeer>> _knowledgeMap;
     // Lists
@@ -70,29 +70,19 @@ public class WifiDirectStreamStub
     private boolean _isSender = false;
     private ASIPSpace mSpace;
 
-    public WifiDirectStreamStub(Context context, AndroidSharkEngine engine, ASIPSpace space, String name) {
-        _context = context;
-        _engine = engine;
+    public WifiDirectStreamStub(Context context, AndroidSharkEngine engine) {
+        mContext = context;
+        mEngine = engine;
 
-        _manager = (WifiP2pManager) _context.getSystemService(Context.WIFI_P2P_SERVICE);
+        mManager = (WifiP2pManager) mContext.getSystemService(Context.WIFI_P2P_SERVICE);
 
-//        STSet topics = InMemoSharkKB.createInMemoSTSet();
-//        ASIPSpace space = null;
-//        try {
-//            topics.createSemanticTag("Beispielinteresse", "www.java.com");
-////            topics.createSemanticTag("Android", "www.android.com");
-//            space = InMemoSharkKB.createInMemoASIPInterest(topics, null, _engine.getOwner(), null, null, null, null, ASIPSpace.DIRECTION_INOUT);
-//        } catch (SharkKBException e) {
-//            e.printStackTrace();
-//        }
+        mWifiDirectManager = new WifiDirectManager(mManager, mContext, this, null, null);
 
-        _wifiDirectManager = new WifiDirectManager(_manager, _context, this, space, name);
+        mWifiDirectBroadcastManager = WifiDirectBroadcastManager.getInstance(mContext);
+        mWifiDirectBroadcastManager.setWifiDirectManager(mWifiDirectManager);
+        mWifiDirectBroadcastManager.setEngine(mEngine);
 
-        _wifiDirectBroadcastManager = WifiDirectBroadcastManager.getInstance(_context);
-        _wifiDirectBroadcastManager.setWifiDirectManager(_wifiDirectManager);
-        _wifiDirectBroadcastManager.setEngine(_engine);
-
-        _engine.addConnectionStatusListener(_wifiDirectBroadcastManager);
+        mEngine.addConnectionStatusListener(mWifiDirectBroadcastManager);
 
         _knowledgeMap = new HashMap<>();
     }
@@ -101,13 +91,13 @@ public class WifiDirectStreamStub
     public void stop() {
         L.d("isStarted:" + _isStarted, this);
         if (_isStarted) {
-            _isStarted = _wifiDirectManager.stop();
+            _isStarted = mWifiDirectManager.stop();
         }
     }
 
     @Override
     public void start() throws IOException {
-        if (!_isStarted) _isStarted = _wifiDirectManager.start();
+        if (!_isStarted) _isStarted = mWifiDirectManager.start();
     }
 
     private void updateDevices(WifiP2pDevice device){
@@ -159,17 +149,17 @@ public class WifiDirectStreamStub
         WifiDirectPeer peer = new WifiDirectPeer(srcDevice, txtRecordMap);
         addPeer(peer);
         // Update Lists in WifiDirectBroadcastManager
-        _wifiDirectBroadcastManager.setDevices(_knownDevices);
-        _wifiDirectBroadcastManager.setPeers(_peers);
-        _wifiDirectBroadcastManager.notifyUpdate();
+        mWifiDirectBroadcastManager.setDevices(_knownDevices);
+        mWifiDirectBroadcastManager.setPeers(_peers);
+        mWifiDirectBroadcastManager.notifyUpdate();
 
         // Send interest to KP
-        ASIPInMessage msg = new ASIPInMessage(_engine, peer.getmInterest(), _engine.getAsipStub());
+        ASIPInMessage msg = new ASIPInMessage(mEngine, peer.getmInterest(), mEngine.getAsipStub());
         msg.setCommand(ASIPMessage.ASIP_EXPOSE);
         msg.setTtl(10);
         msg.setSender(peer.getmTag());
 
-        _engine.getAsipStub().callListener(msg);
+        mEngine.getAsipStub().callListener(msg);
     }
 
     @Override
@@ -201,7 +191,7 @@ public class WifiDirectStreamStub
 
     @Override
     public void offer(ASIPSpace asipSpace) throws SharkNotSupportedException {
-        _wifiDirectManager.offerInterest(asipSpace);
+        mWifiDirectManager.offerInterest(asipSpace);
     }
 
     @Override
@@ -211,8 +201,8 @@ public class WifiDirectStreamStub
 
 //    private void initConnection(){
 //        WifiDirectPeer peer = pickPeer(_currentKnowledge);
-//        if(peer != null && _wifiDirectManager.getStatus() == WifiDirectManager.DISCOVERING){
-//            _wifiDirectManager.connect(peer);
+//        if(peer != null && mWifiDirectManager.getStatus() == WifiDirectManager.DISCOVERING){
+//            mWifiDirectManager.connect(peer);
 //        }
 //    }
 //
@@ -268,7 +258,7 @@ public class WifiDirectStreamStub
 
     public void sendBroadcast(ASIPKnowledge knowledge){
 
-        _wifiDirectBroadcastManager.addKnowledge(knowledge);
+        mWifiDirectBroadcastManager.addKnowledge(knowledge);
 
 //        // TODO to be removed
 //        _knowledgeMap.put(knowledge, new ArrayList<WifiDirectPeer>());
@@ -297,7 +287,7 @@ public class WifiDirectStreamStub
 
     public void onDisconnected(){
         L.d("Disconnect successful", this);
-        _wifiDirectBroadcastManager.onDisconnected();
+        mWifiDirectBroadcastManager.onDisconnected();
     }
 
 //    private ASIPOutMessage createASIPOutMessage(WifiDirectPeer peer, String address){
@@ -306,7 +296,7 @@ public class WifiDirectStreamStub
 //        PeerSemanticTag tcpTag = InMemoSharkKB.createInMemoPeerSemanticTag("Receiver", "www.receiver.de", "tcp://"+address+":7071");
 //        L.d(tcpTag.getAddresses().toString(), this);
 //        L.d(tcpTag.getAddresses()[0].toString(), this);
-//        return _engine.createASIPOutMessage(tcpTag.getAddresses(), tcpTag);
+//        return mEngine.createASIPOutMessage(tcpTag.getAddresses(), tcpTag);
 //    }
 
     @Override
@@ -314,29 +304,29 @@ public class WifiDirectStreamStub
 
         if(info==null) return;
 
-//        Toast.makeText(_context, "Connection incoming", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(mContext, "Connection incoming", Toast.LENGTH_SHORT).show();
 
-        _wifiDirectManager.requestGroupInfo(new WifiP2pManager.GroupInfoListener() {
+        mWifiDirectManager.requestGroupInfo(new WifiP2pManager.GroupInfoListener() {
             @Override
             public void onGroupInfoAvailable(WifiP2pGroup group) {
 
                 if(info.groupFormed){
-                    _wifiDirectBroadcastManager.onConnectionEstablished(info, group);
+                    mWifiDirectBroadcastManager.onConnectionEstablished(info, group);
                 }
 //
 //                if(info.groupFormed && info.isGroupOwner){
 //                    // Owner
-//                    Toast.makeText(_context, "I'm the owner", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mContext, "I'm the owner", Toast.LENGTH_SHORT).show();
 //                    L.d("I'm the owner", this);
 //
 //                    // startTCP
 //                    try {
-//                        _engine.startTCP(7071, _currentKnowledge);
+//                        mEngine.startTCP(7071, _currentKnowledge);
 //                    } catch (IOException e) {
 //                        e.printStackTrace();
 //                    }
 //
-//                    Toast.makeText(_context, "Waiting for connections...", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(mContext, "Waiting for connections...", Toast.LENGTH_LONG).show();
 //
 //                    // Now wait for incoming Connection
 //                    // ...
@@ -344,7 +334,7 @@ public class WifiDirectStreamStub
 //                } else if(info.groupFormed){
 //                    // Client
 //                    L.d("I'm the client", this);
-//                    Toast.makeText(_context, "I'm the client", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(mContext, "I'm the client", Toast.LENGTH_LONG).show();
 //
 //                    // hey I'm the client..
 //                    // go get me the IP Address of the Host
@@ -421,7 +411,7 @@ public class WifiDirectStreamStub
     @Override
     public void connectionClosed() {
         L.d("TCPConnection got closed", this);
-        _wifiDirectManager.disconnect();
+        mWifiDirectManager.disconnect();
 //        L.d("Disconnect triggered.",this);
     }
 }

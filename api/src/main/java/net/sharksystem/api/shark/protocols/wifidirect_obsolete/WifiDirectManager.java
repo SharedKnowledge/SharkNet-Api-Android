@@ -15,6 +15,7 @@ import android.os.Handler;
 
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.system.L;
 import net.sharksystem.api.shark.protocols.wifidirect.WifiActionListener;
@@ -50,7 +51,7 @@ public class WifiDirectManager
 
     private boolean _isOwner;
     private ASIPSpace mInterest;
-    private String mSender;
+    private PeerSemanticTag mSender;
 
     public WifiDirectManager(WifiP2pManager manager, Context context, WifiDirectStreamStub stub) {
         _manager = manager;
@@ -70,7 +71,7 @@ public class WifiDirectManager
         _status = INITIALIZED;
     }
 
-    public WifiDirectManager(WifiP2pManager manager, Context context, WifiDirectStreamStub stub, ASIPSpace space, String name) {
+    public WifiDirectManager(WifiP2pManager manager, Context context, WifiDirectStreamStub stub, ASIPSpace space, PeerSemanticTag name) {
         this(manager, context, stub);
         mInterest = space;
         mSender = name;
@@ -180,10 +181,10 @@ public class WifiDirectManager
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
-        if(mSender ==null || mSender.isEmpty()){
+        if(mSender == null || mSender.getName().isEmpty()){
             name = "A";
         } else {
-            name = mSender;
+            name = mSender.getName();
         }
         _map.put("interest", interest);
         _map.put("name", name);
@@ -224,8 +225,7 @@ public class WifiDirectManager
 
     public void offerInterest(ASIPSpace space) {
         mInterest = space;
-        mSender = space.getSender().getName();
-//        resetDNSMap();
+        mSender.setName(space.getSender().getName());
     }
 
     @Override

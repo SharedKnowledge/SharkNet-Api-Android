@@ -1,5 +1,7 @@
 package net.sharksystem.api.impl;
 
+import net.sharkfw.asip.ASIPInterest;
+import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
@@ -18,7 +20,16 @@ public class InterestImpl implements Interest {
     SharkKB kb = null;
     Taxonomy tx = null;
 
+    public InterestImpl(ASIPSpace space) throws SharkKBException {
+        this.kb = new InMemoSharkKB();
+        this.tx = InMemoSharkKB.createInMemoTaxonomy();
+        this.tx.merge(space.getTopics());
+    }
+
     public InterestImpl(Contact owner) throws SharkKBException {
+
+        // TODO needs to be saved in a kb.
+
         kb = new InMemoSharkKB();
         kb.setOwner(owner.getPST());
         try {
@@ -26,6 +37,12 @@ public class InterestImpl implements Interest {
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
+    }
+
+    public ASIPSpace asASIPSpace(){
+        ASIPInterest inMemoASIPInterest = InMemoSharkKB.createInMemoASIPInterest();
+        inMemoASIPInterest.setTopics(tx);
+        return inMemoASIPInterest;
     }
 
 

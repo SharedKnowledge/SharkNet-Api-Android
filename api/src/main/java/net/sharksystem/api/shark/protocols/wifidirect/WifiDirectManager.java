@@ -19,7 +19,7 @@ import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
-import net.sharksystem.api.shark.Application;
+import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +33,8 @@ public class WifiDirectManager
         extends BroadcastReceiver
         implements WifiP2pManager.DnsSdTxtRecordListener,
         WifiP2pManager.ConnectionInfoListener, Runnable {
+
+    private final AndroidSharkEngine mEngine;
 
     public enum WIFI_STATE {
         INIT,
@@ -62,35 +64,22 @@ public class WifiDirectManager
     //
     //
 
-    interface WifiDirectPeerListener {
-        void onNewInterest(ASIPInterest interest);
-        void onNewPeer(PeerSemanticTag peers);
+    public interface WifiDirectPeerListener {
+        void onNewNearbyPeer(ASIPSpace space);
     }
-    interface WifiDirectNetworkListener {
+    public interface WifiDirectNetworkListener {
         void onNetworkCreated(WifiP2pInfo info, WifiP2pGroup group);
         void onNetworkDestroyed();
     }
 
-    // Instance
-    //
-    //
-
-    private static WifiDirectManager sInstance = null;
-
-    static {
-        sInstance = new WifiDirectManager();
-    }
-
-    private WifiDirectManager() {
-        mContext = Application.getAppContext();
+    public WifiDirectManager(Context context, AndroidSharkEngine engine) {
+        mEngine = engine;
+        addPeerListener(mEngine);
+        mContext =  context;
         mManager = (WifiP2pManager) mContext.getSystemService(Context.WIFI_P2P_SERVICE);
 
         mChannel = mManager.initialize(mContext, mContext.getMainLooper(), null);
         mManager.setDnsSdResponseListeners(mChannel, null, this);
-    }
-
-    public static WifiDirectManager getInstance() {
-        return sInstance;
     }
 
     // Setter
@@ -169,7 +158,6 @@ public class WifiDirectManager
 
             mState = WIFI_STATE.DISCOVERING;
             mIsDiscovering = true;
-
         }
 
     }
@@ -267,8 +255,7 @@ public class WifiDirectManager
 
         // Inform Listener
         for(WifiDirectPeerListener listener : mPeerListeners){
-            listener.onNewPeer(sender);
-            listener.onNewInterest(interest);
+            listener.onNewNearbyPeer(interest);
         }
 
     }

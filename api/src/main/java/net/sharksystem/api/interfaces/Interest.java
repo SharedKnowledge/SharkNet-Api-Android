@@ -1,5 +1,6 @@
 package net.sharksystem.api.interfaces;
 
+import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.TXSemanticTag;
 import net.sharkfw.knowledgeBase.Taxonomy;
 
@@ -14,6 +15,8 @@ public interface Interest {
      * @return
      */
     public Taxonomy getInterests();
+
+    ASIPSpace asASIPSpace();
 
     /**
      * Adds Interest to the Taxonomy with a Name and the subjectidentifier

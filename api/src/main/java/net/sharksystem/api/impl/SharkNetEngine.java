@@ -20,6 +20,8 @@ import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.RadarListener;
 import net.sharksystem.api.interfaces.SharkNet;
+import net.sharksystem.api.shark.Application;
+import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
@@ -46,7 +48,11 @@ public class SharkNetEngine implements SharkNet {
     private static final SemanticTag mSettingsType =
             InMemoSharkKB.createInMemoSemanticTag("SETTINGS", "http://sharksystem.net/settings");
 
+    private AndroidSharkEngine mSharkEngine;
+
     private ASIPSpace mSettingsSpace = null;
+
+    private ArrayList<RadarListener> mRadarListeners = new ArrayList<>();
 
     private static SharkNetEngine sInstance = null;
 
@@ -84,6 +90,20 @@ public class SharkNetEngine implements SharkNet {
         mChatKBs.clear();
     }
 
+    public void startShark() throws SharkKBException {
+        mSharkEngine = new AndroidSharkEngine(Application.getAppContext());
+
+        Profile profile = getMyProfile();
+
+        mSharkEngine.setEngineOwnerPeer(profile.getPST());
+
+        ASIPSpace asipSpace = profile.getInterests().asASIPSpace();
+
+        mSharkEngine.setSpace(asipSpace);
+
+        // TODO start Wifi!!!!
+    }
+
     // Radar
     //
     //
@@ -99,7 +119,7 @@ public class SharkNetEngine implements SharkNet {
     }
 
     @Override
-    public void removeRadarListtener(RadarListener listener) {
+    public void removeRadarListener(RadarListener listener) {
 
     }
 

@@ -1,6 +1,5 @@
 package net.sharksystem.api.interfaces;
 
-import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 
@@ -64,12 +63,12 @@ public interface Contact {
 	void update();
 
 
-	void setInterest(Interest interest);
+	void setInterest(Interest interest) throws SharkKBException;
 	/**
 	 * returns a List of all Interests the profile is interested in
 	 * @return
 	 */
-	Interest getInterests();
+	Interest getInterests() throws SharkKBException;
 
 	/**
 	 * Method to evaluate is a Contact is equal to another

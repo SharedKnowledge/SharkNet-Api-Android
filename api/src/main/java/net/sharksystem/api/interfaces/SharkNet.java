@@ -20,7 +20,7 @@ public interface SharkNet {
 
     void addRadarListener(RadarListener listener);
 
-    void removeRadarListtener(RadarListener listener);
+    void removeRadarListener(RadarListener listener);
 
     /**
      * Returns a List of all personal Profiles

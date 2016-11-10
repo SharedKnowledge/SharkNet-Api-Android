@@ -2,16 +2,17 @@ package net.sharksystem.api.impl;
 
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
+import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.knowledgeBase.Interest;
+import net.sharkfw.asip.engine.ASIPSerializer;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
-import net.sharkfw.system.L;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
+import net.sharksystem.api.interfaces.Interest;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.utils.ClassHelper;
 import net.sharksystem.api.utils.SharkNetUtils;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by j4rvis on 01.08.16.
@@ -169,13 +169,20 @@ public class ContactImpl implements Contact {
     }
 
     @Override
-    public void setInterest(Interest interest) {
-
+    public void setInterest(Interest interest) throws SharkKBException {
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_INTEREST,
+                ASIPSerializer.serializeASIPSpace(interest.asASIPSpace()).toString());
     }
 
-    //    TODO getInterests
     @Override
-    public Interest getInterests() {
+    public Interest getInterests() throws SharkKBException {
+
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_NAME);
+        if(information!=null){
+            String contentAsString = information.getContentAsString();
+            ASIPInterest interest = ASIPSerializer.deserializeASIPInterest(contentAsString);
+            return new InterestImpl(interest);
+        }
         return null;
     }
 
