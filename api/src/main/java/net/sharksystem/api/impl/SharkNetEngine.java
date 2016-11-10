@@ -1,6 +1,5 @@
 package net.sharksystem.api.impl;
 
-import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
@@ -20,11 +19,9 @@ import net.sharksystem.api.interfaces.GetEvents;
 import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.SharkNet;
-import net.sharksystem.api.interfaces.Timeable;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -50,7 +47,7 @@ public class SharkNetEngine implements SharkNet {
 
     private ASIPSpace mSettingsSpace = null;
 
-    private static SharkNetEngine sInstance =  null;
+    private static SharkNetEngine sInstance = null;
 
     // Shark
     private SharkKB mProfileKB = null;
@@ -61,7 +58,7 @@ public class SharkNetEngine implements SharkNet {
     private List<SharkKB> mChatKBs = new ArrayList<>();
 
     public static SharkNetEngine getSharkNet() throws SharkKBException {
-        if(SharkNetEngine.sInstance == null){
+        if (SharkNetEngine.sInstance == null) {
             sInstance = new SharkNetEngine();
         }
         return sInstance;
@@ -74,6 +71,7 @@ public class SharkNetEngine implements SharkNet {
         mContactKB = createKBFromRoot(mRootKB);
         mFeedKB = createKBFromRoot(mRootKB);
         mCommentKB = createKBFromRoot(mRootKB);
+
     }
 
     public void clearData() throws SharkKBException {
@@ -95,7 +93,7 @@ public class SharkNetEngine implements SharkNet {
         ArrayList<Profile> profiles = new ArrayList<>();
 
         Iterator<ASIPInformationSpace> asipInformationSpaceIterator = mProfileKB.informationSpaces();
-        while (asipInformationSpaceIterator.hasNext()){
+        while (asipInformationSpaceIterator.hasNext()) {
             ASIPInformationSpace next = asipInformationSpaceIterator.next();
             ProfileImpl profile = new ProfileImpl(mProfileKB, next);
             profiles.add(profile);
@@ -120,7 +118,7 @@ public class SharkNetEngine implements SharkNet {
         return true;
     }
 
-//    TODO getMyProfile
+    //    TODO getMyProfile
     @Override
     public Profile getMyProfile() throws SharkKBException {
         String string = SharkNetUtils.getInfoAsString(mProfileKB, mSettingsSpace, ACTIVE_PROFILE);
@@ -136,7 +134,7 @@ public class SharkNetEngine implements SharkNet {
     public List<Contact> getContacts() throws SharkKBException {
         List<Contact> contactList = new ArrayList<>();
         Iterator<ASIPInformationSpace> iterator = mContactKB.informationSpaces();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             ASIPInformationSpace next = iterator.next();
             ContactImpl contact = new ContactImpl(mContactKB, next);
             contactList.add(contact);
@@ -147,7 +145,7 @@ public class SharkNetEngine implements SharkNet {
     @Override
     public Contact newContact(String nickname, String uid, String publicKey) throws SharkKBException {
         ContactImpl contact = new ContactImpl(mContactKB, nickname, uid);
-        if(!publicKey.isEmpty()){
+        if (!publicKey.isEmpty()) {
             contact.setPublicKey(publicKey);
         }
         return contact;
@@ -166,7 +164,7 @@ public class SharkNetEngine implements SharkNet {
     public List<Chat> getChats() throws SharkKBException {
         Iterator<SharkKB> kbIterator = mChatKBs.iterator();
         ArrayList<Chat> chats = new ArrayList<>();
-        while (kbIterator.hasNext()){
+        while (kbIterator.hasNext()) {
             SharkKB next = kbIterator.next();
             chats.add(new ChatImpl(this, next));
         }
@@ -188,14 +186,14 @@ public class SharkNetEngine implements SharkNet {
     private List<Feed> getFeeds() throws SharkKBException {
         List<Feed> feeds = new ArrayList<>();
         Iterator<ASIPInformationSpace> iterator = mFeedKB.informationSpaces();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             ASIPInformationSpace next = iterator.next();
-            if(next == null){
+            if (next == null) {
                 continue;
             }
             // checks if the infoSpace has an type SemanticTag with the SI from the mMessageType-Tag
             STSet types = next.getASIPSpace().getTypes();
-            if(types.getSemanticTag(mFeedType.getSI())!=null){
+            if (types.getSemanticTag(mFeedType.getSI()) != null) {
                 Feed feed = new FeedImpl(this, mFeedKB, next);
                 feeds.add(feed);
             }
@@ -234,7 +232,7 @@ public class SharkNetEngine implements SharkNet {
         return (List<Feed>) SharkNetUtils.sortList(listCuted, ascending);
     }
 
-//    TODO newFeed with Content
+    //    TODO newFeed with Content
     @Override
     public Feed newFeed(Content content, Interest interest, Contact sender) throws SharkKBException, JSONException {
         return null;
@@ -254,19 +252,19 @@ public class SharkNetEngine implements SharkNet {
     //
     //
 
-//  TODO exchangeContactNFC
+    //  TODO exchangeContactNFC
     @Override
     public void exchangeContactNFC() {
 
     }
 
-//    TODO addListener
+    //    TODO addListener
     @Override
     public void addListener(Profile p, GetEvents listener) {
 
     }
 
-//    TODO inform
+    //    TODO inform
     @Override
     public void removeListener(Profile p, GetEvents listener) {
 
@@ -297,16 +295,16 @@ public class SharkNetEngine implements SharkNet {
     public Feed getFeedById(String id) throws SharkKBException {
         List<Feed> list = getFeeds();
         Iterator<Feed> iterator = list.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Feed next = iterator.next();
-            if(next.getId().equals(id)){
+            if (next.getId().equals(id)) {
                 return next;
             }
         }
         return null;
     }
 
-    public SharkKB getCommentsKB(){
+    public SharkKB getCommentsKB() {
         return mCommentKB;
     }
 
@@ -320,11 +318,11 @@ public class SharkNetEngine implements SharkNet {
 
     private SharkKB createKBFromRoot(SharkKB sharkKB) throws SharkKBException {
         return new InMemoSharkKB(
-            sharkKB.getTopicsAsSemanticNet(),
-            sharkKB.getTypesAsSemanticNet(),
-            sharkKB.getPeersAsTaxonomy(),
-            sharkKB.getSpatialSTSet(),
-            sharkKB.getTimeSTSet()
+                sharkKB.getTopicsAsSemanticNet(),
+                sharkKB.getTypesAsSemanticNet(),
+                sharkKB.getPeersAsTaxonomy(),
+                sharkKB.getSpatialSTSet(),
+                sharkKB.getTimeSTSet()
         );
     }
 }
