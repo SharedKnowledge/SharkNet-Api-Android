@@ -1,5 +1,6 @@
 package net.sharksystem.api.interfaces;
 
+import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
 
 import org.json.JSONException;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public interface SharkNet {
 
-    List<Contact> getRadarContacts();
+    List<Contact> getRadarContacts() throws SharkKBException;
 
     void addRadarListener(RadarListener listener);
 
@@ -93,6 +94,8 @@ public interface SharkNet {
      * @param uId
      */
     Contact newContact(String nickName, String uId) throws SharkKBException;
+
+    Contact newContact(PeerSemanticTag tag) throws SharkKBException;
 
     /**
      * Set the Profile the User want to use during the session

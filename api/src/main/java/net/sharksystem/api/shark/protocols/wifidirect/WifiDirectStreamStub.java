@@ -23,7 +23,6 @@ public class WifiDirectStreamStub implements StreamStub{
 
     public WifiDirectStreamStub(Context context, AndroidSharkEngine engine) {
         mEngine = engine;
-
         mWifiDirectManager = new WifiDirectManager(context, mEngine);
     }
 

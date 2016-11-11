@@ -103,8 +103,6 @@ public class SharkNetEngine implements SharkNet {
             asipSpace = interests.asASIPSpace();
         }
         mSharkEngine.setSpace(asipSpace);
-
-        // TODO start Wifi!!!!
     }
 
     // Radar
@@ -112,8 +110,18 @@ public class SharkNetEngine implements SharkNet {
     //
 
     @Override
-    public List<Contact> getRadarContacts() {
-        return null;
+    public List<Contact> getRadarContacts() throws SharkKBException {
+
+        List<ASIPSpace> nearbyPeersAsList = mSharkEngine.getNearbyPeersAsList();
+
+        ArrayList<Contact> contacts = new ArrayList<>();
+
+        for (ASIPSpace peer : nearbyPeersAsList){
+            Contact contact = newContact(peer.getSender());
+            contacts.add(contact);
+        }
+
+        return contacts;
     }
 
     @Override
@@ -125,7 +133,6 @@ public class SharkNetEngine implements SharkNet {
     public void removeRadarListener(RadarListener listener) {
 
     }
-
 
     // Profiles
     //
@@ -198,6 +205,12 @@ public class SharkNetEngine implements SharkNet {
     public Contact newContact(String nickName, String uId) throws SharkKBException {
         return newContact(nickName, uId, "");
     }
+
+    @Override
+    public Contact newContact(PeerSemanticTag tag) throws SharkKBException {
+        return new ContactImpl(mContactKB, tag);
+    }
+
 
     // Chats
     //

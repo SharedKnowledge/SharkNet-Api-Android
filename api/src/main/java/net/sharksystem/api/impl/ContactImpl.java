@@ -29,6 +29,7 @@ import java.util.List;
 /**
  * Created by j4rvis on 01.08.16.
  */
+
 public class ContactImpl implements Contact {
 
     protected SharkKB mSharkKB;
@@ -44,7 +45,7 @@ public class ContactImpl implements Contact {
     private final static String CONTACT_NOTE = "CONTACT_NOTE";
     private final static String CONTACT_LAST_SEEN = "CONTACT_LAST_SEEN";
 
-    public ContactImpl(SharkKB sharkKB, PeerSemanticTag tag) throws SharkKBException {
+    protected ContactImpl(SharkKB sharkKB, PeerSemanticTag tag) throws SharkKBException {
         mSharkKB = sharkKB;
         mSpace = createASIPSpace(tag);
 
@@ -57,13 +58,14 @@ public class ContactImpl implements Contact {
 
         // SET FIRST INFO - NAME
         setName(tag.getName());
+        setUID(tag.getSI()[0]);
     }
 
-    public ContactImpl(SharkKB sharkKB, String nickname, String deviceId) throws SharkKBException {
+    protected ContactImpl(SharkKB sharkKB, String nickname, String deviceId) throws SharkKBException {
         this(sharkKB, ContactImpl.createPeerSemanticTag(nickname, deviceId));
     }
 
-    public ContactImpl(SharkKB sharkKB, ASIPInformationSpace informationSpace) throws SharkKBException {
+    protected ContactImpl(SharkKB sharkKB, ASIPInformationSpace informationSpace) throws SharkKBException {
         mSharkKB = sharkKB;
         mSpace = informationSpace.getASIPSpace();
     }
@@ -76,18 +78,6 @@ public class ContactImpl implements Contact {
     private ASIPSpace createASIPSpace(PeerSemanticTag tag) throws SharkKBException {
         return mSharkKB.createASIPSpace((SemanticTag) null, null, null, tag, null, null, null, ASIPSpace.DIRECTION_NOTHING);
     }
-
-//    private ASIPInformation getInfoByName(String name) throws SharkKBException {
-//        Iterator<ASIPInformation> information = mSharkKB.getInformation(mSpace);
-//        while (information.hasNext()) {
-//            ASIPInformation next = information.next();
-//            if (next.getName().equals(name)) {
-//                return next;
-//            }
-//        }
-//        return null;
-//    }
-
 
     @Override
     public PeerSemanticTag getPST() throws SharkKBException {
@@ -113,7 +103,7 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setUID(String uid) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NICKNAME, uid);
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_UID, uid);
     }
 
     @Override
@@ -192,7 +182,6 @@ public class ContactImpl implements Contact {
         return false;
     }
 
-
 //    TODO getOwner
     @Override
     public Profile getOwner() {
@@ -209,7 +198,6 @@ public class ContactImpl implements Contact {
         ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_NAME);
         return information != null ? information.getContentAsString() : null;
     }
-
 
     // SEPERATED BY ';'
     @Override

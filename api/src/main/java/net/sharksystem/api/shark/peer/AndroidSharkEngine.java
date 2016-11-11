@@ -120,7 +120,7 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
     @Override
     public Stub getProtocolStub(int type) throws SharkProtocolNotSupportedException {
         return super.getProtocolStub(type);
-        //TODO this function is called by the parent but the parent function itself look likes a big mess
+        //TODO this function is called by the parent but the parent function itself looks likes a big mess
     }
 
     @Override
