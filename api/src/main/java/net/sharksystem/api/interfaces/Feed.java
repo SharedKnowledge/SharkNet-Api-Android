@@ -1,6 +1,5 @@
 package net.sharksystem.api.interfaces;
 
-import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SharkKBException;
 
 import org.json.JSONException;

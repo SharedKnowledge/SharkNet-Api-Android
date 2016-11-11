@@ -177,7 +177,7 @@ public class ContactImpl implements Contact {
     @Override
     public Interest getInterests() throws SharkKBException {
 
-        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_NAME);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_INTEREST);
         if(information!=null){
             String contentAsString = information.getContentAsString();
             ASIPInterest interest = ASIPSerializer.deserializeASIPInterest(contentAsString);

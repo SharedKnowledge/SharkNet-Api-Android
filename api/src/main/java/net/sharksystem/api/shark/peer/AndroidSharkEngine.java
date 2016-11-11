@@ -6,6 +6,8 @@ import android.content.Context;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.SharkStub;
 import net.sharkfw.kep.SharkProtocolNotSupportedException;
+import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.J2SEAndroidSharkEngine;
 import net.sharkfw.protocols.RequestHandler;
 import net.sharkfw.protocols.Stub;
@@ -45,7 +47,15 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
     }
 
     public void setSpace(ASIPSpace space) {
-        mSpace = space;
+        if(space==null){
+            try {
+                mSpace = InMemoSharkKB.createInMemoASIPInterest(null, null, getOwner(), null, null, null, null, ASIPSpace.DIRECTION_INOUT);
+            } catch (SharkKBException e) {
+                e.printStackTrace();
+            }
+        } else {
+            mSpace = space;
+        }
     }
 
     public ASIPSpace getSpace() {

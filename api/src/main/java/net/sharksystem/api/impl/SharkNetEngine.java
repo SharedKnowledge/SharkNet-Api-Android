@@ -3,7 +3,6 @@ package net.sharksystem.api.impl;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
-import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
@@ -16,6 +15,7 @@ import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
 import net.sharksystem.api.interfaces.Feed;
 import net.sharksystem.api.interfaces.GetEvents;
+import net.sharksystem.api.interfaces.Interest;
 import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.RadarListener;
@@ -97,8 +97,11 @@ public class SharkNetEngine implements SharkNet {
 
         mSharkEngine.setEngineOwnerPeer(profile.getPST());
 
-        ASIPSpace asipSpace = profile.getInterests().asASIPSpace();
-
+        Interest interests = profile.getInterests();
+        ASIPSpace asipSpace = null;
+        if(interests!=null){
+            asipSpace = interests.asASIPSpace();
+        }
         mSharkEngine.setSpace(asipSpace);
 
         // TODO start Wifi!!!!
