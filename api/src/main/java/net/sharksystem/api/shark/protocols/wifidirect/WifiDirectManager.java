@@ -15,10 +15,9 @@ import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Handler;
 
-import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
-import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.system.L;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 
 import java.util.ArrayList;
@@ -46,8 +45,8 @@ public class WifiDirectManager
         NONE
     }
 
-    private boolean mIsReceiverRegistered;
-    private boolean mIsDiscovering;
+    private boolean mIsReceiverRegistered = false;
+    private boolean mIsDiscovering = false;
 
     private WifiP2pDnsSdServiceInfo mServiceInfo;
 
@@ -75,9 +74,9 @@ public class WifiDirectManager
     public WifiDirectManager(Context context, AndroidSharkEngine engine) {
         mEngine = engine;
         addPeerListener(mEngine);
-        mContext =  context;
-        mManager = (WifiP2pManager) mContext.getSystemService(Context.WIFI_P2P_SERVICE);
+        mContext = context;
 
+        mManager = (WifiP2pManager) mContext.getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(mContext, mContext.getMainLooper(), null);
         mManager.setDnsSdResponseListeners(mChannel, null, this);
     }
@@ -125,7 +124,7 @@ public class WifiDirectManager
 
         if(!mIsDiscovering){
 
-            if(mIsReceiverRegistered){
+            if(!mIsReceiverRegistered){
                 IntentFilter intentFilter = new IntentFilter();
                 intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
                 intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -137,21 +136,18 @@ public class WifiDirectManager
             }
 
             mManager.clearLocalServices(mChannel, new WifiActionListener("Clear LocalServices"));
-
-            HashMap<String, String> map = WifiDirectUtil.interest2RecordMap((ASIPInterest) space);
-
+//            HashMap<String, String> map = WifiDirectUtil.interest2RecordMap(space);
+            HashMap<String, String> map = new HashMap<>();
+            map.put("name", "DDDDDDD");
             mServiceInfo =
                     WifiP2pDnsSdServiceInfo.newInstance("_sbc", "_presence._tcp", map);
-
             mManager.addLocalService(mChannel, mServiceInfo,
                     new WifiActionListener("Add LocalService"));
 
             mManager.clearServiceRequests(mChannel,
                     new WifiActionListener("Clear ServiceRequests"));
-
-            WifiP2pDnsSdServiceRequest serviceRequest = WifiP2pDnsSdServiceRequest.newInstance();
-
-            mManager.addServiceRequest(mChannel, serviceRequest,
+            WifiP2pDnsSdServiceRequest wifiP2pDnsSdServiceRequest = WifiP2pDnsSdServiceRequest.newInstance();
+            mManager.addServiceRequest(mChannel, wifiP2pDnsSdServiceRequest,
                     new WifiActionListener("Add ServiceRequest"));
 
             mHandler.post(this);
@@ -232,6 +228,8 @@ public class WifiDirectManager
                                           Map<String, String> txtRecordMap,
                                           WifiP2pDevice srcDevice) {
 
+        L.d("Whoop whoop", this);
+
         if(srcDevice == null || txtRecordMap.isEmpty()) return;
 
         if(WifiDirectUtil.isValidRecordMap(txtRecordMap)){
@@ -240,23 +238,25 @@ public class WifiDirectManager
 
         String addr = "WIFI://" + srcDevice.deviceAddress;
 
-        ASIPInterest interest = null;
-        try {
-            interest = WifiDirectUtil.recordMap2Interest(txtRecordMap);
-        } catch (SharkKBException e) {
-            e.printStackTrace();
-        }
-
-        PeerSemanticTag sender = null;
-        if (interest != null) {
-            sender = interest.getSender();
-            sender.addAddress(addr);
-        }
-
-        // Inform Listener
-        for(WifiDirectPeerListener listener : mPeerListeners){
-            listener.onNewNearbyPeer(interest);
-        }
+        L.d(txtRecordMap.toString(), this);
+//
+//        ASIPInterest interest = null;
+//        try {
+//            interest = WifiDirectUtil.recordMap2Interest(txtRecordMap);
+//        } catch (SharkKBException e) {
+//            e.printStackTrace();
+//        }
+//
+//        PeerSemanticTag sender = null;
+//        if (interest != null) {
+//            sender = interest.getSender();
+//            sender.addAddress(addr);
+//        }
+//
+//        // Inform Listener
+//        for(WifiDirectPeerListener listener : mPeerListeners){
+//            listener.onNewNearbyPeer(interest);
+//        }
 
     }
 

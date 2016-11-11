@@ -1,8 +1,11 @@
 package net.sharksystem.api.impl;
 
+import android.content.Context;
+
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.kep.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
@@ -20,22 +23,23 @@ import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.RadarListener;
 import net.sharksystem.api.interfaces.SharkNet;
-import net.sharksystem.api.shark.Application;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by j4rvis on 01.08.16.
  */
-public class SharkNetEngine implements SharkNet {
+public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersListener {
 
     private static final String ACTIVE_PROFILE = "ACTIVE_PROFILE";
     private static final String ACTIVE_PROFILE_PASSWORD = "ACTIVE_PROFILE_PASSWORD";
@@ -63,21 +67,27 @@ public class SharkNetEngine implements SharkNet {
     private SharkKB mFeedKB = null;
     private SharkKB mCommentKB = null;
     private List<SharkKB> mChatKBs = new ArrayList<>();
+    private ArrayList<Contact> mContacts;
+    private Context mContext;
 
-    public static SharkNetEngine getSharkNet() throws SharkKBException {
+    public static SharkNetEngine getSharkNet(){
         if (SharkNetEngine.sInstance == null) {
             sInstance = new SharkNetEngine();
         }
         return sInstance;
     }
 
-    private SharkNetEngine() throws SharkKBException {
+    private SharkNetEngine(){
         mRootKB = new InMemoSharkKB();
         // Create shared KB
-        mProfileKB = createKBFromRoot(mRootKB);
-        mContactKB = createKBFromRoot(mRootKB);
-        mFeedKB = createKBFromRoot(mRootKB);
-        mCommentKB = createKBFromRoot(mRootKB);
+        try {
+            mProfileKB = createKBFromRoot(mRootKB);
+            mContactKB = createKBFromRoot(mRootKB);
+            mFeedKB = createKBFromRoot(mRootKB);
+            mCommentKB = createKBFromRoot(mRootKB);
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
     }
 
     public void clearData() throws SharkKBException {
@@ -90,8 +100,12 @@ public class SharkNetEngine implements SharkNet {
         mChatKBs.clear();
     }
 
-    public void startShark() throws SharkKBException {
-        mSharkEngine = new AndroidSharkEngine(Application.getAppContext());
+    public void setContext(Context context){
+        mContext = context;
+    }
+
+    public void startShark() throws SharkKBException, SharkProtocolNotSupportedException, IOException {
+        mSharkEngine = new AndroidSharkEngine(mContext);
 
         Profile profile = getMyProfile();
 
@@ -103,6 +117,8 @@ public class SharkNetEngine implements SharkNet {
             asipSpace = interests.asASIPSpace();
         }
         mSharkEngine.setSpace(asipSpace);
+
+        mSharkEngine.startWifiDirect();
     }
 
     // Radar
@@ -110,28 +126,41 @@ public class SharkNetEngine implements SharkNet {
     //
 
     @Override
-    public List<Contact> getRadarContacts() throws SharkKBException {
-
-        List<ASIPSpace> nearbyPeersAsList = mSharkEngine.getNearbyPeersAsList();
-
-        ArrayList<Contact> contacts = new ArrayList<>();
-
-        for (ASIPSpace peer : nearbyPeersAsList){
-            Contact contact = newContact(peer.getSender());
-            contacts.add(contact);
-        }
-
-        return contacts;
+    public List<Contact> getRadarContacts() {
+        return mContacts;
     }
 
     @Override
     public void addRadarListener(RadarListener listener) {
-
+        if(!mRadarListeners.contains(listener)){
+            mRadarListeners.add(listener);
+        }
     }
 
     @Override
     public void removeRadarListener(RadarListener listener) {
+        if(!mRadarListeners.contains(listener)){
+            mRadarListeners.remove(listener);
+        }
+    }
 
+    @Override
+    public void onNearbyPeerDetected(HashMap<ASIPSpace, Long> nearbyPeersMap) {
+        mContacts = new ArrayList<>();
+
+        for( ASIPSpace space : nearbyPeersMap.keySet()){
+            try {
+                Contact contact = newContact(space.getSender());
+                contact.setLastWifiContact(new Timestamp(System.currentTimeMillis()));
+                mContacts.add(contact);
+                // TODO further information in this space?
+            } catch (SharkKBException e) {
+                e.printStackTrace();
+            }
+        }
+        for (RadarListener listener : mRadarListeners){
+            listener.onNewRadarContact(mContacts);
+        }
     }
 
     // Profiles
@@ -340,6 +369,7 @@ public class SharkNetEngine implements SharkNet {
     public void informComment(Comment c) {
 
     }
+
 
     @Override
     public void informContact(Contact c) {

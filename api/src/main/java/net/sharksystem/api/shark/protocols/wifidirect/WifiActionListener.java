@@ -17,7 +17,7 @@ public class WifiActionListener implements WifiP2pManager.ActionListener {
 
     @Override
     public void onSuccess() {
-//        L.d("WifiP2P", message + " successfull");
+//        L.d("WifiDirect - " + message + " successfull");
     }
 
     @Override

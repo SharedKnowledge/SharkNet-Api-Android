@@ -1,6 +1,7 @@
 package net.sharksystem.api.shark.protocols.wifidirect;
 
 import net.sharkfw.asip.ASIPInterest;
+import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
@@ -25,7 +26,7 @@ public class WifiDirectUtil {
     public final static String TIME_RECORD = "TI";
     public final static String DIRECTION_RECORD = "DI";
 
-    public static HashMap<String, String> interest2RecordMap(ASIPInterest space){
+    public static HashMap<String, String> interest2RecordMap(ASIPSpace space){
 
         HashMap<String, String> map = new HashMap<>();
 
@@ -44,26 +45,26 @@ public class WifiDirectUtil {
             if(space.getTopics() != null){
                 serializedTopic = ASIPSerializer.serializeSTSet(space.getTopics()).toString();
             }
-            if(space.getTypes() == null){
+            if(space.getTypes() != null){
                 serializedType = ASIPSerializer.serializeSTSet(space.getTypes()).toString();
             }
-            if(space.getSender() == null){
+            if(space.getSender() != null){
                 serializedSender = ASIPSerializer.serializeTag(space.getSender()).toString();
                 name = space.getSender().getName();
                 if(name.isEmpty()) {
                     name = "A";
                 }
             }
-            if(space.getApprovers() == null){
+            if(space.getApprovers() != null){
                 serializedApprovers = ASIPSerializer.serializeSTSet(space.getApprovers()).toString();
             }
-            if(space.getReceivers() == null){
+            if(space.getReceivers() != null){
                 serializedReceiver = ASIPSerializer.serializeSTSet(space.getReceivers()).toString();
             }
-            if(space.getLocations() == null){
+            if(space.getLocations() != null){
                 serializedLocation = ASIPSerializer.serializeSTSet(space.getLocations()).toString();
             }
-            if(space.getTimes() == null){
+            if(space.getTimes() != null){
                 serializedTime = ASIPSerializer.serializeSTSet(space.getTimes()).toString();
             }
             if(space.getDirection() < 0){
