@@ -11,7 +11,6 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.J2SEAndroidSharkEngine;
 import net.sharkfw.protocols.RequestHandler;
 import net.sharkfw.protocols.Stub;
-import net.sharkfw.system.L;
 import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectManager;
 import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectStreamStub;
@@ -19,8 +18,8 @@ import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectStreamStub;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -126,10 +125,13 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
     @Override
     public void onNewNearbyPeer(ASIPSpace interest) {
         if (interest.getSender() != null) {
-            for (Map.Entry<ASIPSpace, Long> entry : mNearbyPeers.entrySet()) {
-                L.d(entry.getKey().getSender().getName() + " " + Arrays.toString(entry.getKey().getSender().getAddresses()), this);
-                if (entry.getKey().getSender().getName().equals(interest.getSender().getName())) {
-                    mNearbyPeers.remove(entry.getKey());
+
+            Iterator<Map.Entry<ASIPSpace, Long>> iterator = mNearbyPeers.entrySet().iterator();
+            while (iterator.hasNext()){
+//                L.d(entry.getKey().getSender().getName() + " " + Arrays.toString(entry.getKey().getSender().getAddresses()), this);
+                Map.Entry<ASIPSpace, Long> next = iterator.next();
+                if (next.getKey().getSender().getName().equals(interest.getSender().getName())) {
+                    iterator.remove();
                 }
             }
             this.mNearbyPeers.put(interest, System.currentTimeMillis());
