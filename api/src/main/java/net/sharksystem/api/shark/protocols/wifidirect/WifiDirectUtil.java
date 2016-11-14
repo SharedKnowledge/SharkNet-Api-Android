@@ -26,14 +26,14 @@ public class WifiDirectUtil {
     public final static String TIME_RECORD = "TI";
     public final static String DIRECTION_RECORD = "DI";
 
-    public static HashMap<String, String> interest2RecordMap(ASIPInterest interest){
+    public static HashMap<String, String> interest2RecordMap(ASIPInterest interest) {
 
         HashMap<String, String> map = new HashMap<>();
 
         WifiDirectUtil.set2Map(map, WifiDirectUtil.TOPIC_RECORD, interest.getTopics());
         WifiDirectUtil.set2Map(map, WifiDirectUtil.TYPE_RECORD, interest.getTypes());
 
-        if(interest.getSender() != null){
+        if (interest.getSender() != null) {
             try {
                 String senderString = ASIPSerializer.serializeTag(interest.getSender()).toString();
                 map.put(WifiDirectUtil.SENDER_RECORD, senderString);
@@ -47,7 +47,7 @@ public class WifiDirectUtil {
         WifiDirectUtil.set2Map(map, WifiDirectUtil.TIME_RECORD, interest.getTimes());
         WifiDirectUtil.set2Map(map, WifiDirectUtil.LOCATION_RECORD, interest.getLocations());
 
-        if(interest.getDirection() >= 0){
+        if (interest.getDirection() >= 0) {
             int direction = interest.getDirection();
             map.put(DIRECTION_RECORD, String.valueOf(direction));
         }
@@ -55,8 +55,8 @@ public class WifiDirectUtil {
         return map;
     }
 
-    private static void set2Map(HashMap<String, String> map, String key, STSet set){
-        if(set != null && !set.isEmpty()){
+    private static void set2Map(HashMap<String, String> map, String key, STSet set) {
+        if (set != null && !set.isEmpty()) {
             try {
                 String string = ASIPSerializer.serializeSTSet(set).toString();
                 map.put(key, string);
@@ -78,37 +78,39 @@ public class WifiDirectUtil {
         interest.setLocations(InMemoSharkKB.createInMemoSpatialSTSet());
         interest.setTimes(InMemoSharkKB.createInMemoTimeSTSet());
 
-        if(map.containsKey(TOPIC_RECORD)){
+        if (map.containsKey(TOPIC_RECORD)) {
             String record = map.get(TOPIC_RECORD);
             interest.getTopics().merge(ASIPSerializer.deserializeSTSet(record));
         }
-        if(map.containsKey(TYPE_RECORD)){
+        if (map.containsKey(TYPE_RECORD)) {
             String record = map.get(TYPE_RECORD);
             interest.getTypes().merge(ASIPSerializer.deserializeSTSet(record));
         }
-        if(map.containsKey(SENDER_RECORD)){
+        if (map.containsKey(SENDER_RECORD)) {
             String record = map.get(SENDER_RECORD);
             interest.setSender(ASIPSerializer.deserializePeerTag(record));
         }
-        if(map.containsKey(APPROVERS_RECORD)){
+        if (map.containsKey(APPROVERS_RECORD)) {
             String record = map.get(APPROVERS_RECORD);
             interest.getApprovers().merge(ASIPSerializer.deserializePeerSTSet(null, record));
         }
-        if(map.containsKey(RECEIVER_RECORD)){
+        if (map.containsKey(RECEIVER_RECORD)) {
             String record = map.get(RECEIVER_RECORD);
             interest.getReceivers().merge(ASIPSerializer.deserializePeerSTSet(null, record));
         }
-        if(map.containsKey(LOCATION_RECORD)){
+        if (map.containsKey(LOCATION_RECORD)) {
             String record = map.get(LOCATION_RECORD);
             interest.getLocations().merge(ASIPSerializer.deserializeSpatialSTSet(null, record));
         }
-        if(map.containsKey(TIME_RECORD)){
+        if (map.containsKey(TIME_RECORD)) {
             String record = map.get(TIME_RECORD);
             interest.getTimes().merge(ASIPSerializer.deserializeTimeSTSet(null, record));
         }
-        if(map.containsKey(DIRECTION_RECORD)){
-            int record = Integer.getInteger(map.get(DIRECTION_RECORD));
-            interest.setDirection(record);
+        if (map.containsKey(DIRECTION_RECORD)) {
+            String s = map.get(DIRECTION_RECORD);
+            if (s != null) {
+                interest.setDirection(Integer.parseInt(s));
+            }
         }
         return interest;
     }

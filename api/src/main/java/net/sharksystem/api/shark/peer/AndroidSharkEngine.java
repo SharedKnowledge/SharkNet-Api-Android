@@ -133,7 +133,10 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
                 }
             }
             this.mNearbyPeers.put(interest, System.currentTimeMillis());
-            callNearbyPeersListeners();
+
+            for (NearbyPeersListener listener : mNearbyPeersListeners) {
+                listener.onNearbyPeerDetected(mNearbyPeers);
+            }
         }
     }
 
@@ -151,12 +154,6 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
 
     public void removeNearbyPeersListener(NearbyPeersListener listener) {
         mNearbyPeersListeners.remove(listener);
-    }
-
-    private void callNearbyPeersListeners() {
-        for (NearbyPeersListener listener : mNearbyPeersListeners) {
-            listener.onNearbyPeerDetected(mNearbyPeers);
-        }
     }
 
     public List<ASIPSpace> getNearbyPeersAsList(long millis) {

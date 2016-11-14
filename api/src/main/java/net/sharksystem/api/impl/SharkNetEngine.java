@@ -12,6 +12,7 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.system.L;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Comment;
 import net.sharksystem.api.interfaces.Contact;
@@ -108,7 +109,6 @@ public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersL
         mSharkEngine = new AndroidSharkEngine(mContext);
 
         Profile profile = getMyProfile();
-
         mSharkEngine.setEngineOwnerPeer(profile.getPST());
 
         Interest interests = profile.getInterests();
@@ -117,7 +117,7 @@ public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersL
             asipSpace = interests.asASIPSpace();
         }
         mSharkEngine.setSpace(asipSpace);
-
+        mSharkEngine.addNearbyPeersListener(this);
         mSharkEngine.startWifiDirect();
     }
 
