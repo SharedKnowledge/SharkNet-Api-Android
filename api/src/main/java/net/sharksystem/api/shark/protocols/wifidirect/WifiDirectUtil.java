@@ -1,10 +1,11 @@
 package net.sharksystem.api.shark.protocols.wifidirect;
 
 import net.sharkfw.asip.ASIPInterest;
-import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.system.L;
 
 import org.json.JSONException;
 
@@ -16,7 +17,6 @@ import java.util.Map;
  */
 public class WifiDirectUtil {
 
-    public final static String NAME_RECORD = "NAME";
     public final static String TOPIC_RECORD = "TO";
     public final static String TYPE_RECORD = "TY";
     public final static String SENDER_RECORD = "SE";
@@ -26,66 +26,45 @@ public class WifiDirectUtil {
     public final static String TIME_RECORD = "TI";
     public final static String DIRECTION_RECORD = "DI";
 
-    public static HashMap<String, String> interest2RecordMap(ASIPSpace space){
+    public static HashMap<String, String> interest2RecordMap(ASIPInterest interest){
 
         HashMap<String, String> map = new HashMap<>();
 
-        String serializedTopic = "";
-        String serializedType = "";
-        String serializedSender = "";
-        String serializedApprovers = "";
-        String serializedReceiver = "";
-        String serializedLocation = "";
-        String serializedTime = "";
-        int direction = -1;
-        String name = "";
+        WifiDirectUtil.set2Map(map, WifiDirectUtil.TOPIC_RECORD, interest.getTopics());
+        WifiDirectUtil.set2Map(map, WifiDirectUtil.TYPE_RECORD, interest.getTypes());
 
-        try {
-
-            if(space.getTopics() != null){
-                serializedTopic = ASIPSerializer.serializeSTSet(space.getTopics()).toString();
+        if(interest.getSender() != null){
+            try {
+                String senderString = ASIPSerializer.serializeTag(interest.getSender()).toString();
+                map.put(WifiDirectUtil.SENDER_RECORD, senderString);
+            } catch (JSONException | SharkKBException e) {
+                e.printStackTrace();
             }
-            if(space.getTypes() != null){
-                serializedType = ASIPSerializer.serializeSTSet(space.getTypes()).toString();
-            }
-            if(space.getSender() != null){
-                serializedSender = ASIPSerializer.serializeTag(space.getSender()).toString();
-                name = space.getSender().getName();
-                if(name.isEmpty()) {
-                    name = "A";
-                }
-            }
-            if(space.getApprovers() != null){
-                serializedApprovers = ASIPSerializer.serializeSTSet(space.getApprovers()).toString();
-            }
-            if(space.getReceivers() != null){
-                serializedReceiver = ASIPSerializer.serializeSTSet(space.getReceivers()).toString();
-            }
-            if(space.getLocations() != null){
-                serializedLocation = ASIPSerializer.serializeSTSet(space.getLocations()).toString();
-            }
-            if(space.getTimes() != null){
-                serializedTime = ASIPSerializer.serializeSTSet(space.getTimes()).toString();
-            }
-            if(space.getDirection() < 0){
-                direction = space.getDirection();
-            }
-
-        } catch (SharkKBException | JSONException e) {
-            e.printStackTrace();
         }
 
-        map.put(NAME_RECORD, name);
-        map.put(TOPIC_RECORD, serializedTopic);
-        map.put(TYPE_RECORD, serializedType);
-        map.put(SENDER_RECORD, serializedSender);
-        map.put(APPROVERS_RECORD, serializedApprovers);
-        map.put(RECEIVER_RECORD, serializedReceiver);
-        map.put(LOCATION_RECORD, serializedLocation);
-        map.put(TIME_RECORD, serializedTime);
-        map.put(DIRECTION_RECORD, String.valueOf(direction));
+        WifiDirectUtil.set2Map(map, WifiDirectUtil.APPROVERS_RECORD, interest.getApprovers());
+        WifiDirectUtil.set2Map(map, WifiDirectUtil.RECEIVER_RECORD, interest.getReceivers());
+        WifiDirectUtil.set2Map(map, WifiDirectUtil.TIME_RECORD, interest.getTimes());
+        WifiDirectUtil.set2Map(map, WifiDirectUtil.LOCATION_RECORD, interest.getLocations());
+
+        if(interest.getDirection() >= 0){
+            int direction = interest.getDirection();
+            map.put(DIRECTION_RECORD, String.valueOf(direction));
+        }
 
         return map;
+    }
+
+    private static void set2Map(HashMap<String, String> map, String key, STSet set){
+        if(set != null && !set.isEmpty()){
+            try {
+                String string = ASIPSerializer.serializeSTSet(set).toString();
+                map.put(key, string);
+            } catch (SharkKBException | JSONException e) {
+                e.printStackTrace();
+                L.d(e.getMessage(), WifiDirectUtil.class);
+            }
+        }
     }
 
     public static ASIPInterest recordMap2Interest(Map<String, String> map) throws SharkKBException {
@@ -132,14 +111,5 @@ public class WifiDirectUtil {
             interest.setDirection(record);
         }
         return interest;
-    }
-
-    public static boolean isValidRecordMap(Map<String, String> map){
-        if(map.containsKey(NAME_RECORD)
-                && map.containsKey(TOPIC_RECORD)){
-            return true;
-        } else {
-            return false;
-        }
     }
 }

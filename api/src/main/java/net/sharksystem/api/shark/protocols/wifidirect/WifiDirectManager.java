@@ -15,6 +15,7 @@ import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Handler;
 
+import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.system.L;
@@ -137,8 +138,7 @@ public class WifiDirectManager
 
             mManager.clearLocalServices(mChannel, new WifiActionListener("Clear LocalServices"));
 //            HashMap<String, String> map = WifiDirectUtil.interest2RecordMap(space);
-            HashMap<String, String> map = new HashMap<>();
-            map.put("name", "DDDDDDD");
+            HashMap<String, String> map = WifiDirectUtil.interest2RecordMap((ASIPInterest) space);
             mServiceInfo =
                     WifiP2pDnsSdServiceInfo.newInstance("_sbc", "_presence._tcp", map);
             mManager.addLocalService(mChannel, mServiceInfo,
@@ -231,10 +231,6 @@ public class WifiDirectManager
         L.d("Whoop whoop", this);
 
         if(srcDevice == null || txtRecordMap.isEmpty()) return;
-
-        if(WifiDirectUtil.isValidRecordMap(txtRecordMap)){
-            return;
-        }
 
         String addr = "WIFI://" + srcDevice.deviceAddress;
 

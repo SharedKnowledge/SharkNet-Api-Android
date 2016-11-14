@@ -24,7 +24,6 @@ import net.sharkfw.protocols.StreamStub;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
-import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectUtil;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -143,9 +142,6 @@ public class WifiDirectStreamStub
         // Add device to knownDevices list.
         updateDevices(srcDevice);
         // Add peer tp list
-        if(WifiDirectUtil.isValidRecordMap(txtRecordMap)){
-            return;
-        }
         WifiDirectPeer peer = new WifiDirectPeer(srcDevice, txtRecordMap);
         addPeer(peer);
         // Update Lists in WifiDirectBroadcastManager
