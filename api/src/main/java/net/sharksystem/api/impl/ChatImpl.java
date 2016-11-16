@@ -54,7 +54,6 @@ public class ChatImpl implements Chat {
     private SyncKB mChatKB;
 
 
-
     public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
         mChatKB = new SyncKB(sharkKB);
         mSharkNetEngine = sharkNetEngine;
@@ -62,7 +61,7 @@ public class ChatImpl implements Chat {
         mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
                 null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
 
-        if(getID()==null){
+        if (getID() == null) {
             SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_ID, String.valueOf(System.currentTimeMillis()));
         }
     }
@@ -72,7 +71,7 @@ public class ChatImpl implements Chat {
 
         setContacts(recipients);
 
-        if(owner!=null){
+        if (owner != null) {
             String serializedTag = ASIPSerializer.serializeTag(owner.getPST()).toString();
             ASIPInformation information = mChatKB.addInformation(serializedTag, mChatConfigSpace);
             information.setName(CHAT_OWNER);
@@ -123,14 +122,14 @@ public class ChatImpl implements Chat {
     private List<Message> getMessages() throws SharkKBException {
         ArrayList<Message> messages = new ArrayList<>();
         Iterator<ASIPInformationSpace> informationSpaces = mChatKB.informationSpaces();
-        while (informationSpaces.hasNext()){
+        while (informationSpaces.hasNext()) {
             ASIPInformationSpace next = informationSpaces.next();
-            if(next == null){
+            if (next == null) {
                 continue;
             }
             // checks if the infoSpace has an type SemanticTag with the SI from the mMessageType-Tag
             STSet types = next.getASIPSpace().getTypes();
-            if(types.getSemanticTag(mMessageType.getSI())!=null){
+            if (types.getSemanticTag(mMessageType.getSI()) != null) {
                 MessageImpl message = new MessageImpl(mSharkNetEngine, this, mChatKB, next);
                 messages.add(message);
             }
@@ -173,7 +172,7 @@ public class ChatImpl implements Chat {
         PeerSTSet peers = InMemoSharkKB.createInMemoPeerSTSet();
 
         Iterator<Contact> iterator = contacts.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Contact next = iterator.next();
             peers.merge(next.getPST());
         }
@@ -185,22 +184,22 @@ public class ChatImpl implements Chat {
 
     @Override
     public List<Contact> getContacts() throws SharkKBException {
-        if(mSharkNetEngine==null){
+        if (mSharkNetEngine == null) {
             return null;
         }
 
         ArrayList<Contact> list = new ArrayList<>();
 
         Iterator<ASIPInformation> iterator = mChatKB.getInformation(mChatConfigSpace);
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             ASIPInformation next = iterator.next();
             // Check if we have an information with the serialized PSTSet as content
-            if(next.getName().equals(CHAT_RECIPIENTS)){
+            if (next.getName().equals(CHAT_RECIPIENTS)) {
                 String contentAsString = next.getContentAsString();
                 // Deserialize the PSTSet and get the peerTags
                 PeerSTSet peerSTSet = ASIPSerializer.deserializePeerSTSet(null, contentAsString);
                 Enumeration<PeerSemanticTag> peerTags = peerSTSet.peerTags();
-                while (peerTags.hasMoreElements()){
+                while (peerTags.hasMoreElements()) {
                     PeerSemanticTag peerSemanticTag = peerTags.nextElement();
                     // Get the contact for the PST from the sharkNEtEngine and add it to the list.
                     Contact contact = mSharkNetEngine.getContactByTag(peerSemanticTag);
@@ -246,7 +245,7 @@ public class ChatImpl implements Chat {
     @Override
     public String getTitle() throws SharkKBException {
         ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_TITLE);
-        if (information!=null){
+        if (information != null) {
             return information.getContentAsString();
         }
         return null;
@@ -255,7 +254,7 @@ public class ChatImpl implements Chat {
     @Override
     public Contact getOwner() throws SharkKBException {
         ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_OWNER);
-        if(information!=null){
+        if (information != null) {
             String informationContentAsString = information.getContentAsString();
             PeerSemanticTag peerSemanticTag = ASIPSerializer.deserializePeerTag(informationContentAsString);
             return mSharkNetEngine.getContactByTag(peerSemanticTag);
@@ -272,7 +271,7 @@ public class ChatImpl implements Chat {
     @Override
     public Contact getAdmin() throws SharkKBException {
         ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_ADMIN);
-        if(information!=null){
+        if (information != null) {
             String informationContentAsString = information.getContentAsString();
             PeerSemanticTag peerSemanticTag = ASIPSerializer.deserializePeerTag(informationContentAsString);
             return mSharkNetEngine.getContactByTag(peerSemanticTag);

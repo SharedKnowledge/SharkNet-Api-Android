@@ -12,7 +12,6 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
-import net.sharkfw.system.L;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Comment;
 import net.sharksystem.api.interfaces.Contact;
@@ -99,6 +98,10 @@ public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersL
         mFeedKB = createKBFromRoot(mRootKB);
         mCommentKB = createKBFromRoot(mRootKB);
         mChatKBs.clear();
+    }
+
+    public AndroidSharkEngine getSharkEngine() {
+        return mSharkEngine;
     }
 
     public void setContext(Context context){
@@ -197,12 +200,16 @@ public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersL
         return true;
     }
 
-    //    TODO getMyProfile
     @Override
     public Profile getMyProfile() throws SharkKBException {
         String string = SharkNetUtils.getInfoAsString(mProfileKB, mSettingsSpace, ACTIVE_PROFILE);
-        PeerSemanticTag tag = ASIPSerializer.deserializePeerTag(string);
-        return getProfileByTag(tag);
+        if(string != null && !string.isEmpty()){
+            PeerSemanticTag tag = ASIPSerializer.deserializePeerTag(string);
+            if(tag!=null){
+                return getProfileByTag(tag);
+            }
+        }
+        return null;
     }
 
     // Contacts

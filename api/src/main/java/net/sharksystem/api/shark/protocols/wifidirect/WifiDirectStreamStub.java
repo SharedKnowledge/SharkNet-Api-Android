@@ -1,6 +1,8 @@
 package net.sharksystem.api.shark.protocols.wifidirect;
 
 import android.content.Context;
+import android.net.wifi.p2p.WifiP2pGroup;
+import android.net.wifi.p2p.WifiP2pInfo;
 
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.Knowledge;
@@ -15,11 +17,12 @@ import java.io.IOException;
 /**
  * Created by j4rvis on 22.07.16.
  */
-public class WifiDirectStreamStub implements StreamStub{
+public class WifiDirectStreamStub implements StreamStub, WifiDirectManager.WifiDirectNetworkListener {
 
     private final AndroidSharkEngine mEngine;
     private final WifiDirectManager mWifiDirectManager;
     private boolean mIsStarted = false;
+    private RequestHandler mRequestHandler;
 
     public WifiDirectStreamStub(Context context, AndroidSharkEngine engine) {
         mEngine = engine;
@@ -27,8 +30,7 @@ public class WifiDirectStreamStub implements StreamStub{
     }
 
     @Override
-    public StreamConnection createStreamConnection(String s) throws IOException {
-        // TODO using wifi:// address to connect to peer
+    public StreamConnection createStreamConnection(String address) throws IOException {
         return null;
     }
 
@@ -39,7 +41,9 @@ public class WifiDirectStreamStub implements StreamStub{
     }
 
     @Override
-    public void setHandler(RequestHandler requestHandler) {}
+    public void setHandler(RequestHandler requestHandler) {
+        mRequestHandler = requestHandler;
+    }
 
     @Override
     public void start() throws IOException {
@@ -72,5 +76,14 @@ public class WifiDirectStreamStub implements StreamStub{
     @Override
     public void offer(Knowledge knowledge) throws SharkNotSupportedException {
         // TODO not yet implemented
+    }
+
+    @Override
+    public void onNetworkCreated(WifiP2pInfo info, WifiP2pGroup group) {
+    }
+
+    @Override
+    public void onNetworkDestroyed() {
+
     }
 }

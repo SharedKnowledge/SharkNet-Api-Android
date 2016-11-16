@@ -49,15 +49,13 @@ public class ContactImpl implements Contact {
         mSharkKB = sharkKB;
         mSpace = createASIPSpace(tag);
 
-//        System.out.println(L.semanticTag2String(tag));
-//        System.out.println(L.asipSpace2String(mSpace));
-
-//        System.out.println("Name: " + tag.getName());
-//        System.out.println("SI: " + tag.getSI()[0]);
-//        System.out.println("PST-Name: " + mSpace.getSender().getName());
+//        L.d("tag name: "+tag.getName(), this);
+//        L.d("tag si: "+tag.getSI()[0], this);
+//        L.d("pst name: "+mSpace.getSender().getName(), this);
 
         // SET FIRST INFO - NAME
         setName(tag.getName());
+        setNickname(tag.getName());
         setUID(tag.getSI()[0]);
     }
 

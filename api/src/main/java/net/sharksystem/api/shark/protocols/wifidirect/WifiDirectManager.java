@@ -19,6 +19,8 @@ import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.protocols.Protocols;
+import net.sharkfw.system.L;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 
 import java.util.ArrayList;
@@ -80,6 +82,17 @@ public class WifiDirectManager
         mManager = (WifiP2pManager) mContext.getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(mContext, mContext.getMainLooper(), null);
         mManager.setDnsSdResponseListeners(mChannel, null, this);
+        mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                L.d("Group removed", this);
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                L.d("Removing group failed.", this);
+            }
+        });
     }
 
     // Setter
@@ -96,9 +109,9 @@ public class WifiDirectManager
     }
 
     public void addNetworkListener(WifiDirectNetworkListener listener){
-        if(!mNetworkListeners.contains(listener)){
-            mNetworkListeners.add(listener);
-        }
+        mNetworkListeners.add(listener);
+//        if(!mNetworkListeners.contains(listener)){
+//        }
     }
 
     public void setDiscoveryInterval(int interval){
@@ -184,26 +197,20 @@ public class WifiDirectManager
 
     }
 
-    public void connect(PeerSemanticTag peer) throws IllegalArgumentException{
+    public void connect(final String address) throws IllegalArgumentException{
         final WifiP2pConfig config = new WifiP2pConfig();
-        for(String addr : peer.getAddresses()){
-            if(addr.startsWith("WIFI://")){
-                config.deviceAddress = addr;
-            }
-        }
-        if(config.deviceAddress == null || config.deviceAddress.isEmpty()){
-            throw new IllegalArgumentException("Peer does not have a WIFI address");
-        }
-
+        config.deviceAddress = address;
         config.wps.setup = WpsInfo.PBC;
+        L.d("Going to connect to " + address, this);
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-
+                L.d("Connection to address: " + address + " initiated", this);
             }
 
             @Override
             public void onFailure(int reason) {
+                L.d("Connection to address: " + address + " failed.", this);
             }
         });
         mState = WIFI_STATE.CONNECTING;
@@ -230,7 +237,7 @@ public class WifiDirectManager
 
         if(srcDevice == null || txtRecordMap.isEmpty()) return;
 
-        String addr = "wifi://" + srcDevice.deviceAddress;
+        String addr = Protocols.WIFI_DIRECT_PREFIX + srcDevice.deviceAddress;
 
 //        L.d(txtRecordMap.toString(), this);
 
@@ -245,7 +252,8 @@ public class WifiDirectManager
             e.printStackTrace();
         }
 
-        // Inform Listener
+        // Inform Listenerelse
+
         for(WifiDirectPeerListener listener : mPeerListeners){
             listener.onNewNearbyPeer(interest);
         }
@@ -254,6 +262,7 @@ public class WifiDirectManager
 
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
+        L.d("Wohoo WifiNetwork created.", this);
         mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
             @Override
             public void onGroupInfoAvailable(WifiP2pGroup group) {
