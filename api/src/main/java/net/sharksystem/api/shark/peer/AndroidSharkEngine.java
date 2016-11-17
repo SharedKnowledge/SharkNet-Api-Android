@@ -11,6 +11,7 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.J2SEAndroidSharkEngine;
 import net.sharkfw.protocols.RequestHandler;
 import net.sharkfw.protocols.Stub;
+import net.sharksystem.api.shark.protocols.bluetooth.BluetoothStreamStub;
 import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectManager;
 import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectStreamStub;
@@ -103,17 +104,20 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
 
     @Override
     protected Stub createBluetoothStreamStub(SharkStub kepStub) throws SharkProtocolNotSupportedException {
-        throw new SharkProtocolNotSupportedException();
+        if(currentStub==null){
+            currentStub = new BluetoothStreamStub();
+        }
+        return currentStub;
     }
 
     @Override
     public void startBluetooth() throws SharkProtocolNotSupportedException, IOException {
-        throw new SharkProtocolNotSupportedException();
+        this.createBluetoothStreamStub(this.getAsipStub()).start();
     }
 
     @Override
     public void stopBluetooth() throws SharkProtocolNotSupportedException {
-        throw new SharkProtocolNotSupportedException();
+        currentStub.stop();
     }
 
     @Override
