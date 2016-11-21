@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import net.sharkfw.asip.ASIPSpace;
+import net.sharkfw.asip.ASIPStub;
 import net.sharkfw.asip.SharkStub;
 import net.sharkfw.kep.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.SharkKBException;
@@ -38,6 +39,10 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
     public AndroidSharkEngine(Context context) {
         super();
         mContext = context;
+    }
+
+    public Context getContext(){
+        return mContext;
     }
 
     public AndroidSharkEngine(Activity activity) {
@@ -103,9 +108,9 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
     }
 
     @Override
-    protected Stub createBluetoothStreamStub(SharkStub kepStub) throws SharkProtocolNotSupportedException {
+    protected Stub createBluetoothStreamStub(ASIPStub stub) throws SharkProtocolNotSupportedException {
         if(currentStub==null){
-            currentStub = new BluetoothStreamStub();
+            currentStub = new BluetoothStreamStub(this, stub);
         }
         return currentStub;
     }
