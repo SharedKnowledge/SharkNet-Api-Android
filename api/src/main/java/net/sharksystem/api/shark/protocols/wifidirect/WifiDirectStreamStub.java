@@ -1,8 +1,6 @@
 package net.sharksystem.api.shark.protocols.wifidirect;
 
 import android.content.Context;
-import android.net.wifi.p2p.WifiP2pGroup;
-import android.net.wifi.p2p.WifiP2pInfo;
 
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.Knowledge;
@@ -17,16 +15,15 @@ import java.io.IOException;
 /**
  * Created by j4rvis on 22.07.16.
  */
-public class WifiDirectStreamStub implements StreamStub, WifiDirectManager.WifiDirectNetworkListener {
+public class WifiDirectStreamStub implements StreamStub {
 
     private final AndroidSharkEngine mEngine;
-    private final WifiDirectManager mWifiDirectManager;
+    private final WifiDirectAdvertisingManager mWifiDirectAdvertisingManager;
     private boolean mIsStarted = false;
-    private RequestHandler mRequestHandler;
 
     public WifiDirectStreamStub(Context context, AndroidSharkEngine engine) {
         mEngine = engine;
-        mWifiDirectManager = new WifiDirectManager(context, mEngine);
+        mWifiDirectAdvertisingManager = new WifiDirectAdvertisingManager(context, mEngine);
     }
 
     @Override
@@ -42,13 +39,12 @@ public class WifiDirectStreamStub implements StreamStub, WifiDirectManager.WifiD
 
     @Override
     public void setHandler(RequestHandler requestHandler) {
-        mRequestHandler = requestHandler;
     }
 
     @Override
     public void start() throws IOException {
         if(!mIsStarted){
-            mWifiDirectManager.startAdvertising(mEngine.getSpace());
+            mWifiDirectAdvertisingManager.startAdvertising(mEngine.getSpace());
             mIsStarted = true;
         }
     }
@@ -56,7 +52,7 @@ public class WifiDirectStreamStub implements StreamStub, WifiDirectManager.WifiD
     @Override
     public void stop() {
         if(mIsStarted){
-            mWifiDirectManager.stopAdvertising();
+            mWifiDirectAdvertisingManager.stopAdvertising();
             mIsStarted = false;
         }
     }
@@ -69,21 +65,12 @@ public class WifiDirectStreamStub implements StreamStub, WifiDirectManager.WifiD
     @Override
     public void offer(ASIPSpace asipSpace) throws SharkNotSupportedException {
         stop();
-        mWifiDirectManager.startAdvertising(asipSpace);
+        mWifiDirectAdvertisingManager.startAdvertising(asipSpace);
         mIsStarted = true;
     }
 
     @Override
     public void offer(Knowledge knowledge) throws SharkNotSupportedException {
         // TODO not yet implemented
-    }
-
-    @Override
-    public void onNetworkCreated(WifiP2pInfo info, WifiP2pGroup group) {
-    }
-
-    @Override
-    public void onNetworkDestroyed() {
-
     }
 }

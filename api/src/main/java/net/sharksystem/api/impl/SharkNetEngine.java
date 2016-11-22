@@ -24,6 +24,8 @@ import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.RadarListener;
 import net.sharksystem.api.interfaces.SharkNet;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
+import net.sharksystem.api.shark.peer.NearbyPeer;
+import net.sharksystem.api.shark.peer.NearbyPeerManager;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
@@ -32,14 +34,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by j4rvis on 01.08.16.
  */
-public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersListener {
+public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerListener{
 
     private static final String ACTIVE_PROFILE = "ACTIVE_PROFILE";
     private static final String ACTIVE_PROFILE_PASSWORD = "ACTIVE_PROFILE_PASSWORD";
@@ -120,8 +121,9 @@ public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersL
             asipSpace = interests.asASIPSpace();
         }
         mSharkEngine.setSpace(asipSpace);
-        mSharkEngine.addNearbyPeersListener(this);
-        mSharkEngine.startWifiDirect();
+        mSharkEngine.addNearbyPeerListener(this);
+        mSharkEngine.startBluetooth();
+        mSharkEngine.startDiscovery();
     }
 
     // Radar
@@ -148,13 +150,13 @@ public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersL
     }
 
     @Override
-    public void onNearbyPeerDetected(HashMap<ASIPSpace, Long> nearbyPeersMap) {
+    public void onNearbyPeerFound(ArrayList<NearbyPeer> peers) {
         mContacts = new ArrayList<>();
 
-        for( ASIPSpace space : nearbyPeersMap.keySet()){
+        for( NearbyPeer peer : peers){
             try {
-                Contact contact = newContact(space.getSender());
-                contact.setLastWifiContact(new Timestamp(System.currentTimeMillis()));
+                Contact contact = newContact(peer.getSender());
+                contact.setLastWifiContact(new Timestamp(peer.getLastSeen()));
                 mContacts.add(contact);
                 // TODO further information in this space?
             } catch (SharkKBException e) {
@@ -165,7 +167,6 @@ public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersL
             listener.onNewRadarContact(mContacts);
         }
     }
-
     // Profiles
     //
     //
@@ -418,4 +419,5 @@ public class SharkNetEngine implements SharkNet, AndroidSharkEngine.NearbyPeersL
                 sharkKB.getTimeSTSet()
         );
     }
+
 }

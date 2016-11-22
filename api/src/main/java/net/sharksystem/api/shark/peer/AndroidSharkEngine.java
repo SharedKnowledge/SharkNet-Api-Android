@@ -7,34 +7,31 @@ import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.ASIPStub;
 import net.sharkfw.asip.SharkStub;
 import net.sharkfw.kep.SharkProtocolNotSupportedException;
+import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.J2SEAndroidSharkEngine;
 import net.sharkfw.protocols.RequestHandler;
 import net.sharkfw.protocols.Stub;
+import net.sharksystem.api.shark.ports.RadarDiscoveryPort;
 import net.sharksystem.api.shark.protocols.bluetooth.BluetoothStreamStub;
 import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
-import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectManager;
-import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectStreamStub;
+import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectAdvertisingManager;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
-public class AndroidSharkEngine extends J2SEAndroidSharkEngine
-        implements WifiDirectManager.WifiDirectPeerListener {
+public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
 
     private Context mContext;
     private WeakReference<Activity> activityRef;
     private Stub currentStub;
     private ASIPSpace mSpace;
 
-    private HashMap<ASIPSpace, Long> mNearbyPeers = new HashMap<>();
-    private ArrayList<NearbyPeersListener> mNearbyPeersListeners = new ArrayList<>();
+    private WifiDirectAdvertisingManager mAdvertisingManager;
+
+    public final static String DISCOVERY_TOPIC = "DISCOVERY_INTEREST";
+    public final static String DISCOVERY_SI = "www.sharksystem.net/discovery";
 
     public AndroidSharkEngine(Context context) {
         super();
@@ -51,15 +48,17 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
         activityRef = new WeakReference<>(activity);
     }
 
-    public void setSpace(ASIPSpace space) {
+    public void setSpace(ASIPSpace space) throws SharkKBException {
+
+        STSet topicSet = InMemoSharkKB.createInMemoSTSet();
+        topicSet.createSemanticTag(DISCOVERY_TOPIC, DISCOVERY_SI);
+
         if(space==null){
-            try {
-                mSpace = InMemoSharkKB.createInMemoASIPInterest(null, null, getOwner(), null, null, null, null, ASIPSpace.DIRECTION_INOUT);
-            } catch (SharkKBException e) {
-                e.printStackTrace();
-            }
+            mSpace = InMemoSharkKB.createInMemoASIPInterest(topicSet, null, getOwner(), null, null, null, null, ASIPSpace.DIRECTION_INOUT);
         } else {
             mSpace = space;
+            mSpace.getSender().merge(getOwner());
+            mSpace.getTopics().merge(topicSet);
         }
     }
 
@@ -67,25 +66,18 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
         return mSpace;
     }
 
-    /*
-     * Wifi Direct methods
-     * @see net.sharkfw.peer.SharkEngine#createWifiDirectStreamStub(net.sharkfw.kep.KEPStub)
-     */
-    protected Stub createWifiDirectStreamStub(SharkStub stub) throws SharkProtocolNotSupportedException {
-        if (currentStub == null) {
-            currentStub = new WifiDirectStreamStub(mContext, this);
-            currentStub.setHandler((RequestHandler) stub);
-        }
-        return currentStub;
+    public void addNearbyPeerListener(NearbyPeerManager.NearbyPeerListener listener){
+        NearbyPeerManager.getInstance().addNearbyPeerListener(listener);
     }
 
-    @Override
-    public void startWifiDirect() throws SharkProtocolNotSupportedException, IOException {
-        this.createWifiDirectStreamStub(this.getAsipStub()).start();
+    public void startDiscovery(){
+        new RadarDiscoveryPort(this);
+        mAdvertisingManager = new WifiDirectAdvertisingManager(mContext, this);
+        mAdvertisingManager.startAdvertising(mSpace);
     }
 
-    public void stopWifiDirect() throws SharkProtocolNotSupportedException {
-        currentStub.stop();
+    public void stopDiscovery(){
+        mAdvertisingManager.stopAdvertising();
     }
 
     @Override
@@ -130,79 +122,4 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine
         return super.getProtocolStub(type);
         //TODO this function is called by the parent but the parent function itself looks likes a big mess
     }
-
-    @Override
-    public void onNewNearbyPeer(ASIPSpace interest) {
-        if (interest.getSender() != null) {
-
-            Iterator<Map.Entry<ASIPSpace, Long>> iterator = mNearbyPeers.entrySet().iterator();
-            while (iterator.hasNext()){
-//                L.d(entry.getKey().getSender().getName() + " " + Arrays.toString(entry.getKey().getSender().getAddresses()), this);
-                Map.Entry<ASIPSpace, Long> next = iterator.next();
-                if (next.getKey().getSender().getName().equals(interest.getSender().getName())) {
-                    iterator.remove();
-                }
-            }
-            this.mNearbyPeers.put(interest, System.currentTimeMillis());
-
-            for (NearbyPeersListener listener : mNearbyPeersListeners) {
-                listener.onNearbyPeerDetected(mNearbyPeers);
-            }
-        }
-    }
-
-    // Wifi Radar
-
-    public interface NearbyPeersListener {
-        void onNearbyPeerDetected(HashMap<ASIPSpace, Long> nearbyPeersMap);
-    }
-
-    public void addNearbyPeersListener(NearbyPeersListener listener) {
-        if (!mNearbyPeersListeners.contains(listener)) {
-            mNearbyPeersListeners.add(listener);
-        }
-    }
-
-    public void removeNearbyPeersListener(NearbyPeersListener listener) {
-        mNearbyPeersListeners.remove(listener);
-    }
-
-    public List<ASIPSpace> getNearbyPeersAsList(long millis) {
-        long currentTime = System.currentTimeMillis();
-
-        ArrayList<ASIPSpace> tags = new ArrayList<>();
-
-        for (Map.Entry<ASIPSpace, Long> entry : this.mNearbyPeers.entrySet()) {
-            if (currentTime - entry.getValue() <= millis) {
-                tags.add(entry.getKey());
-            }
-        }
-
-        return tags;
-    }
-
-    public List<ASIPSpace> getNearbyPeersAsList() {
-        return getNearbyPeersAsList(1000 * 60);
-    }
-
-
-    public HashMap<ASIPSpace, Long> getNearbyPeers(long millis) {
-        long currentTime = System.currentTimeMillis();
-
-        HashMap<ASIPSpace, Long> temp = new HashMap<>();
-
-        for (Map.Entry<ASIPSpace, Long> entry : this.mNearbyPeers.entrySet()) {
-            if (currentTime - entry.getValue() <= millis) {
-                temp.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        return temp;
-    }
-
-    public HashMap<ASIPSpace, Long> getNearbyPeers() {
-        return getNearbyPeers(1000 * 60);
-    }
-
-
 }
