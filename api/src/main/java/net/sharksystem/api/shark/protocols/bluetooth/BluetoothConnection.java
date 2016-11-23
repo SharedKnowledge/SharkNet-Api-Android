@@ -33,6 +33,9 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
             mOutputStream = mSocket.getOutputStream();
             mRemoteAddress = mSocket.getRemoteDevice().getAddress();
             mLocalAddress = localAddress;
+
+            L.d("Yeah we established a connection!", this);
+
         } catch (IOException e) {
             L.e("Can not create a Connection to the device. Reason: " + e.getMessage(), this);
             throw e;

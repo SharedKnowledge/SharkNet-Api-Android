@@ -50,6 +50,8 @@ public class BluetoothStreamStub implements StreamStub {
         }
         BluetoothDevice remoteDevice = mBluetoothAdapter.getRemoteDevice(address);
 
+        L.d("trying to create an outgoing connection!", this);
+
         return new BluetoothConnection(remoteDevice, this.getLocalAddress());
     }
 

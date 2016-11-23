@@ -127,7 +127,6 @@ public class WifiDirectAdvertisingManager
         if (srcDevice == null || txtRecordMap.isEmpty()) return;
         try {
             ASIPInterest interest = WifiDirectUtil.recordMap2Interest(txtRecordMap);
-            L.d("Found one!" + interest.getSender().getAddresses()[0], this);
             mEngine.handleASIPInterest(interest);
         } catch (SharkKBException e) {
             e.printStackTrace();

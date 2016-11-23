@@ -58,6 +58,7 @@ public class BluetoothServer implements SharkServer {
             while (mActive){
                 BluetoothSocket bluetoothSocket = mSocket.accept();
                 BluetoothConnection con = new BluetoothConnection(bluetoothSocket, mLocalAddress);
+                L.d("Yeah an incoming BLUETOOTH Connection!", this);
                 mRequestHandler.handleStream(con);
             }
             mSocket.close();
