@@ -116,8 +116,12 @@ public interface SharkNet {
      */
     Profile getMyProfile() throws SharkKBException;
 
+    interface NFCListener{
+        void onNewContactViaNFC(Contact contact);
+    }
+
     /**
      * Exchange Contact via NFC (just Method, not implemented)
      */
-    void exchangeContactNFC();
+    void exchangeContactNFC(NFCListener listener);
 }

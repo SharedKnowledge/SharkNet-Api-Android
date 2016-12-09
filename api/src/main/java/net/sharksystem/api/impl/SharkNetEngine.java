@@ -424,7 +424,7 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     //  TODO exchangeContactNFC
     @Override
-    public void exchangeContactNFC() {
+    public void exchangeContactNFC(NFCListener listener) {
 
     }
 
