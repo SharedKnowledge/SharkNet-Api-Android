@@ -3,7 +3,7 @@ package net.sharksystem.api.impl;
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
@@ -62,7 +62,7 @@ public class MessageImpl implements Message {
             owner = sender.getPST();
         }
 
-        String serializedOwner = ASIPSerializer.serializeTag(owner).toString();
+        String serializedOwner = ASIPMessageSerializerHelper.serializeTag(owner).toString();
         SharkNetUtils.setInfoWithName(mChatKB, space, MESSAGE_SENDER, serializedOwner);
 
         // now search for the desired InformationSpace and set it.
@@ -97,7 +97,7 @@ public class MessageImpl implements Message {
         ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mInformationSpace.getASIPSpace(), MESSAGE_SENDER);
         if(information!=null){
             String informationContentAsString = information.getContentAsString();
-            PeerSemanticTag sender = ASIPSerializer.deserializePeerTag(informationContentAsString);
+            PeerSemanticTag sender = ASIPMessageSerializerHelper.deserializePeerTag(informationContentAsString);
             return mEngine.getContactByTag(sender);
         }
         return null;

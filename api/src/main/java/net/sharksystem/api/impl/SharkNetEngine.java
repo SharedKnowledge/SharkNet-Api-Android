@@ -4,22 +4,22 @@ import android.content.Context;
 
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.kep.SharkProtocolNotSupportedException;
+import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
+import net.sharkfw.knowledgeBase.sync.manager.SyncManager.SyncInviteListener;
 import net.sharksystem.api.interfaces.Chat;
-import net.sharksystem.api.interfaces.Comment;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
 import net.sharksystem.api.interfaces.Feed;
-import net.sharksystem.api.interfaces.GetEvents;
 import net.sharksystem.api.interfaces.Interest;
-import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
 import net.sharksystem.api.interfaces.RadarListener;
 import net.sharksystem.api.interfaces.SharkNet;
@@ -34,13 +34,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by j4rvis on 01.08.16.
  */
-public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerListener{
+public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerListener, SyncInviteListener{
+
+    public interface EventListener{
+        void onNewChat(Chat chat);
+    }
 
     private static final String ACTIVE_PROFILE = "ACTIVE_PROFILE";
     private static final String ACTIVE_PROFILE_PASSWORD = "ACTIVE_PROFILE_PASSWORD";
@@ -52,14 +57,11 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     private static final SemanticTag mSettingsType =
             InMemoSharkKB.createInMemoSemanticTag("SETTINGS", "http://sharksystem.net/settings");
-
     private AndroidSharkEngine mSharkEngine;
-
     private ASIPSpace mSettingsSpace = null;
-
     private ArrayList<RadarListener> mRadarListeners = new ArrayList<>();
-
     private static SharkNetEngine sInstance = null;
+    private ArrayList<EventListener> mEventListeners = new ArrayList<>();
 
     // Shark
     private SharkKB mProfileKB = null;
@@ -67,7 +69,7 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
     private SharkKB mContactKB = null;
     private SharkKB mFeedKB = null;
     private SharkKB mCommentKB = null;
-    private List<SharkKB> mChatKBs = new ArrayList<>();
+    private List<SyncComponent> mChatComponents = new ArrayList<>();
     private ArrayList<Contact> mContacts;
     private Context mContext;
 
@@ -98,7 +100,7 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
         mContactKB = createKBFromRoot(mRootKB);
         mFeedKB = createKBFromRoot(mRootKB);
         mCommentKB = createKBFromRoot(mRootKB);
-        mChatKBs.clear();
+        mChatComponents.clear();
     }
 
     public AndroidSharkEngine getSharkEngine() {
@@ -107,10 +109,10 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     public void setContext(Context context){
         mContext = context;
+        mSharkEngine = new AndroidSharkEngine(mContext);
     }
 
     public void startShark() throws SharkKBException, SharkProtocolNotSupportedException, IOException {
-        mSharkEngine = new AndroidSharkEngine(mContext);
 
         Profile profile = getMyProfile();
         mSharkEngine.setEngineOwnerPeer(profile.getPST());
@@ -121,10 +123,25 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
             asipSpace = interests.asASIPSpace();
         }
         mSharkEngine.setSpace(asipSpace);
+
+        // Sync
+        mSharkEngine.getSyncManager().allowInvitation(true);
+
+        // Discovery
         mSharkEngine.addNearbyPeerListener(this);
         mSharkEngine.startBluetooth();
         mSharkEngine.startDiscovery();
+
     }
+
+    // Listener
+    //
+    //
+
+    public void addEventListener(EventListener listener){
+        mEventListeners.add(listener);
+    }
+
 
     // Radar
     //
@@ -155,6 +172,8 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
         for( NearbyPeer peer : peers){
             try {
+                // TODO do we already have the peer but without the address?
+                // TODO Update if already known peer
                 Contact contact = newContact(peer.getSender());
                 contact.setLastWifiContact(new Timestamp(peer.getLastSeen()));
                 mContacts.add(contact);
@@ -195,7 +214,7 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
     public boolean setActiveProfile(Profile myProfile, String password) throws SharkKBException, JSONException {
         myProfile.setPassword(password);
         PeerSemanticTag tag = myProfile.getPST();
-        String string = ASIPSerializer.serializeTag(tag).toString();
+        String string = ASIPMessageSerializerHelper.serializeTag(tag).toString();
         mSettingsSpace = SharkNetUtils.createCurrentTimeSpace(mProfileKB, mSettingsType);
         SharkNetUtils.setInfoWithName(mProfileKB, mSettingsSpace, ACTIVE_PROFILE, string);
         return true;
@@ -205,7 +224,7 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
     public Profile getMyProfile() throws SharkKBException {
         String string = SharkNetUtils.getInfoAsString(mProfileKB, mSettingsSpace, ACTIVE_PROFILE);
         if(string != null && !string.isEmpty()){
-            PeerSemanticTag tag = ASIPSerializer.deserializePeerTag(string);
+            PeerSemanticTag tag = ASIPMessageSerializerHelper.deserializePeerTag(string);
             if(tag!=null){
                 return getProfileByTag(tag);
             }
@@ -255,21 +274,79 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     @Override
     public List<Chat> getChats() throws SharkKBException {
-        Iterator<SharkKB> kbIterator = mChatKBs.iterator();
+        Iterator<SyncComponent> componentIterator = mChatComponents.iterator();
         ArrayList<Chat> chats = new ArrayList<>();
-        while (kbIterator.hasNext()) {
-            SharkKB next = kbIterator.next();
+        while (componentIterator.hasNext()) {
+            SyncComponent next = componentIterator.next();
             chats.add(new ChatImpl(this, next));
         }
         return chats;
     }
 
     @Override
+    public Chat getChatById(String id) throws SharkKBException {
+        for (Chat next : this.getChats()) {
+            if (next.getID().equals(id)) {
+                return next;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void onInvitation(SyncComponent component) {
+        mChatComponents.add(component);
+
+        PeerSTSet members = component.getMembers();
+        ArrayList<Contact> contacts = new ArrayList<>();
+        Enumeration<PeerSemanticTag> peerSemanticTagEnumeration = members.peerTags();
+        while (peerSemanticTagEnumeration.hasMoreElements()){
+            PeerSemanticTag peerSemanticTag = peerSemanticTagEnumeration.nextElement();
+            try {
+                Contact byTag = getContactByTag(peerSemanticTag);
+                contacts.add(byTag);
+            } catch (SharkKBException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        for (EventListener listener : mEventListeners){
+            try {
+                listener.onNewChat(new ChatImpl(this, component, contacts, getMyProfile()));
+            } catch (SharkKBException | JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
     public Chat newChat(List<Contact> recipients) throws SharkKBException, JSONException {
         InMemoSharkKB inMemoSharkKB = (InMemoSharkKB) createKBFromRoot(mRootKB);
-        mChatKBs.add(inMemoSharkKB);
+//        mChatKBs.add(inMemoSharkKB);
 
-        return new ChatImpl(this, inMemoSharkKB, recipients, getMyProfile());
+        PeerSTSet peerSTSet = InMemoSharkKB.createInMemoPeerSTSet();
+
+        for (Contact contact : recipients) {
+            peerSTSet.merge(contact.getPST());
+        }
+
+        SemanticTag uniqueChatId = createUniqueChatId(recipients);
+
+        SyncComponent component = mSharkEngine.getSyncManager().createSyncComponent(inMemoSharkKB, uniqueChatId, peerSTSet, mSharkEngine.getOwner(), true);
+        mChatComponents.add(component);
+
+        return new ChatImpl(this, component, recipients, getMyProfile());
+    }
+
+    public SemanticTag createUniqueChatId(List<Contact> recipients) throws SharkKBException {
+        String name = "";
+        for (Contact contact : recipients){
+            name += contact.getPST().getName();
+        }
+        name+= System.currentTimeMillis();
+
+        return InMemoSharkKB.createInMemoSemanticTag(name, name);
     }
 
     // Feeds
@@ -351,39 +428,6 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     }
 
-    //    TODO addListener
-    @Override
-    public void addListener(Profile p, GetEvents listener) {
-
-    }
-
-    //    TODO inform
-    @Override
-    public void removeListener(Profile p, GetEvents listener) {
-
-    }
-
-    @Override
-    public void informMessage(Message m) {
-
-    }
-
-    @Override
-    public void informFeed(Feed f) {
-
-    }
-
-    @Override
-    public void informComment(Comment c) {
-
-    }
-
-
-    @Override
-    public void informContact(Contact c) {
-
-    }
-
     // Facade Getter
 
     public Feed getFeedById(String id) throws SharkKBException {
@@ -419,5 +463,4 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
                 sharkKB.getTimeSTSet()
         );
     }
-
 }

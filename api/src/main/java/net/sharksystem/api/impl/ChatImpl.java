@@ -3,15 +3,16 @@ package net.sharksystem.api.impl;
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
-import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
+import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
+import net.sharkfw.system.L;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
@@ -51,31 +52,38 @@ public class ChatImpl implements Chat {
 
     // Shark
     private SharkNetEngine mSharkNetEngine;
-    private SyncKB mChatKB;
+    private SyncComponent mSyncComponent;
+    private SyncKB mSyncKB;
 
 
-    public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB) throws SharkKBException {
-        mChatKB = new SyncKB(sharkKB);
+    public ChatImpl(SharkNetEngine sharkNetEngine, SyncComponent syncComponent) throws SharkKBException {
+        mSyncComponent = syncComponent;
+        mSyncKB = mSyncComponent.getKb();
         mSharkNetEngine = sharkNetEngine;
 
-        mChatConfigSpace = mChatKB.createASIPSpace(null, mChatConfigurationType,
+        mChatConfigSpace = mSyncKB.createASIPSpace(null, mChatConfigurationType,
                 null, null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
 
         if (getID() == null) {
-            SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_ID, String.valueOf(System.currentTimeMillis()));
+            SharkNetUtils.setInfoWithName(mSyncKB, mChatConfigSpace, CHAT_ID, String.valueOf(System.currentTimeMillis()));
         }
     }
 
-    public ChatImpl(SharkNetEngine sharkNetEngine, SharkKB sharkKB, List<Contact> recipients, Contact owner) throws SharkKBException, JSONException {
-        this(sharkNetEngine, sharkKB);
+    public ChatImpl(SharkNetEngine sharkNetEngine, SyncComponent syncComponent, List<Contact> recipients, Contact owner) throws SharkKBException, JSONException {
+        this(sharkNetEngine, syncComponent);
 
         setContacts(recipients);
 
+        for (Contact contact : recipients){
+            addContact(contact);
+        }
+
         if (owner != null) {
-            String serializedTag = ASIPSerializer.serializeTag(owner.getPST()).toString();
-            ASIPInformation information = mChatKB.addInformation(serializedTag, mChatConfigSpace);
+            String serializedTag = ASIPMessageSerializerHelper.serializeTag(owner.getPST()).toString();
+            ASIPInformation information = mSyncKB.addInformation(serializedTag, mChatConfigSpace);
             information.setName(CHAT_OWNER);
         }
+        L.d("New chat created!", this);
     }
 
     @Override
@@ -87,16 +95,26 @@ public class ChatImpl implements Chat {
 
     @Override
     public void sendMessage(InputStream inputStream, String messageString, String mimeType) throws JSONException, SharkKBException {
-        ASIPSpace space = SharkNetUtils.createCurrentTimeSpace(mChatKB, mMessageType);
-        MessageImpl message = new MessageImpl(mSharkNetEngine, this, mChatKB, space);
+        ASIPSpace space = SharkNetUtils.createCurrentTimeSpace(mSyncKB, mMessageType);
+        MessageImpl message = new MessageImpl(mSharkNetEngine, this, mSyncKB, space);
         message.setContent(inputStream, messageString, mimeType);
+
+        mSyncComponent.sendInvite();
+
+        mSharkNetEngine.getSharkEngine().getSyncManager().triggerSync();
     }
 
     @Override
     public void sendMessage(InputStream inputStream, String messageString, String mimetype, Contact sender) throws JSONException, SharkKBException {
-        ASIPSpace space = SharkNetUtils.createCurrentTimeSpace(mChatKB, mMessageType);
-        MessageImpl message = new MessageImpl(mSharkNetEngine, this, mChatKB, space, sender);
+        ASIPSpace space = SharkNetUtils.createCurrentTimeSpace(mSyncKB, mMessageType);
+        MessageImpl message = new MessageImpl(mSharkNetEngine, this, mSyncKB, space, sender);
         message.setContent(inputStream, messageString, mimetype);
+
+        mSyncComponent.sendInvite();
+
+        // TODO trigger single syncComponent!
+
+        mSharkNetEngine.getSharkEngine().getSyncManager().triggerSync();
     }
 
     @Override
@@ -121,7 +139,7 @@ public class ChatImpl implements Chat {
 
     private List<Message> getMessages() throws SharkKBException {
         ArrayList<Message> messages = new ArrayList<>();
-        Iterator<ASIPInformationSpace> informationSpaces = mChatKB.informationSpaces();
+        Iterator<ASIPInformationSpace> informationSpaces = mSyncKB.informationSpaces();
         while (informationSpaces.hasNext()) {
             ASIPInformationSpace next = informationSpaces.next();
             if (next == null) {
@@ -130,7 +148,7 @@ public class ChatImpl implements Chat {
             // checks if the infoSpace has an type SemanticTag with the SI from the mMessageType-Tag
             STSet types = next.getASIPSpace().getTypes();
             if (types.getSemanticTag(mMessageType.getSI()) != null) {
-                MessageImpl message = new MessageImpl(mSharkNetEngine, this, mChatKB, next);
+                MessageImpl message = new MessageImpl(mSharkNetEngine, this, mSyncKB, next);
                 messages.add(message);
             }
         }
@@ -177,9 +195,9 @@ public class ChatImpl implements Chat {
             peers.merge(next.getPST());
         }
 
-        String serializedPeers = ASIPSerializer.serializeSTSet(peers).toString();
+        String serializedPeers = ASIPMessageSerializerHelper.serializeSTSet(peers).toString();
 
-        SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_RECIPIENTS, serializedPeers);
+        SharkNetUtils.setInfoWithName(mSyncKB, mChatConfigSpace, CHAT_RECIPIENTS, serializedPeers);
     }
 
     @Override
@@ -190,14 +208,14 @@ public class ChatImpl implements Chat {
 
         ArrayList<Contact> list = new ArrayList<>();
 
-        Iterator<ASIPInformation> iterator = mChatKB.getInformation(mChatConfigSpace);
+        Iterator<ASIPInformation> iterator = mSyncKB.getInformation(mChatConfigSpace);
         while (iterator.hasNext()) {
             ASIPInformation next = iterator.next();
             // Check if we have an information with the serialized PSTSet as content
             if (next.getName().equals(CHAT_RECIPIENTS)) {
                 String contentAsString = next.getContentAsString();
                 // Deserialize the PSTSet and get the peerTags
-                PeerSTSet peerSTSet = ASIPSerializer.deserializePeerSTSet(null, contentAsString);
+                PeerSTSet peerSTSet = ASIPMessageSerializerHelper.deserializePeerSTSet(null, contentAsString);
                 Enumeration<PeerSemanticTag> peerTags = peerSTSet.peerTags();
                 while (peerTags.hasMoreElements()) {
                     PeerSemanticTag peerSemanticTag = peerTags.nextElement();
@@ -216,6 +234,8 @@ public class ChatImpl implements Chat {
         List<Contact> contacts = getContacts();
         contacts.add(contact);
         setContacts(contacts);
+
+        mSyncComponent.addMember(contact.getPST());
     }
 
     @Override
@@ -223,28 +243,29 @@ public class ChatImpl implements Chat {
         List<Contact> contacts = getContacts();
         contacts.remove(contact);
         setContacts(contacts);
+        mSyncComponent.removeMember(contact.getPST());
     }
 
     @Override
     public void setPicture(InputStream picture, String mimeType) throws SharkKBException {
-        ContentImpl content = new ContentImpl(mChatKB, mChatConfigSpace);
+        ContentImpl content = new ContentImpl(mSyncKB, mChatConfigSpace);
         content.setInputStream(picture);
         content.setMimeType(mimeType);
     }
 
     @Override
     public Content getPicture() {
-        return new ContentImpl(mChatKB, mChatConfigSpace);
+        return new ContentImpl(mSyncKB, mChatConfigSpace);
     }
 
     @Override
     public void setTitle(String title) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_TITLE, title);
+        SharkNetUtils.setInfoWithName(mSyncKB, mChatConfigSpace, CHAT_TITLE, title);
     }
 
     @Override
     public String getTitle() throws SharkKBException {
-        ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_TITLE);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSyncKB, mChatConfigSpace, CHAT_TITLE);
         if (information != null) {
             return information.getContentAsString();
         }
@@ -253,10 +274,10 @@ public class ChatImpl implements Chat {
 
     @Override
     public Contact getOwner() throws SharkKBException {
-        ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_OWNER);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSyncKB, mChatConfigSpace, CHAT_OWNER);
         if (information != null) {
             String informationContentAsString = information.getContentAsString();
-            PeerSemanticTag peerSemanticTag = ASIPSerializer.deserializePeerTag(informationContentAsString);
+            PeerSemanticTag peerSemanticTag = ASIPMessageSerializerHelper.deserializePeerTag(informationContentAsString);
             return mSharkNetEngine.getContactByTag(peerSemanticTag);
         }
         return null;
@@ -264,16 +285,16 @@ public class ChatImpl implements Chat {
 
     @Override
     public void setAdmin(Contact admin) throws SharkKBException, JSONException {
-        String serializedTag = ASIPSerializer.serializeTag(admin.getPST()).toString();
-        SharkNetUtils.setInfoWithName(mChatKB, mChatConfigSpace, CHAT_ADMIN, serializedTag);
+        String serializedTag = ASIPMessageSerializerHelper.serializeTag(admin.getPST()).toString();
+        SharkNetUtils.setInfoWithName(mSyncKB, mChatConfigSpace, CHAT_ADMIN, serializedTag);
     }
 
     @Override
     public Contact getAdmin() throws SharkKBException {
-        ASIPInformation information = SharkNetUtils.getInfoByName(mChatKB, mChatConfigSpace, CHAT_ADMIN);
+        ASIPInformation information = SharkNetUtils.getInfoByName(mSyncKB, mChatConfigSpace, CHAT_ADMIN);
         if (information != null) {
             String informationContentAsString = information.getContentAsString();
-            PeerSemanticTag peerSemanticTag = ASIPSerializer.deserializePeerTag(informationContentAsString);
+            PeerSemanticTag peerSemanticTag = ASIPMessageSerializerHelper.deserializePeerTag(informationContentAsString);
             return mSharkNetEngine.getContactByTag(peerSemanticTag);
         }
         return null;
@@ -281,7 +302,7 @@ public class ChatImpl implements Chat {
 
     @Override
     public String getID() throws SharkKBException {
-        return SharkNetUtils.getInfoAsString(mChatKB, mChatConfigSpace, CHAT_ID);
+        return SharkNetUtils.getInfoAsString(mSyncKB, mChatConfigSpace, CHAT_ID);
     }
 
     @Override

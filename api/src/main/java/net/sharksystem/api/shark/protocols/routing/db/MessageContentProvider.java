@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import net.sharkfw.asip.engine.ASIPInMessage;
 import net.sharkfw.asip.engine.ASIPMessage;
-import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.SharkKBException;
 
 import org.json.JSONException;
@@ -49,9 +49,9 @@ public class MessageContentProvider {
 
         String content;
         if (msg.getCommand() == ASIPMessage.ASIP_INSERT) {
-            content = ASIPSerializer.serializeKnowledge(msg.getKnowledge()).toString();
+            content = ASIPMessageSerializerHelper.serializeKnowledge(msg.getKnowledge()).toString();
         } else  if (msg.getCommand() == ASIPMessage.ASIP_EXPOSE) {
-            content = ASIPSerializer.serializeInterest(msg.getInterest()).toString();
+            content = ASIPMessageSerializerHelper.serializeInterest(msg.getInterest()).toString();
         } else {
             InputStream is = msg.getInputStream();
             Scanner s = new Scanner(is).useDelimiter("\\A");
@@ -68,11 +68,10 @@ public class MessageContentProvider {
         //values.put(MySQLiteHelper.SIGNATURE, msg.getSignature());
         values.put(MySQLiteHelper.COLUMN_TTL, msg.getTtl());
         values.put(MySQLiteHelper.COLUMN_COMMAND, msg.getCommand());
-        values.put(MySQLiteHelper.COLUMN_SENDER, msg.getSender() != null ? ASIPSerializer.serializeTag(msg.getSender()).toString() : "");
-        values.put(MySQLiteHelper.COLUMN_RECEIVERS, msg.getReceivers() != null ? ASIPSerializer.serializeSTSet(msg.getReceivers()).toString() : "");
-        values.put(MySQLiteHelper.COLUMN_RECEIVERPEER, msg.getReceiverPeer() != null ? ASIPSerializer.serializeTag(msg.getReceiverPeer()).toString() : "");
-        values.put(MySQLiteHelper.COLUMN_RECEIVERLOCATION, msg.getReceiverSpatial() != null ? ASIPSerializer.serializeTag(msg.getReceiverSpatial()).toString() : "");
-        values.put(MySQLiteHelper.COLUMN_RECEIVERTIME, msg.getReceiverTime() != null ? ASIPSerializer.serializeTag(msg.getReceiverTime()).toString() : "");
+        values.put(MySQLiteHelper.COLUMN_SENDER, msg.getSender() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getSender()).toString() : "");
+        values.put(MySQLiteHelper.COLUMN_RECEIVERPEER, msg.getReceiverPeer() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverPeer()).toString() : "");
+        values.put(MySQLiteHelper.COLUMN_RECEIVERLOCATION, msg.getReceiverSpatial() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverSpatial()).toString() : "");
+        values.put(MySQLiteHelper.COLUMN_RECEIVERTIME, msg.getReceiverTime() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverTime()).toString() : "");
         values.put(MySQLiteHelper.COLUMN_CONTENT, content);
 
         database.insert(MySQLiteHelper.TABLE_MESSAGES, null, values);
@@ -93,11 +92,10 @@ public class MessageContentProvider {
         //values.put(MySQLiteHelper.SIGNATURE, msg.getSignature());
         values.put(MySQLiteHelper.COLUMN_TTL, msg.getTtl());
         values.put(MySQLiteHelper.COLUMN_COMMAND, msg.getCommand());
-        values.put(MySQLiteHelper.COLUMN_SENDER, msg.getSender() != null ? ASIPSerializer.serializeTag(msg.getSender()).toString() : "");
-        values.put(MySQLiteHelper.COLUMN_RECEIVERS, msg.getReceivers() != null ? ASIPSerializer.serializeSTSet(msg.getReceivers()).toString() : "");
-        values.put(MySQLiteHelper.COLUMN_RECEIVERPEER, msg.getReceiverPeer() != null ? ASIPSerializer.serializeTag(msg.getReceiverPeer()).toString() : "");
-        values.put(MySQLiteHelper.COLUMN_RECEIVERLOCATION, msg.getReceiverSpatial() != null ? ASIPSerializer.serializeTag(msg.getReceiverSpatial()).toString() : "");
-        values.put(MySQLiteHelper.COLUMN_RECEIVERTIME, msg.getReceiverTime() != null ? ASIPSerializer.serializeTag(msg.getReceiverTime()).toString() : "");
+        values.put(MySQLiteHelper.COLUMN_SENDER, msg.getSender() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getSender()).toString() : "");
+        values.put(MySQLiteHelper.COLUMN_RECEIVERPEER, msg.getReceiverPeer() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverPeer()).toString() : "");
+        values.put(MySQLiteHelper.COLUMN_RECEIVERLOCATION, msg.getReceiverSpatial() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverSpatial()).toString() : "");
+        values.put(MySQLiteHelper.COLUMN_RECEIVERTIME, msg.getReceiverTime() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverTime()).toString() : "");
         values.put(MySQLiteHelper.COLUMN_CONTENT, msg.getContent());
 
         database.update(MySQLiteHelper.TABLE_MESSAGES, values, "_id="+msg.getId(), null);
@@ -142,11 +140,11 @@ public class MessageContentProvider {
         //messageDTO.setSignature(cursor.getString(6));
         messageDTO.setTtl(cursor.getLong(6));
         messageDTO.setCommand(cursor.getInt(7));
-        messageDTO.setSender(ASIPSerializer.deserializePeerTag(cursor.getString(8)));
-        //messageDTO.setReceivers(ASIPSerializer.deserializeSTSet(cursor.getString(9)));
-        messageDTO.setReceiverPeer(ASIPSerializer.deserializePeerTag(cursor.getString(10)));
-        messageDTO.setReceiverSpatial(ASIPSerializer.deserializeSpatialTag(cursor.getString(11)));
-        messageDTO.setReceiverTime(ASIPSerializer.deserializeTimeTag(cursor.getString(12)));
+        messageDTO.setSender(ASIPMessageSerializerHelper.deserializePeerTag(cursor.getString(8)));
+        //messageDTO.setReceivers(ASIPMessageSerializerHelper.deserializeSTSet(cursor.getString(9)));
+        messageDTO.setReceiverPeer(ASIPMessageSerializerHelper.deserializePeerTag(cursor.getString(10)));
+        messageDTO.setReceiverSpatial(ASIPMessageSerializerHelper.deserializeSpatialTag(cursor.getString(11)));
+        messageDTO.setReceiverTime(ASIPMessageSerializerHelper.deserializeTimeTag(cursor.getString(12)));
         messageDTO.setContent(cursor.getString(13));
 
         //TODO content is just a string right now..can be interest or knowledge or raw though

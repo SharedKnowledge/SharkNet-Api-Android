@@ -1,7 +1,7 @@
 package net.sharksystem.api.shark.protocols.wifidirect;
 
 import net.sharkfw.asip.ASIPInterest;
-import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
@@ -35,7 +35,7 @@ public class WifiDirectUtil {
 
         if (interest.getSender() != null) {
             try {
-                String senderString = ASIPSerializer.serializeTag(interest.getSender()).toString();
+                String senderString = ASIPMessageSerializerHelper.serializeTag(interest.getSender()).toString();
                 map.put(WifiDirectUtil.SENDER_RECORD, senderString);
             } catch (JSONException | SharkKBException e) {
                 e.printStackTrace();
@@ -58,7 +58,7 @@ public class WifiDirectUtil {
     private static void set2Map(HashMap<String, String> map, String key, STSet set) {
         if (set != null && !set.isEmpty()) {
             try {
-                String string = ASIPSerializer.serializeSTSet(set).toString();
+                String string = ASIPMessageSerializerHelper.serializeSTSet(set).toString();
                 map.put(key, string);
             } catch (SharkKBException | JSONException e) {
                 e.printStackTrace();
@@ -80,31 +80,31 @@ public class WifiDirectUtil {
 
         if (map.containsKey(TOPIC_RECORD)) {
             String record = map.get(TOPIC_RECORD);
-            interest.getTopics().merge(ASIPSerializer.deserializeSTSet(record));
+            interest.getTopics().merge(ASIPMessageSerializerHelper.deserializeSTSet(null, record));
         }
         if (map.containsKey(TYPE_RECORD)) {
             String record = map.get(TYPE_RECORD);
-            interest.getTypes().merge(ASIPSerializer.deserializeSTSet(record));
+            interest.getTypes().merge(ASIPMessageSerializerHelper.deserializeSTSet(null, record));
         }
         if (map.containsKey(SENDER_RECORD)) {
             String record = map.get(SENDER_RECORD);
-            interest.setSender(ASIPSerializer.deserializePeerTag(record));
+            interest.setSender(ASIPMessageSerializerHelper.deserializePeerTag(record));
         }
         if (map.containsKey(APPROVERS_RECORD)) {
             String record = map.get(APPROVERS_RECORD);
-            interest.getApprovers().merge(ASIPSerializer.deserializePeerSTSet(null, record));
+            interest.getApprovers().merge(ASIPMessageSerializerHelper.deserializePeerSTSet(null, record));
         }
         if (map.containsKey(RECEIVER_RECORD)) {
             String record = map.get(RECEIVER_RECORD);
-            interest.getReceivers().merge(ASIPSerializer.deserializePeerSTSet(null, record));
+            interest.getReceivers().merge(ASIPMessageSerializerHelper.deserializePeerSTSet(null, record));
         }
         if (map.containsKey(LOCATION_RECORD)) {
             String record = map.get(LOCATION_RECORD);
-            interest.getLocations().merge(ASIPSerializer.deserializeSpatialSTSet(null, record));
+            interest.getLocations().merge(ASIPMessageSerializerHelper.deserializeSpatialSTSet(null, record));
         }
         if (map.containsKey(TIME_RECORD)) {
             String record = map.get(TIME_RECORD);
-            interest.getTimes().merge(ASIPSerializer.deserializeTimeSTSet(null, record));
+            interest.getTimes().merge(ASIPMessageSerializerHelper.deserializeTimeSTSet(null, record));
         }
         if (map.containsKey(DIRECTION_RECORD)) {
             String s = map.get(DIRECTION_RECORD);

@@ -3,7 +3,7 @@ package net.sharksystem.api.impl;
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
@@ -43,7 +43,7 @@ public class CommentImpl implements Comment {
         // There should not be an InformationSpace yet, so create one by adding the first information
         // by setting the sender
         PeerSemanticTag owner = mSharkKB.getOwner();
-        String serializedOwner = ASIPSerializer.serializeTag(owner).toString();
+        String serializedOwner = ASIPMessageSerializerHelper.serializeTag(owner).toString();
         SharkNetUtils.setInfoWithName(mSharkKB, space, COMMENT_SENDER, serializedOwner);
 
         // now search for the desired InformationSpace and set it.
@@ -66,7 +66,7 @@ public class CommentImpl implements Comment {
         ASIPInformation information =
                 SharkNetUtils.getInfoByName(mSharkKB, mInformationSpace.getASIPSpace(), COMMENT_SENDER);
         if(information!=null){
-            PeerSemanticTag tag = ASIPSerializer.deserializePeerTag(information.getContentAsString());
+            PeerSemanticTag tag = ASIPMessageSerializerHelper.deserializePeerTag(information.getContentAsString());
             return mEngine.getContactByTag(tag);
         }
         return null;

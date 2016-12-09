@@ -3,7 +3,7 @@ package net.sharksystem.api.impl;
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
@@ -52,7 +52,7 @@ public class FeedImpl implements Feed {
         mKb = kb;
 
         PeerSemanticTag owner = mKb.getOwner();
-        String serializedOwner = ASIPSerializer.serializeTag(owner).toString();
+        String serializedOwner = ASIPMessageSerializerHelper.serializeTag(owner).toString();
         SharkNetUtils.setInfoWithName(mKb, space, FEED_SENDER, serializedOwner);
 
         // now search for the desired InformationSpace and set it.
@@ -75,7 +75,7 @@ public class FeedImpl implements Feed {
 
     @Override
     public void setInterest(Interest interest) throws SharkKBException {
-        String s = ASIPSerializer.serializeASIPSpace((ASIPSpace) interest).toString();
+        String s = ASIPMessageSerializerHelper.serializeASIPSpace((ASIPSpace) interest).toString();
         SharkNetUtils.setInfoWithName(mKb, mInformationSpace.getASIPSpace(), FEED_INTEREST, s);
     }
 
@@ -84,7 +84,7 @@ public class FeedImpl implements Feed {
         ASIPInformation information =
                 SharkNetUtils.getInfoByName(mKb, mInformationSpace.getASIPSpace(), FEED_INTEREST);
         if(information!=null){
-            return (Interest) ASIPSerializer.deserializeASIPInterest(information.getContentAsString());
+            return (Interest) ASIPMessageSerializerHelper.deserializeASIPInterest(information.getContentAsString());
         }
         return null;
     }
@@ -139,7 +139,7 @@ public class FeedImpl implements Feed {
     @Override
     public void setSender(Contact sender) throws SharkKBException, JSONException {
         PeerSemanticTag tag = sender.getPST();
-        String s = ASIPSerializer.serializeTag(tag).toString();
+        String s = ASIPMessageSerializerHelper.serializeTag(tag).toString();
         SharkNetUtils.setInfoWithName(mKb, mInformationSpace.getASIPSpace(), FEED_SENDER, s);
     }
 
@@ -148,7 +148,7 @@ public class FeedImpl implements Feed {
         ASIPInformation information = SharkNetUtils.getInfoByName(mKb, mInformationSpace.getASIPSpace(), FEED_SENDER);
         if(information!=null){
             String informationContentAsString = information.getContentAsString();
-            PeerSemanticTag sender = ASIPSerializer.deserializePeerTag(informationContentAsString);
+            PeerSemanticTag sender = ASIPMessageSerializerHelper.deserializePeerTag(informationContentAsString);
             return mEngine.getContactByTag(sender);
         }
         return null;

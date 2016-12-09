@@ -58,6 +58,8 @@ public interface SharkNet {
      */
     List<Chat> getChats() throws SharkKBException;
 
+    Chat getChatById(String id) throws SharkKBException;
+
     /**
      * Initializes a new Feed an Safes it in the KnowledgeBase
      */
@@ -118,50 +120,4 @@ public interface SharkNet {
      * Exchange Contact via NFC (just Method, not implemented)
      */
     void exchangeContactNFC();
-
-    /**
-     * Adds Listener to the List of Listener
-     *
-     * @param p
-     * @param listener
-     */
-    void addListener(Profile p, GetEvents listener);
-
-    /**
-     * Removes a Listener
-     *
-     * @param p
-     * @param listener
-     */
-    void removeListener(Profile p, GetEvents listener);
-
-    /**
-     * Methods calls all Methods of registered listeners when the profile matches a contact in the recipientslist of the message
-     *
-     * @param m
-     */
-    void informMessage(Message m) throws SharkKBException;
-
-    /**
-     * Methods calls all Methods of registered listeners and informs about feed
-     *
-     * @param f
-     */
-    void informFeed(Feed f) throws SharkKBException;
-
-    /**
-     * Methods calls all Methods of registered listeners and informs about comment
-     *
-     * @param c
-     */
-    void informComment(Comment c) throws SharkKBException;
-
-    /**
-     * Methods calls all Methods of registered listeners and informs about contact (for example when exchanged via NFC)
-     *
-     * @param c
-     */
-    void informContact(Contact c);
-
-
 }

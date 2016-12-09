@@ -59,7 +59,6 @@ public class NearbyPeerManager implements Runnable{
 
     @Override
     public void run() {
-        // TODO So now go and check all the peers we found!
         if(mPeers.isEmpty()) return;
 
         for (NearbyPeer peer : mPeers){
@@ -108,7 +107,7 @@ public class NearbyPeerManager implements Runnable{
         }
         Collections.sort(mPeers);
 
-        mHandler.post(this);
+//        mHandler.post(this);
 
         for (NearbyPeerListener listener : mListeners){
             listener.onNearbyPeerFound(mPeers);

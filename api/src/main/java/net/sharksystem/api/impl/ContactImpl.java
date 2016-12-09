@@ -4,9 +4,10 @@ import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.asip.engine.ASIPSerializer;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
@@ -24,6 +25,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -47,7 +49,18 @@ public class ContactImpl implements Contact {
 
     protected ContactImpl(SharkKB sharkKB, PeerSemanticTag tag) throws SharkKBException {
         mSharkKB = sharkKB;
-        mSpace = createASIPSpace(tag);
+
+        Iterator<ASIPInformationSpace> allInformationSpaces = mSharkKB.getAllInformationSpaces();
+        while (allInformationSpaces.hasNext() && mSpace==null){
+            ASIPInformationSpace next = allInformationSpaces.next();
+            ASIPSpace asipSpace = next.getASIPSpace();
+            if(SharkCSAlgebra.identical(asipSpace.getSender(), tag)){
+                mSpace = asipSpace;
+            }
+        }
+        if(mSpace==null){
+            mSpace = createASIPSpace(tag);
+        }
 
 //        L.d("tag name: "+tag.getName(), this);
 //        L.d("tag si: "+tag.getSI()[0], this);
@@ -159,7 +172,7 @@ public class ContactImpl implements Contact {
     @Override
     public void setInterest(Interest interest) throws SharkKBException {
         SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_INTEREST,
-                ASIPSerializer.serializeASIPSpace(interest.asASIPSpace()).toString());
+                ASIPMessageSerializerHelper.serializeASIPSpace(interest.asASIPSpace()).toString());
     }
 
     @Override
@@ -168,7 +181,7 @@ public class ContactImpl implements Contact {
         ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_INTEREST);
         if(information!=null){
             String contentAsString = information.getContentAsString();
-            ASIPInterest interest = ASIPSerializer.deserializeASIPInterest(contentAsString);
+            ASIPInterest interest = ASIPMessageSerializerHelper.deserializeASIPInterest(contentAsString);
             return new InterestImpl(interest);
         }
         return null;
