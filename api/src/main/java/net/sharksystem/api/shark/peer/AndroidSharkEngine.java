@@ -8,6 +8,7 @@ import net.sharkfw.asip.ASIPStub;
 import net.sharkfw.asip.SharkStub;
 import net.sharkfw.kep.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.STSet;
+import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.J2SEAndroidSharkEngine;
@@ -35,6 +36,12 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
 
     public AndroidSharkEngine(Context context) {
         super();
+        mContext = context;
+        NearbyPeerManager.getInstance().setEngine(this);
+    }
+
+    public AndroidSharkEngine(Context context, SharkKB sharkKB){
+        super(sharkKB);
         mContext = context;
         NearbyPeerManager.getInstance().setEngine(this);
     }

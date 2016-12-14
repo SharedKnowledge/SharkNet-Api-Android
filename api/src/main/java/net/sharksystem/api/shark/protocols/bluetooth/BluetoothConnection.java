@@ -34,8 +34,6 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
             mRemoteAddress = mSocket.getRemoteDevice().getAddress();
             mLocalAddress = localAddress;
 
-            L.d("Yeah we established a connection!", this);
-
         } catch (IOException e) {
             L.e("Can not create a Connection to the device. Reason: " + e.getMessage(), this);
             throw e;
@@ -100,6 +98,7 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
 
     @Override
     public void close() {
+        L.d("Closing Bluetooth-Connection from: " + this.getReplyAddressString() + " to: " + this.getReceiverAddressString(), this);
         try {
             mSocket.close();
         } catch (IOException e) {

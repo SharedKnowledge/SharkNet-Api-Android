@@ -73,6 +73,7 @@ public class ChatImpl implements Chat {
         this(sharkNetEngine, syncComponent);
 
         setContacts(recipients);
+        setTitle(syncComponent.getUniqueName().getName());
 
         for (Contact contact : recipients){
             addContact(contact);
@@ -88,9 +89,6 @@ public class ChatImpl implements Chat {
 
     @Override
     public void sendMessage(Content content) throws SharkKBException {
-//        ASIPSpace space = createMessageSpace();
-//        new MessageImpl(space);
-//        mChatKB.addInformation(content.getInputStream(), content.getLength(), space);
     }
 
     @Override
@@ -99,9 +97,7 @@ public class ChatImpl implements Chat {
         MessageImpl message = new MessageImpl(mSharkNetEngine, this, mSyncKB, space);
         message.setContent(inputStream, messageString, mimeType);
 
-        mSyncComponent.sendInvite();
-
-        mSharkNetEngine.getSharkEngine().getSyncManager().triggerSync();
+        mSharkNetEngine.getSharkEngine().getSyncManager().sendMerge(mSyncComponent);
     }
 
     @Override
@@ -110,11 +106,7 @@ public class ChatImpl implements Chat {
         MessageImpl message = new MessageImpl(mSharkNetEngine, this, mSyncKB, space, sender);
         message.setContent(inputStream, messageString, mimetype);
 
-        mSyncComponent.sendInvite();
-
-        // TODO trigger single syncComponent!
-
-        mSharkNetEngine.getSharkEngine().getSyncManager().triggerSync();
+        mSharkNetEngine.getSharkEngine().getSyncManager().sendMerge(mSyncComponent);
     }
 
     @Override

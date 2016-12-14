@@ -15,6 +15,7 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
 import net.sharkfw.knowledgeBase.sync.manager.SyncManager.SyncInviteListener;
+import net.sharkfw.system.L;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
@@ -109,7 +110,7 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     public void setContext(Context context){
         mContext = context;
-        mSharkEngine = new AndroidSharkEngine(mContext);
+        mSharkEngine = new AndroidSharkEngine(mContext, mRootKB);
     }
 
     public void startShark() throws SharkKBException, SharkProtocolNotSupportedException, IOException {
@@ -126,6 +127,7 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
         // Sync
         mSharkEngine.getSyncManager().allowInvitation(true);
+        mSharkEngine.getSyncManager().addInviteListener(this);
 
         // Discovery
         mSharkEngine.addNearbyPeerListener(this);
@@ -274,6 +276,7 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     @Override
     public List<Chat> getChats() throws SharkKBException {
+        L.d("Number of chats: ", mChatComponents.size());
         Iterator<SyncComponent> componentIterator = mChatComponents.iterator();
         ArrayList<Chat> chats = new ArrayList<>();
         while (componentIterator.hasNext()) {
@@ -295,8 +298,6 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     @Override
     public void onInvitation(SyncComponent component) {
-        mChatComponents.add(component);
-
         PeerSTSet members = component.getMembers();
         ArrayList<Contact> contacts = new ArrayList<>();
         Enumeration<PeerSemanticTag> peerSemanticTagEnumeration = members.peerTags();
@@ -311,13 +312,17 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
         }
 
-        for (EventListener listener : mEventListeners){
-            try {
-                listener.onNewChat(new ChatImpl(this, component, contacts, getMyProfile()));
-            } catch (SharkKBException | JSONException e) {
-                e.printStackTrace();
-            }
+        L.d("onInvitation triggered!", this);
+        try {
+            ChatImpl chat = new ChatImpl(this, component, contacts, getMyProfile());
+            mChatComponents.add(component);
+//            for (EventListener listener : mEventListeners){
+//                listener.onNewChat(chat);
+//            }
+        } catch (SharkKBException | JSONException e) {
+            e.printStackTrace();
         }
+
     }
 
     @Override
@@ -456,11 +461,11 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     private SharkKB createKBFromRoot(SharkKB sharkKB) throws SharkKBException {
         return new InMemoSharkKB(
-                sharkKB.getTopicsAsSemanticNet(),
-                sharkKB.getTypesAsSemanticNet(),
+                InMemoSharkKB.createInMemoSemanticNet(),
+                InMemoSharkKB.createInMemoSemanticNet(),
                 sharkKB.getPeersAsTaxonomy(),
-                sharkKB.getSpatialSTSet(),
-                sharkKB.getTimeSTSet()
+                InMemoSharkKB.createInMemoSpatialSTSet(),
+                InMemoSharkKB.createInMemoTimeSTSet()
         );
     }
 }
