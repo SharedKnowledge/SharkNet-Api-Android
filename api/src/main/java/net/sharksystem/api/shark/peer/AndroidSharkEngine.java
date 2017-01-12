@@ -6,7 +6,7 @@ import android.content.Context;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.ASIPStub;
 import net.sharkfw.asip.SharkStub;
-import net.sharkfw.kep.SharkProtocolNotSupportedException;
+import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;

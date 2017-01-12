@@ -40,7 +40,12 @@ public class InterestImpl implements Interest {
     }
 
     public ASIPSpace asASIPSpace(){
-        ASIPInterest inMemoASIPInterest = InMemoSharkKB.createInMemoASIPInterest();
+        ASIPInterest inMemoASIPInterest = null;
+        try {
+            inMemoASIPInterest = InMemoSharkKB.createInMemoASIPInterest();
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
         inMemoASIPInterest.setTopics(tx);
         return inMemoASIPInterest;
     }

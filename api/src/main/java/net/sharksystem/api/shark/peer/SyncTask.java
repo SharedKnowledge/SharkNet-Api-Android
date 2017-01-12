@@ -5,7 +5,7 @@ import net.sharkfw.asip.engine.ASIPOutMessage;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SharkKBException;
-import net.sharkfw.knowledgeBase.inmemory.InMemoKnowledge;
+import net.sharkfw.knowledgeBase.inmemory.InMemoASIPKnowledge;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.SharkEngine;
 import net.sharkfw.system.SharkTask;
@@ -31,7 +31,7 @@ public class SyncTask extends SharkTask {
         // TODO Create a Message and send it!
 
         ASIPOutMessage asipOutMessage = mEngine.createASIPOutMessage(mPeer.getSender().getAddresses(), mPeer.getSender());
-        InMemoKnowledge inMemoKnowledge = new InMemoKnowledge();
+        InMemoASIPKnowledge inMemoKnowledge = new InMemoASIPKnowledge();
         try {
             STSet topics = InMemoSharkKB.createInMemoSTSet();
             topics.createSemanticTag("TEST", "www.test.de");

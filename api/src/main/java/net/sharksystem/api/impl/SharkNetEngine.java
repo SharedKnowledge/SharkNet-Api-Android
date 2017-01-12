@@ -5,7 +5,7 @@ import android.content.Context;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
-import net.sharkfw.kep.SharkProtocolNotSupportedException;
+import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
@@ -276,7 +276,6 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     @Override
     public List<Chat> getChats() throws SharkKBException {
-        L.d("Number of chats: ", mChatComponents.size());
         Iterator<SyncComponent> componentIterator = mChatComponents.iterator();
         ArrayList<Chat> chats = new ArrayList<>();
         while (componentIterator.hasNext()) {

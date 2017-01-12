@@ -7,7 +7,7 @@ import android.nfc.NfcAdapter;
 import android.os.Build;
 
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.kep.SharkProtocolNotSupportedException;
+import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.Knowledge;
 import net.sharkfw.protocols.MessageStub;
 import net.sharkfw.protocols.RequestHandler;

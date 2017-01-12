@@ -8,11 +8,11 @@ import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
-import net.sharkfw.system.L;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
@@ -84,7 +84,6 @@ public class ChatImpl implements Chat {
             ASIPInformation information = mSyncKB.addInformation(serializedTag, mChatConfigSpace);
             information.setName(CHAT_OWNER);
         }
-        L.d("New chat created!", this);
     }
 
     @Override
@@ -97,7 +96,17 @@ public class ChatImpl implements Chat {
         MessageImpl message = new MessageImpl(mSharkNetEngine, this, mSyncKB, space);
         message.setContent(inputStream, messageString, mimeType);
 
-        mSharkNetEngine.getSharkEngine().getSyncManager().sendMerge(mSyncComponent);
+        Iterator<Contact> iterator = this.getContacts().iterator();
+        Contact contact = null;
+        while (iterator.hasNext()){
+            Contact next = iterator.next();
+            if (!SharkCSAlgebra.identical(next.getPST(), mSharkNetEngine.getMyProfile().getPST())){
+                contact = next;
+            }
+        }
+        if(contact!=null){
+            mSharkNetEngine.getSharkEngine().getSyncManager().sendMerge(mSyncComponent, contact.getPST());
+        }
     }
 
     @Override
@@ -106,7 +115,17 @@ public class ChatImpl implements Chat {
         MessageImpl message = new MessageImpl(mSharkNetEngine, this, mSyncKB, space, sender);
         message.setContent(inputStream, messageString, mimetype);
 
-        mSharkNetEngine.getSharkEngine().getSyncManager().sendMerge(mSyncComponent);
+        Iterator<Contact> iterator = this.getContacts().iterator();
+        Contact contact = null;
+        while (iterator.hasNext()){
+            Contact next = iterator.next();
+            if (!SharkCSAlgebra.identical(next.getPST(), mSharkNetEngine.getMyProfile().getPST())){
+                contact = next;
+            }
+        }
+        if(contact!=null){
+            mSharkNetEngine.getSharkEngine().getSyncManager().sendMerge(mSyncComponent, contact.getPST());
+        }
     }
 
     @Override

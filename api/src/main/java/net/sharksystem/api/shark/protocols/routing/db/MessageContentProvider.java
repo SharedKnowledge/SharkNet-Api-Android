@@ -68,7 +68,7 @@ public class MessageContentProvider {
         //values.put(MySQLiteHelper.SIGNATURE, msg.getSignature());
         values.put(MySQLiteHelper.COLUMN_TTL, msg.getTtl());
         values.put(MySQLiteHelper.COLUMN_COMMAND, msg.getCommand());
-        values.put(MySQLiteHelper.COLUMN_SENDER, msg.getSender() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getSender()).toString() : "");
+//        values.put(MySQLiteHelper.COLUMN_SENDER, msg.getSender() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getSender()).toString() : "");
         values.put(MySQLiteHelper.COLUMN_RECEIVERPEER, msg.getReceiverPeer() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverPeer()).toString() : "");
         values.put(MySQLiteHelper.COLUMN_RECEIVERLOCATION, msg.getReceiverSpatial() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverSpatial()).toString() : "");
         values.put(MySQLiteHelper.COLUMN_RECEIVERTIME, msg.getReceiverTime() != null ? ASIPMessageSerializerHelper.serializeTag(msg.getReceiverTime()).toString() : "");

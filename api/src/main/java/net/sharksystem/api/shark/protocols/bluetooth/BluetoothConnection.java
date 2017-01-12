@@ -4,8 +4,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
 import net.sharkfw.protocols.ConnectionListenerManager;
-import net.sharkfw.protocols.SharkInputStream;
-import net.sharkfw.protocols.SharkOutputStream;
 import net.sharkfw.protocols.StreamConnection;
 import net.sharkfw.system.L;
 
@@ -36,7 +34,7 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
 
         } catch (IOException e) {
             L.e("Can not create a Connection to the device. Reason: " + e.getMessage(), this);
-            throw e;
+            throw new IOException(e.getMessage(), e.getCause());
         }
     }
 
@@ -49,13 +47,6 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
         mRemoteAddress = mSocket.getRemoteDevice().getAddress();
     }
 
-
-
-    @Override
-    public SharkInputStream getSharkInputStream() {
-        return null;
-    }
-
     @Override
     public InputStream getInputStream() {
         return mInputStream;
@@ -64,11 +55,6 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
     @Override
     public OutputStream getOutputStream() {
         return mOutputStream;
-    }
-
-    @Override
-    public SharkOutputStream getSharkOutputStream() {
-        return null;
     }
 
     @Override

@@ -1,7 +1,5 @@
 package net.sharksystem.api.impl;
 
-import com.google.common.hash.HashCode;
-
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SharkKB;
@@ -11,7 +9,6 @@ import net.sharksystem.api.interfaces.Setting;
 import net.sharksystem.api.utils.ClassHelper;
 import net.sharksystem.api.utils.SharkNetUtils;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 

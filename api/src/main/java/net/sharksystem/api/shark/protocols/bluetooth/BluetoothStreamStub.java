@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.kep.SharkProtocolNotSupportedException;
+import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.Knowledge;
 import net.sharkfw.protocols.Protocols;
 import net.sharkfw.protocols.RequestHandler;
