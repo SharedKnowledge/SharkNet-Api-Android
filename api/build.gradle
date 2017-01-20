@@ -16,6 +16,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions{
+        abortOnError false // to be removed from the fw: java.awt, javax.
+    }
 }
 
 dependencies {
@@ -30,5 +33,4 @@ dependencies {
     }
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.vividsolutions:jts:1.13'
 }
