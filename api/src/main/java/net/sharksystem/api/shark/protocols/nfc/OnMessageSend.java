@@ -1,7 +1,7 @@
 package net.sharksystem.api.shark.protocols.nfc;
 
 /**
- * Created by Mario Neises (mn-io) on 22.01.16.
+ * Created by mn-io on 22.01.16.
  */
 public interface OnMessageSend {
 

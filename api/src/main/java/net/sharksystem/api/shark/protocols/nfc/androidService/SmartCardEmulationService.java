@@ -5,20 +5,21 @@ import android.nfc.cardemulation.HostApduService;
 import android.os.Build;
 import android.os.Bundle;
 
+import net.sharkfw.system.L;
 import net.sharksystem.api.shark.protocols.nfc.OnMessageReceived;
 import net.sharksystem.api.shark.protocols.nfc.OnMessageSend;
 import net.sharksystem.api.shark.protocols.nfc.readerWriterMode.IsoDepTransceiver;
 
 import java.util.Arrays;
 
+
 /**
- * Created by Mario Neises (mn-io) on 22.01.16.
+ * Created by mn-io on 22.01.16.
  */
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class SmartCardEmulationService extends HostApduService {
 
     public static final byte[] KEEP_CHANNEL_OPEN_SIGNAL_PASSIVE = {(byte) 0xFE, (byte) 0xFF, (byte) 0xFE, (byte) 0xFF, (byte) 0xFE, (byte) 0xFF, (byte) 0xFE, (byte) 0xFF, (byte) 0xFE, (byte) 0xFF, (byte) 0xFE, (byte) 0xFF, (byte) 0xFC,};
-    public static final byte[] EMPTY_MSG = new byte[0];
 
     private static OnMessageSend src;
     private static OnMessageReceived sink;
@@ -27,12 +28,15 @@ public class SmartCardEmulationService extends HostApduService {
 
     @Override
     public void onDeactivated(int reason) {
+
+        L.d("onDeactivated: " + (reason == HostApduService.DEACTIVATION_LINK_LOSS ? "DEACTIVATION_LINK_LOSS" : "DEACTIVATION_DESELECTED"), this);
+
         if (src != null) {
             src.onDeactivated(reason);
         }
 
         if (sink != null) {
-            sink.handleTagLost();
+            sink.tagLost();
         }
 
         isValidReader = false;
@@ -40,6 +44,7 @@ public class SmartCardEmulationService extends HostApduService {
 
     @Override
     public byte[] processCommandApdu(byte[] data, Bundle extras) {
+
         if (src == null) {
             return null;
         }
@@ -53,12 +58,8 @@ public class SmartCardEmulationService extends HostApduService {
             return null;
         }
 
-        if (sink != null) {
-            if (!Arrays.equals(IsoDepTransceiver.KEEP_CHANNEL_OPEN_SIGNAL_ACTIVE, data)) {
-                sink.handleMessageReceived(data);
-            } else {
-                sink.handleMessageReceived(EMPTY_MSG);
-            }
+        if (sink != null && !Arrays.equals(IsoDepTransceiver.KEEP_CHANNEL_OPEN_SIGNAL_ACTIVE, data)) {
+            sink.onMessage(data);
         }
 
         byte[] nextMessage = src.getNextMessage();

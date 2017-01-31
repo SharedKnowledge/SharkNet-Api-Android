@@ -1,20 +1,16 @@
 package net.sharksystem.api.shark.protocols.nfc;
 
-import net.sharksystem.api.shark.protocols.nfc.ux.NfcUxHandler;
+import net.sharksystem.api.AndroidUtils;
 
 import java.util.Arrays;
 
 /**
- * Created by Mario Neises (mn-io) on 25.01.2016.
+ * Created by mn-io on 25.01.2016.
  */
 public class NfcMessageSendHandler implements OnMessageSend {
-    private byte[] byteBuffer = null;
+    byte[] byteBuffer = null;
     private int size;
     private final Object lock = new Object();
-    private NfcUxHandler uxHandler;
-    public static final String EXCEPTION_BUFFER_NOT_EMPTY = "Buffer not empty. Data loss on attempt to overwrite existing data";
-    public static final String EXCEPTION_BUFFER_NOT_COMPLETELY_SENT = "Buffer not send entirely before deactivated";
-
 
     @Override
     public byte[] getNextMessage() {
@@ -24,15 +20,7 @@ public class NfcMessageSendHandler implements OnMessageSend {
 
     @Override
     public void onDeactivated(int reason) {
-        synchronized (lock) {
-            if (byteBuffer != null && byteBuffer.length > 0) {
-                getUxHandler().sendingNotDoneCompletely(byteBuffer);
-                this.byteBuffer = null;
-                return;
-            }
-            this.byteBuffer = null;
-            getUxHandler().tagGoneOnSender();
-        }
+        //TODO: clear buffer here? or restore full buffer if not empty yet?
     }
 
     @Override
@@ -42,18 +30,17 @@ public class NfcMessageSendHandler implements OnMessageSend {
 
     public void setData(byte[] data) {
         synchronized (lock) {
-            this.byteBuffer = data;
-            if (data != null) {
-                getUxHandler().preparedSending(data.length);
+            if (byteBuffer != null && byteBuffer.length > 0) {
+                throw new IllegalStateException("Buffer not empty. Data loss on attempt to overwrite existing data");
             }
+            this.byteBuffer = data;
         }
     }
 
-    public byte[] getBytesFromBuffer(int maxLength) {
+    byte[] getBytesFromBuffer(int maxLength) {
         synchronized (lock) {
             if (byteBuffer == null || 0 == byteBuffer.length) {
                 byteBuffer = null;
-                getUxHandler().sending(0, 0);
                 return null;
             }
 
@@ -61,21 +48,7 @@ public class NfcMessageSendHandler implements OnMessageSend {
             final byte[] currentBuffer = Arrays.copyOfRange(byteBuffer, 0, length);
 
             byteBuffer = Arrays.copyOfRange(byteBuffer, length, byteBuffer.length);
-            getUxHandler().sending(currentBuffer.length, byteBuffer.length);
             return currentBuffer;
         }
-    }
-
-    private NfcUxHandler getUxHandler() {
-        if (this.uxHandler != null) {
-            return uxHandler;
-        } else {
-            uxHandler = new NfcUxHandler();
-            return uxHandler;
-        }
-    }
-
-    public void setUxHandler(NfcUxHandler uxHandler) {
-        this.uxHandler = uxHandler;
     }
 }

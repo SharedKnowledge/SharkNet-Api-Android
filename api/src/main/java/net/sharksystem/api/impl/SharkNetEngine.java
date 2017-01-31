@@ -131,8 +131,8 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
         // Discovery
         mSharkEngine.addNearbyPeerListener(this);
-        mSharkEngine.startBluetooth();
-        mSharkEngine.startDiscovery();
+//        mSharkEngine.startBluetooth();
+//        mSharkEngine.startDiscovery();
 
     }
 

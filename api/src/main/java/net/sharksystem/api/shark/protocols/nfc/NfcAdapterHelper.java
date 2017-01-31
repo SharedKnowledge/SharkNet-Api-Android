@@ -10,15 +10,12 @@ import net.sharksystem.api.shark.protocols.nfc.readerWriterMode.NfcReaderCallbac
 
 
 /**
- * Created by Mario Neises (mn-io) on 23.01.2016.
+ * Created by mn-io on 23.01.2016.
  */
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class NfcAdapterHelper {
 
     public static final int NFC_FLAGS = NfcAdapter.FLAG_READER_NFC_A | NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK | NfcAdapter.FLAG_READER_NO_PLATFORM_SOUNDS;
-
-    // Needed to guess: https://stackoverflow.com/questions/23831830/android-4-4-hce-host-based-card-emulation-processcommandapdu-apdu-length
-    public static final int MAX_APDU_SIZE = 220;
 
     /*
      * NFC is waiting for other NFC device to connect to.
@@ -42,8 +39,6 @@ public class NfcAdapterHelper {
         if (activity.isDestroyed()) {
             return;
         }
-
-        src.setMaxSize(MAX_APDU_SIZE);
         SmartCardEmulationService.setInitialHandshakeResponse(smartCardIdentifier);
         SmartCardEmulationService.setSource(src);
         SmartCardEmulationService.setSink(dst);

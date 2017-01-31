@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SharkNet-Api-Android</string>
+    <string name="service_description">APDU service</string>>
+    <string name="aid_description">AID description</string>
 </resources>

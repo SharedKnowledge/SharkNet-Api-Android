@@ -3,40 +3,34 @@ package net.sharksystem.api.shark.protocols.nfc;
 import android.nfc.Tag;
 
 import net.sharkfw.protocols.RequestHandler;
-import net.sharksystem.api.shark.protocols.nfc.ux.NfcUxHandler;
+import net.sharkfw.system.L;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * Created by Mario Neises (mn-io) on 25.01.2016.
+ * Created by mn-io on 25.01.2016.
  */
 public class NfcMessageReceivedHandler implements OnMessageReceived {
-
-    public static final String EXCEPTION_STUB_NULL = "Stub must not be null";
-
+    private final NfcMessageStub.NFCMessageListener nfcMessageListener;
     private RequestHandler handler;
-    private final NfcMessageStub nfcMessageStub;
-    private NfcUxHandler uxHandler;
-
+    private NfcMessageStub nfcMessageStub;
     private byte[] byteBuffer;
 
-    public NfcMessageReceivedHandler(NfcMessageStub nfcMessageStub) {
-        if (nfcMessageStub == null) {
-            throw new IllegalArgumentException(EXCEPTION_STUB_NULL);
-        }
-
+    public NfcMessageReceivedHandler(NfcMessageStub nfcMessageStub, NfcMessageStub.NFCMessageListener listener) {
         this.nfcMessageStub = nfcMessageStub;
+        this.nfcMessageListener = listener;
     }
 
     @Override
-    public void handleMessageReceived(byte[] msg) {
+    public void onMessage(byte[] message) {
         if (byteBuffer == null) {
-            byteBuffer = concat(new byte[0], msg);
+            byteBuffer = message;
         } else {
-            byteBuffer = concat(byteBuffer, msg);
+            byteBuffer = concat(byteBuffer, message);
         }
-
-        getUxHandler().receiving(msg.length, byteBuffer.length);
+        L.d("onMessage: " + byteBuffer, this);
+        this.nfcMessageListener.onMessageReceived(new String(byteBuffer, StandardCharsets.UTF_8));
     }
 
     public static byte[] concat(byte[] first, byte[] second) {
@@ -47,41 +41,25 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
     }
 
     @Override
-    public void handleError(Exception exception) {
-        getUxHandler().handleErrorOnReceiving(exception);
+    public void onError(Exception exception) {
+        L.d("onError", this);
     }
 
     @Override
-    public void handleTagLost() {
-        if (byteBuffer != null && byteBuffer.length > 0) {
-            try {
-                handler.handleMessage(byteBuffer, nfcMessageStub);
-            } catch (Exception e) {
-                getUxHandler().handleErrorOnReceiving(e);
-            }
+    public void tagLost() {
+        if (byteBuffer != null) {
+            L.d("Message completed: " + new String(byteBuffer, StandardCharsets.UTF_8), this);
+            nfcMessageListener.onExchangeComplete(new String(byteBuffer, StandardCharsets.UTF_8));
+            // Pass to the handler for the ports
+//            handler.handleMessage(byteBuffer, nfcMessageStub);
             byteBuffer = null;
         }
-        getUxHandler().tagGoneOnReceiver();
     }
 
     @Override
-    public void handleNewTag(Tag tag) {
-    }
+    public void newTag(Tag tag) { }
 
     public void setHandler(RequestHandler handler) {
         this.handler = handler;
-    }
-
-    private NfcUxHandler getUxHandler() {
-        if (this.uxHandler != null) {
-            return uxHandler;
-        } else {
-            uxHandler = new NfcUxHandler();
-            return uxHandler;
-        }
-    }
-
-    public void setUxHandler(NfcUxHandler uxHandler) {
-        this.uxHandler = uxHandler;
     }
 }

@@ -20,12 +20,11 @@ import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectAdvertisingManager;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 
 public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
 
     private Context mContext;
-    private WeakReference<Activity> activityRef;
+    private Activity activity;
     private Stub currentStub;
     private ASIPSpace mSpace;
 
@@ -33,6 +32,7 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
 
     public final static String DISCOVERY_TOPIC = "DISCOVERY_INTEREST";
     public final static String DISCOVERY_SI = "www.sharksystem.net/discovery";
+    private NfcMessageStub.NFCMessageListener nfcMessageListener;
 
     public AndroidSharkEngine(Context context) {
         super();
@@ -50,10 +50,8 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
         return mContext;
     }
 
-    public AndroidSharkEngine(Activity activity) {
-        super();
-        mContext = activity.getApplicationContext();
-        activityRef = new WeakReference<>(activity);
+    public void setActivity(Activity activity){
+        this.activity = activity;
     }
 
     public void setSpace(ASIPSpace space) throws SharkKBException {
@@ -91,10 +89,14 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
     @Override
     protected Stub createNfcStreamStub(SharkStub stub) throws SharkProtocolNotSupportedException {
         if (currentStub == null) {
-            currentStub = new NfcMessageStub(mContext, activityRef);
+            currentStub = new NfcMessageStub(mContext, activity, nfcMessageListener);
             currentStub.setHandler((RequestHandler) stub);
         }
         return currentStub;
+    }
+
+    public void setNFCMessageListener(NfcMessageStub.NFCMessageListener listener){
+        nfcMessageListener = listener;
     }
 
     @Override
@@ -105,6 +107,10 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
     @Override
     public void stopNfc() throws SharkProtocolNotSupportedException {
         this.createNfcStreamStub(this.getAsipStub()).stop();
+    }
+
+    public void sendNFCMessage(String message) throws IOException {
+        ((NfcMessageStub) this.currentStub).sendMessage(message.getBytes(), "");
     }
 
     @Override
@@ -122,7 +128,7 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
 
     @Override
     public void stopBluetooth() throws SharkProtocolNotSupportedException {
-        currentStub.stop();
+        this.createBluetoothStreamStub(this.getAsipStub()).stop();
     }
 
     @Override
