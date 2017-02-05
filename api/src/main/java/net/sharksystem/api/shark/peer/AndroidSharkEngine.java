@@ -3,10 +3,12 @@ package net.sharksystem.api.shark.peer;
 import android.app.Activity;
 import android.content.Context;
 
+import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.ASIPStub;
 import net.sharkfw.asip.SharkStub;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
+import net.sharkfw.knowledgeBase.Knowledge;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
@@ -14,6 +16,7 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.J2SEAndroidSharkEngine;
 import net.sharkfw.protocols.RequestHandler;
 import net.sharkfw.protocols.Stub;
+import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.shark.ports.RadarDiscoveryPort;
 import net.sharksystem.api.shark.protocols.bluetooth.BluetoothStreamStub;
 import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
@@ -87,9 +90,9 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
     }
 
     @Override
-    protected Stub createNfcStreamStub(SharkStub stub) throws SharkProtocolNotSupportedException {
+    protected Stub createNFCMessageStub(SharkStub stub) throws SharkProtocolNotSupportedException {
         if (currentStub == null) {
-            currentStub = new NfcMessageStub(mContext, activity, nfcMessageListener);
+            currentStub = new NfcMessageStub(this, mContext, activity, nfcMessageListener);
             currentStub.setHandler((RequestHandler) stub);
         }
         return currentStub;
@@ -99,18 +102,18 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
         nfcMessageListener = listener;
     }
 
+    public void offerNFC(ASIPKnowledge knowledge) throws SharkProtocolNotSupportedException, SharkNotSupportedException {
+        this.createNFCMessageStub(this.getAsipStub()).offer((Knowledge) knowledge);
+    }
+
     @Override
     public void startNfc() throws SharkProtocolNotSupportedException, IOException {
-        this.createNfcStreamStub(this.getAsipStub()).start();
+        this.createNFCMessageStub(this.getAsipStub()).start();
     }
 
     @Override
     public void stopNfc() throws SharkProtocolNotSupportedException {
-        this.createNfcStreamStub(this.getAsipStub()).stop();
-    }
-
-    public void sendNFCMessage(String message) throws IOException {
-        ((NfcMessageStub) this.currentStub).sendMessage(message.getBytes(), "");
+        this.createNFCMessageStub(this.getAsipStub()).stop();
     }
 
     @Override

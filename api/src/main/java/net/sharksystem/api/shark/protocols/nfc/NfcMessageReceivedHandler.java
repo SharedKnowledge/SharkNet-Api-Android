@@ -2,6 +2,7 @@ package net.sharksystem.api.shark.protocols.nfc;
 
 import android.nfc.Tag;
 
+import net.sharkfw.asip.serialization.ASIPSerializerException;
 import net.sharkfw.protocols.RequestHandler;
 import net.sharkfw.system.L;
 
@@ -30,7 +31,7 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
             byteBuffer = concat(byteBuffer, message);
         }
         L.d("onMessage: " + byteBuffer, this);
-        this.nfcMessageListener.onMessageReceived(new String(byteBuffer, StandardCharsets.UTF_8));
+        this.nfcMessageListener.onMessageReceived("We received a new message.");
     }
 
     public static byte[] concat(byte[] first, byte[] second) {
@@ -48,10 +49,14 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
     @Override
     public void tagLost() {
         if (byteBuffer != null) {
-            L.d("Message completed: " + new String(byteBuffer, StandardCharsets.UTF_8), this);
-            nfcMessageListener.onExchangeComplete(new String(byteBuffer, StandardCharsets.UTF_8));
+            nfcMessageListener.onExchangeComplete("We completed the Exchange.");
             // Pass to the handler for the ports
-//            handler.handleMessage(byteBuffer, nfcMessageStub);
+            try {
+                handler.handleMessage(byteBuffer, nfcMessageStub);
+            } catch (ASIPSerializerException e) {
+                e.printStackTrace();
+                this.nfcMessageListener.onExchangeFailure("Message can't be serialized to ASIP.");
+            }
             byteBuffer = null;
         }
     }

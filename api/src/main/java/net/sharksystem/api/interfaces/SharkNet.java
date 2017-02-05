@@ -2,6 +2,7 @@ package net.sharksystem.api.interfaces;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 
 import org.json.JSONException;
 
@@ -116,12 +117,17 @@ public interface SharkNet {
      */
     Profile getMyProfile() throws SharkKBException;
 
-    interface NFCListener{
-        void onNewContactViaNFC(Contact contact) throws SharkKBException;
+    interface NFCContentListener {
+        void onNewContact(Contact contact, List<Contact> contacts) throws SharkKBException;
     }
 
     /**
-     * Exchange Contact via NFC (just Method, not implemented)
+     * Exchange Contact via NFC
      */
-    void exchangeContactNFC(NFCListener listener);
+    void exchangeContactNFC(NFCContentListener contentListener, NfcMessageStub.NFCMessageListener messageListener);
+
+    /**
+     * Activate Reader mode for the device
+     */
+    void startSendingViaNFC();
 }

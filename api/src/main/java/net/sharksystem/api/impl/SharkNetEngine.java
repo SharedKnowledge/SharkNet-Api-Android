@@ -12,10 +12,12 @@ import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.knowledgeBase.inmemory.InMemoASIPKnowledge;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
 import net.sharkfw.knowledgeBase.sync.manager.SyncManager.SyncInviteListener;
 import net.sharkfw.system.L;
+import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
@@ -27,6 +29,7 @@ import net.sharksystem.api.interfaces.SharkNet;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeer;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
+import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
@@ -234,6 +237,39 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
         return null;
     }
 
+    @Override
+    public void exchangeContactNFC(NFCContentListener contentListener, NfcMessageStub.NFCMessageListener messageListener) {
+
+        // TODO get my Contact
+//        InMemoASIPKnowledge inMemoASIPKnowledge = new InMemoASIPKnowledge();
+//        try {
+//            inMemoASIPKnowledge.addInformation("This is just a simple test", InMemoSharkKB.createInMemoASIPInterest());
+//        } catch (SharkKBException e) {
+//            e.printStackTrace();
+//        }
+
+        try {
+            mSharkEngine.setNFCMessageListener(messageListener);
+            // Create the nfcPort w/ the listener set
+            new NFCContactPort(mSharkEngine, contentListener);
+            // TODO The contacts shall be offered here
+//            mSharkEngine.offerNFC(inMemoASIPKnowledge);
+            mSharkEngine.stopNfc();
+        } catch (SharkProtocolNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void startSendingViaNFC() {
+        try {
+            mSharkEngine.startNfc();
+        } catch (SharkProtocolNotSupportedException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Contacts
     //
     //
@@ -426,11 +462,6 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
     //
     //
 
-    //  TODO exchangeContactNFC
-    @Override
-    public void exchangeContactNFC(NFCListener listener) {
-
-    }
 
     // Facade Getter
 
