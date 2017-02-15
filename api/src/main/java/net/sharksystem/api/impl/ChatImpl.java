@@ -237,7 +237,7 @@ public class ChatImpl implements Chat {
                 return list;
             }
         }
-        return null;
+        return list;
     }
 
     @Override
