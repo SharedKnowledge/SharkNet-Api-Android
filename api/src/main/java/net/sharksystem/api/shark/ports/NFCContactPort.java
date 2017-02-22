@@ -1,4 +1,4 @@
-package net.sharksystem.api.impl;
+package net.sharksystem.api.shark.ports;
 
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInterest;
