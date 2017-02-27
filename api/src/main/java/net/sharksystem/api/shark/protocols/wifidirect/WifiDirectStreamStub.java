@@ -2,6 +2,7 @@ package net.sharksystem.api.shark.protocols.wifidirect;
 
 import android.content.Context;
 
+import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.Knowledge;
 import net.sharkfw.protocols.RequestHandler;
@@ -70,7 +71,7 @@ public class WifiDirectStreamStub implements StreamStub {
     }
 
     @Override
-    public void offer(Knowledge knowledge) throws SharkNotSupportedException {
+    public void offer(ASIPKnowledge knowledge) throws SharkNotSupportedException {
         // TODO not yet implemented
     }
 }

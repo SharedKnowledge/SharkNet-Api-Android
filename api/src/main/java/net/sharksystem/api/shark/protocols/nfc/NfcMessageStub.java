@@ -6,6 +6,7 @@ import android.content.Context;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 
+import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.ASIPOutMessage;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
@@ -33,8 +34,7 @@ public class NfcMessageStub implements MessageStub {
     private final SharkEngine sharkEngine;
 
     public interface NFCMessageListener{
-        void onMessageReceived(String message);
-        void onExchangeComplete(String message);
+        void onMessageReceived();
         void onExchangeFailure(String failure);
     }
 
@@ -87,7 +87,6 @@ public class NfcMessageStub implements MessageStub {
 
     @Override
     public void sendMessage(byte[] msg, String recAddress) throws IOException {
-        L.d("sendMessage called", this);
         sendRequestHandler.setData(msg);
         sendRequestHandler.setMaxSize(1024);
     }
@@ -101,8 +100,7 @@ public class NfcMessageStub implements MessageStub {
      * @param knowledge
      */
     @Override
-    public void offer(Knowledge knowledge) {
-        L.d("Offer called", this);
+    public void offer(ASIPKnowledge knowledge) {
         ASIPOutMessage outMessage = this.sharkEngine.createASIPOutMessage(new String[]{"nfc://"},
                 this.sharkEngine.getOwner(),
                 null,
@@ -113,7 +111,6 @@ public class NfcMessageStub implements MessageStub {
                 1);
 
         outMessage.insert(knowledge);
-        // Should send the whole message as byte[] to this.sendMessage()
     }
 
     @Override

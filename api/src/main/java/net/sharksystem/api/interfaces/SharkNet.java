@@ -1,11 +1,19 @@
 package net.sharksystem.api.interfaces;
 
+import android.app.Activity;
+
+import net.sharkfw.asip.ASIPKnowledge;
+import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.system.SharkNotSupportedException;
+import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
+import net.sharksystem.api.shark.ports.NfcPkiPortListener;
 import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
@@ -117,17 +125,13 @@ public interface SharkNet {
      */
     Profile getMyProfile() throws SharkKBException;
 
-    interface NFCContentListener {
-        void onNewContact(Contact contact, List<Contact> contacts) throws SharkKBException;
-    }
-
     /**
      * Exchange Contact via NFC
      */
-    void exchangeContactNFC(NFCContentListener contentListener, NfcMessageStub.NFCMessageListener messageListener);
+    NfcPkiPortEventListener setupNfc(Activity activity, NfcPkiPortListener listener, ASIPKnowledge knowledge) throws SharkProtocolNotSupportedException, SharkNotSupportedException;
 
     /**
      * Activate Reader mode for the device
      */
-    void startSendingViaNFC();
+    void startSendingViaNfc() throws SharkProtocolNotSupportedException, IOException;
 }

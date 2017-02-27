@@ -30,8 +30,8 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
         } else {
             byteBuffer = concat(byteBuffer, message);
         }
-        L.d("onMessage: " + byteBuffer, this);
-        this.nfcMessageListener.onMessageReceived("We received a new message.");
+//        L.d("onMessage: " + byteBuffer, this);
+        this.nfcMessageListener.onMessageReceived();
     }
 
     public static byte[] concat(byte[] first, byte[] second) {
@@ -47,9 +47,13 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
     }
 
     @Override
+    public void newTag(Tag tag) {
+
+    }
+
+    @Override
     public void tagLost() {
         if (byteBuffer != null) {
-            nfcMessageListener.onExchangeComplete("We completed the Exchange.");
             // Pass to the handler for the ports
             try {
                 handler.handleMessage(byteBuffer, nfcMessageStub);
@@ -60,9 +64,6 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
             byteBuffer = null;
         }
     }
-
-    @Override
-    public void newTag(Tag tag) { }
 
     public void setHandler(RequestHandler handler) {
         this.handler = handler;

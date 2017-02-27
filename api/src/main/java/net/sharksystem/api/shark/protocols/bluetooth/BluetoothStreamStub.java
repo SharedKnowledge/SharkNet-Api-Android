@@ -3,6 +3,7 @@ package net.sharksystem.api.shark.protocols.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
+import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.Knowledge;
@@ -97,7 +98,7 @@ public class BluetoothStreamStub implements StreamStub {
     }
 
     @Override
-    public void offer(Knowledge knowledge) throws SharkNotSupportedException {
+    public void offer(ASIPKnowledge knowledge) throws SharkNotSupportedException {
 
     }
 }
