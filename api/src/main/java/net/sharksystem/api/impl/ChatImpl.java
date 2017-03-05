@@ -73,7 +73,7 @@ public class ChatImpl implements Chat {
         this(sharkNetEngine, syncComponent);
 
         setContacts(recipients);
-        setTitle(syncComponent.getUniqueName().getName());
+//        setTitle(syncComponent.getUniqueName().getName());
 
         for (Contact contact : recipients){
             addContact(contact);
