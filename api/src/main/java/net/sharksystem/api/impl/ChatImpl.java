@@ -25,6 +25,7 @@ import org.json.JSONException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -317,8 +318,8 @@ public class ChatImpl implements Chat {
     }
 
     @Override
-    public Timestamp getTimestamp() throws SharkKBException {
+    public Date getDateReceived() throws SharkKBException {
         List<Message> messages = getMessages(true);
-        return messages.get(0).getTimestamp();
+        return messages.get(0).getDateReceived();
     }
 }

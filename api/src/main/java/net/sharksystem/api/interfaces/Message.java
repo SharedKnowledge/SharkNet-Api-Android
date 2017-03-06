@@ -4,6 +4,7 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,12 +13,6 @@ import java.util.List;
  */
 
 public interface Message extends Timeable, ContainsContent {
-	/**
-	 * Returns the Date, Time when a message was created
-	 * @return
-     */
-    Timestamp getTimestamp() throws SharkKBException;
-
 	/**
 	 * returns the Author of a message
 	 * @return

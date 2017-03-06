@@ -6,6 +6,7 @@ import org.json.JSONException;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -89,12 +90,6 @@ public interface Chat extends Timeable {
 	 * Returns the Profile of the owner of the Chat
 	 */
 	Contact getOwner() throws SharkKBException;
-
-	/**
-	 * Returns the Timestamp of the most recent Message
-	 */
-	Timestamp getTimestamp() throws SharkKBException;
-
 
 	/**
 	 * Adds Contact to the Chat

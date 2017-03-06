@@ -141,7 +141,7 @@ public class SharkNetUtils {
     }
 
     /**
-     * Sorts the Lists of Timeable Objects which are Objects with the Method getTimestamp (Comment, Feed, Message)
+     * Sorts the Lists of Timeable Objects which are Objects with the Method getDateReceived (Comment, Feed, Message)
      *
      * @param sortList
      * @return
@@ -158,11 +158,11 @@ public class SharkNetUtils {
         for (int i = 1; i < m_list.size(); i++) {
             for (int j = 0; j < m_list.size() - 1; j++) {
                 change = false;
-                if(m_list.get(j).getTimestamp() != null && m_list.get(j+1).getTimestamp()!=null){
-                    if (m_list.get(j).getTimestamp().before(m_list.get(j + 1).getTimestamp()) && ascending) {
+                if(m_list.get(j).getDateReceived() != null && m_list.get(j+1).getDateReceived()!=null){
+                    if (m_list.get(j).getDateReceived().before(m_list.get(j + 1).getDateReceived()) && ascending) {
                         change = true;
                     }
-                    if(m_list.get(j).getTimestamp().after(m_list.get(j + 1).getTimestamp()) && !ascending){
+                    if(m_list.get(j).getDateReceived().after(m_list.get(j + 1).getDateReceived()) && !ascending){
                         change = true;
                     }
 
@@ -200,12 +200,12 @@ public class SharkNetUtils {
             int iterator = 0;
             while ((!reachStart && !reachStop) && iterator < swapList.size()) {
                 if (!reachStart && reachStop) {
-                    if (swapList.get(iterator).getTimestamp().before(start) || swapList.get(iterator).getTimestamp().equals(start)) {
+                    if (swapList.get(iterator).getDateReceived().before(start) || swapList.get(iterator).getDateReceived().equals(start)) {
                         reachStart = true;
                     } else iteratorstart = iterator;
                 }
                 if (!reachStop) {
-                    if (swapList.get(iterator).getTimestamp().before(stop)) {
+                    if (swapList.get(iterator).getDateReceived().before(stop)) {
                         reachStop = true;
                     } else iteratorstop = iterator;
                 }

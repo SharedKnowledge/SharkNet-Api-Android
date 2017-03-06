@@ -12,11 +12,11 @@ public class MessageComparator implements Comparator<Message> {
     @Override
     public int compare(Message lhs, Message rhs) {
         try {
-            if (lhs.getTimestamp().before(rhs.getTimestamp())) {
+            if (lhs.getDateReceived().before(rhs.getDateReceived())) {
                 return -1;
-            } else if (lhs.getTimestamp().equals(rhs.getTimestamp())) {
+            } else if (lhs.getDateReceived().equals(rhs.getDateReceived())) {
                 return 0;
-            } else if (lhs.getTimestamp().after(rhs.getTimestamp())) {
+            } else if (lhs.getDateReceived().after(rhs.getDateReceived())) {
                 return 1;
             }
         } catch (SharkKBException e) {

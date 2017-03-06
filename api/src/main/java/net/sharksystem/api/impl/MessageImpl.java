@@ -23,6 +23,7 @@ import org.json.JSONException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -81,13 +82,13 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public Timestamp getTimestamp() throws SharkKBException {
+    public Date getDateReceived() throws SharkKBException {
         TimeSTSet times = mInformationSpace.getASIPSpace().getTimes();
         Iterator<TimeSemanticTag> timeSemanticTagIterator = times.tstTags();
         if(timeSemanticTagIterator.hasNext()) {
             TimeSemanticTag next = timeSemanticTagIterator.next();
             long from = next.getFrom();
-            return new Timestamp(from);
+            return new Date(from);
         }
         return null;
     }

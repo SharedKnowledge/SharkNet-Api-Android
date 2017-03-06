@@ -22,7 +22,7 @@ public interface Comment extends Timeable, ContainsContent {
 	 * Returns the Date and Time a comment was created
 	 * @return
      */
-    Timestamp getTimestamp() throws SharkKBException;
+    Timestamp getDateReceived() throws SharkKBException;
 
 	/**
 	 * Returns the Feed the comment is referencing

@@ -73,7 +73,7 @@ public class CommentImpl implements Comment {
     }
 
     @Override
-    public Timestamp getTimestamp() throws SharkKBException {
+    public Timestamp getDateReceived() throws SharkKBException {
         TimeSTSet times = mInformationSpace.getASIPSpace().getTimes();
         Iterator<TimeSemanticTag> timeSemanticTagIterator = times.tstTags();
         if(timeSemanticTagIterator.hasNext()) {

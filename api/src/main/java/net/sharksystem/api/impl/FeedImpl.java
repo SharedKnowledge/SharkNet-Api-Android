@@ -92,7 +92,7 @@ public class FeedImpl implements Feed {
     private void setId() throws SharkKBException {
         String name = getSender().getName();
         String si = getSender().getPST().getSI()[0];
-        int timestamp = getTimestamp().getNanos();
+        int timestamp = getDateReceived().getNanos();
 
         SharkNetUtils.setInfoWithName(
                 mKb,
@@ -111,7 +111,7 @@ public class FeedImpl implements Feed {
     }
 
     @Override
-    public Timestamp getTimestamp() throws SharkKBException {
+    public Timestamp getDateReceived() throws SharkKBException {
         TimeSTSet times = mInformationSpace.getASIPSpace().getTimes();
         Iterator<TimeSemanticTag> timeSemanticTagIterator = times.tstTags();
         if(timeSemanticTagIterator.hasNext()) {

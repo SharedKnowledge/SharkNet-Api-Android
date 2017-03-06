@@ -29,7 +29,7 @@ public interface Feed extends Timeable, ContainsContent{
 	 * Returns Date and Time when the feed was created
 	 * @return
      */
-    Timestamp getTimestamp() throws SharkKBException;
+    Timestamp getDateReceived() throws SharkKBException;
 
 	void setContent(InputStream inputStream, String messageString, String mimeType) throws SharkKBException;
 
