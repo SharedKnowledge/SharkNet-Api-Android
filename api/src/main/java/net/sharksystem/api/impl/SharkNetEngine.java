@@ -270,6 +270,11 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
         return new ProfileImpl(mProfileKB, nickname, deviceID);
     }
 
+    @Override
+    public Profile newProfile(PeerSemanticTag tag) throws SharkKBException {
+        return new ProfileImpl(mProfileKB, tag);
+    }
+
 
     // Chats
     //

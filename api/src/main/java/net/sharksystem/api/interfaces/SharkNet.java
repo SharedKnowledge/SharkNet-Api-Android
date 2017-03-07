@@ -83,6 +83,8 @@ public interface SharkNet {
      */
     Profile newProfile(String nickname, String deviceID) throws SharkKBException;
 
+    Profile newProfile(PeerSemanticTag tag) throws SharkKBException;
+
     /**
      * Initializes a Chat and safes it in the KnowledgeBase
      *
