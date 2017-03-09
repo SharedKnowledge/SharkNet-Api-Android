@@ -60,6 +60,8 @@ public interface SharkNet {
      */
     List<Contact> getContacts() throws SharkKBException;
 
+    List<Contact> getContactsWithoutMe() throws SharkKBException;
+
     /**
      * returns a list of all chats
      *

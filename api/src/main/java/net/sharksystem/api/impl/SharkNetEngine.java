@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import net.sharkfw.asip.ASIPInformationSpace;
+import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
@@ -12,6 +13,7 @@ import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
@@ -222,6 +224,13 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
             contactList.add(contact);
         }
         return contactList;
+    }
+
+    @Override
+    public List<Contact> getContactsWithoutMe() throws SharkKBException {
+        List<Contact> contacts = getContacts();
+        contacts.remove(getMyProfile());
+        return contacts;
     }
 
     @Override
@@ -484,6 +493,26 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
 
     public Profile getProfileByTag(PeerSemanticTag tag) throws SharkKBException {
         return new ProfileImpl(this.mProfileKB, tag);
+    }
+
+    private boolean contactAlreadyExists(SharkKB kb, PeerSemanticTag tag){
+        try {
+            Iterator<ASIPInformationSpace> allInformationSpaces = kb.getAllInformationSpaces();
+            while (allInformationSpaces.hasNext()){
+                ASIPInformationSpace next = allInformationSpaces.next();
+                ASIPSpace asipSpace = next.getASIPSpace();
+                if(SharkCSAlgebra.identical(tag, asipSpace.getSender())){
+                    return true;
+                }
+            }
+
+//            ASIPInterest space = InMemoSharkKB.createInMemoASIPInterest(null, null, tag, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
+//            Iterator<ASIPInformationSpace> informationSpaces = kb.getInformationSpaces(space);
+//            return informationSpaces.hasNext();
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private SharkKB createKBFromRoot(SharkKB sharkKB) throws SharkKBException {

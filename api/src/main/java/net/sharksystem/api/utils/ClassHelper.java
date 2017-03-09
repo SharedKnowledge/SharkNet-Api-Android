@@ -1,5 +1,7 @@
 package net.sharksystem.api.utils;
 
+import net.sharkfw.system.L;
+
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,9 +31,9 @@ public class ClassHelper {
                 withModifier(Modifier.PUBLIC), withPrefix("get"));
 
         for (Method next : getters) {
-            System.out.println("------------------------------------------------------------------");
-            System.out.println(classToCheck.getName() + "." + next.getName());
-            System.out.println(next.invoke(lhs));
+//            L.d("------------------------------------------------------------------", classToCheck);
+//            L.d(classToCheck.getName() + "." + next.getName(), classToCheck);
+//            L.d(next.invoke(lhs) + "", classToCheck);
             if (next.invoke(lhs) == null && next.invoke(rhs) == null) {
                 equals = true;
             } else if (next.invoke(lhs) != null && next.invoke(rhs) != null) {

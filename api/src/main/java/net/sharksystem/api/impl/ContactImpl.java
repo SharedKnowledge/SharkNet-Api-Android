@@ -11,6 +11,7 @@ import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.system.L;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Content;
 import net.sharksystem.api.interfaces.Interest;
@@ -34,9 +35,6 @@ import java.util.List;
 
 public class ContactImpl implements Contact {
 
-    protected SharkKB mSharkKB;
-    protected ASIPSpace mSpace;
-
     private final static String CONTACT_NAME = "CONTACT_NAME";
     private final static String CONTACT_NICKNAME = "CONTACT_NICKNAME";
     private final static String CONTACT_UID = "CONTACT_UID";
@@ -46,27 +44,24 @@ public class ContactImpl implements Contact {
     private final static String CONTACT_EMAIL = "CONTACT_EMAIL";
     private final static String CONTACT_NOTE = "CONTACT_NOTE";
     private final static String CONTACT_LAST_SEEN = "CONTACT_LAST_SEEN";
+    protected SharkKB mSharkKB;
+    protected ASIPSpace mSpace;
 
     protected ContactImpl(SharkKB sharkKB, PeerSemanticTag tag) throws SharkKBException {
         mSharkKB = sharkKB;
 
         Iterator<ASIPInformationSpace> allInformationSpaces = mSharkKB.getAllInformationSpaces();
-        while (allInformationSpaces.hasNext() && mSpace==null){
+        while (allInformationSpaces.hasNext() && mSpace == null) {
             ASIPInformationSpace next = allInformationSpaces.next();
             ASIPSpace asipSpace = next.getASIPSpace();
-            if(SharkCSAlgebra.identical(asipSpace.getSender(), tag)){
+            if (SharkCSAlgebra.identical(asipSpace.getSender(), tag)) {
                 mSpace = asipSpace;
             }
         }
-        if(mSpace==null){
+        if (mSpace == null) {
             mSpace = createASIPSpace(tag);
         }
 
-//        L.d("tag name: "+tag.getName(), this);
-//        L.d("tag si: "+tag.getSI()[0], this);
-//        L.d("pst name: "+mSpace.getSender().getName(), this);
-
-        // SET FIRST INFO - NAME
         setName(tag.getName());
         setNickname(tag.getName());
         setUID(tag.getSI()[0]);
@@ -141,19 +136,19 @@ public class ContactImpl implements Contact {
         SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_PUBLIC_KEY, publicKey);
     }
 
-//    TODO getPublicKeyExpiration
+    //    TODO getPublicKeyExpiration
     @Override
     public Timestamp getPublicKeyExpiration() {
         return null;
     }
 
-//    TODO getPublicKeyFingerprint
+    //    TODO getPublicKeyFingerprint
     @Override
     public String getPublicKeyFingerprint() {
         return null;
     }
 
-//    TODO deleteKey
+    //    TODO deleteKey
     @Override
     public void deleteKey() {
 
@@ -171,15 +166,14 @@ public class ContactImpl implements Contact {
 
     @Override
     public void setInterest(Interest interest) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_INTEREST,
-                ASIPMessageSerializerHelper.serializeASIPSpace(interest.asASIPSpace()).toString());
+        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_INTEREST, ASIPMessageSerializerHelper.serializeASIPSpace(interest.asASIPSpace()).toString());
     }
 
     @Override
     public Interest getInterests() throws SharkKBException {
 
         ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_INTEREST);
-        if(information!=null){
+        if (information != null) {
             String contentAsString = information.getContentAsString();
             ASIPInterest interest = ASIPMessageSerializerHelper.deserializeASIPInterest(contentAsString);
             return new InterestImpl(interest);
@@ -187,24 +181,44 @@ public class ContactImpl implements Contact {
         return null;
     }
 
-//    TODO isEqual
+    //    TODO isEqual
     @Override
     public boolean isEqual(Contact c) {
         return false;
     }
 
-//    TODO getOwner
+    //    TODO getOwner
     @Override
     public Profile getOwner() {
         return null;
     }
 
+    //    TODO Implement hashCode, also for PST and Interest.
     @Override
+    public int hashCode() {
+        try {
+            return ClassHelper.hashCode(ContactImpl.class, this);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return (int) Math.random();
+    }    @Override
     public void setName(String name) throws SharkKBException {
         SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NAME, name);
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        try {
+            return ClassHelper.equals(Contact.class, this, o);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }    @Override
     public String getName() throws SharkKBException {
         ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_NAME);
         return information != null ? information.getContentAsString() : null;
@@ -265,7 +279,7 @@ public class ContactImpl implements Contact {
     @Override
     public Timestamp getLastWifiContact() throws SharkKBException {
         ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_LAST_SEEN);
-        if(information!=null){
+        if (information != null) {
             String string = information.getContentAsString();
             return new Timestamp(Long.parseLong(string));
         }
@@ -277,27 +291,7 @@ public class ContactImpl implements Contact {
         SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_LAST_SEEN, String.valueOf(lastWifiContact.getTime()));
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
 
-        try {
-            return ClassHelper.equals(Contact.class, this, o);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
-//    TODO Implement hashCode, also for PST and Interest.
-    @Override
-    public int hashCode() {
-        try {
-            return ClassHelper.hashCode(ContactImpl.class, this);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return (int) Math.random();
-    }
+
 }

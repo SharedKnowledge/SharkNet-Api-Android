@@ -220,6 +220,13 @@ public class ChatImpl implements Chat {
     }
 
     @Override
+    public List<Contact> getContactsWithoutMe() throws SharkKBException {
+        List<Contact> contacts = getContacts();
+        contacts.remove(mSharkNetEngine.getMyProfile());
+        return contacts;
+    }
+
+    @Override
     public List<Contact> getContacts() throws SharkKBException {
         if (mSharkNetEngine == null) {
             return null;
@@ -240,9 +247,6 @@ public class ChatImpl implements Chat {
                     PeerSemanticTag peerSemanticTag = peerTags.nextElement();
                     // Get the contact for the PST from the sharkNEtEngine and add it to the list.
                     Contact contact = mSharkNetEngine.getContactByTag(peerSemanticTag);
-                    if(contact==null){
-                        contact = mSharkNetEngine.getProfileByTag(peerSemanticTag);
-                    }
                     list.add(contact);
                 }
                 return list;
@@ -312,7 +316,6 @@ public class ChatImpl implements Chat {
         List<Contact> contacts = getContacts();
         contacts.add(contact);
         setContacts(contacts);
-
         mSyncComponent.addMember(contact.getPST());
     }
 

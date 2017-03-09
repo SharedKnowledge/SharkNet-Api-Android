@@ -5,7 +5,6 @@ import net.sharksystem.api.interfaces.Chat;
 import net.sharksystem.api.interfaces.Contact;
 import net.sharksystem.api.interfaces.Message;
 import net.sharksystem.api.interfaces.Profile;
-import net.sharksystem.api.utils.DummyCreator;
 
 import org.json.JSONException;
 import org.junit.Assert;

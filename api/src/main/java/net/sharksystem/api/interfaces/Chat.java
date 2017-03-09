@@ -132,4 +132,5 @@ public interface Chat extends Timeable {
     void setAdmin(Contact admin) throws SharkKBException, JSONException;
 
 
+    List<Contact> getContactsWithoutMe() throws SharkKBException;
 }
