@@ -92,6 +92,8 @@ public interface SharkNet {
      */
     Chat newChat(List<Contact> recipients) throws SharkKBException, JSONException;
 
+    Chat newChat(Contact recipient) throws SharkKBException, JSONException;
+
     /**
      * Adds a Contact to the KnowledgeBase
      *

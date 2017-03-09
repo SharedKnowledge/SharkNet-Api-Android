@@ -283,10 +283,9 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
     @Override
     public Chat newChat(List<Contact> recipients) throws SharkKBException, JSONException {
         InMemoSharkKB inMemoSharkKB = (InMemoSharkKB) createKBFromRoot(mRootKB);
-//        mChatKBs.add(inMemoSharkKB);
-
         PeerSTSet peerSTSet = InMemoSharkKB.createInMemoPeerSTSet();
 
+        recipients.add(getMyProfile());
         for (Contact contact : recipients) {
             peerSTSet.merge(contact.getPST());
         }
@@ -297,6 +296,13 @@ public class SharkNetEngine implements SharkNet, NearbyPeerManager.NearbyPeerLis
         mChatComponents.add(component);
 
         return new ChatImpl(this, component, recipients, getMyProfile());
+    }
+
+    @Override
+    public Chat newChat(Contact recipient) throws SharkKBException, JSONException {
+        ArrayList<Contact> contacts = new ArrayList<>();
+        contacts.add(recipient);
+        return this.newChat(contacts);
     }
 
     @Override
