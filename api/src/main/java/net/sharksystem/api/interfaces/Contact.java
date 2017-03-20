@@ -94,31 +94,6 @@ public interface Contact {
 	String getName() throws SharkKBException;
 
 	/**
-	 * spelling suggestion- addTelephoneNumber()
-	 * add a Telephonnumber to the Contact. The Contact has a List which can include more phone numbers (no validation included)
-	 * @param telephoneNumber
-     */
-	void addTelephoneNumber(String telephoneNumber) throws SharkKBException;
-
-	/**
-	 * Returns the List of Phone Numbers
-	 * @return
-     */
-	List<String> getTelephoneNumber() throws SharkKBException;
-
-	/**
-	 * Adds/Or overwrites the Note to a contact
-	 * @param note
-     */
-	void addNote(String note) throws SharkKBException;
-
-	/**
-	 * Returns Notes to a contact
-	 * @return
-     */
-	String getNote() throws SharkKBException;
-
-	/**
 	 * sets the e-mail of a contact (no validation included)
 	 * @param email
      */

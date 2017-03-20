@@ -224,42 +224,6 @@ public class ContactImpl implements Contact {
         return information != null ? information.getContentAsString() : null;
     }
 
-    // SEPERATED BY ';'
-    @Override
-    public void addTelephoneNumber(String telephoneNumber) throws SharkKBException {
-        if (getTelephoneNumber().isEmpty()) {
-            SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_TELEPHONE, telephoneNumber);
-        } else {
-            ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_TELEPHONE);
-            if (information != null) {
-                String content = information.getContentAsString();
-                information.setContent(content + ";" + telephoneNumber);
-            }
-        }
-    }
-
-    @Override
-    public List<String> getTelephoneNumber() throws SharkKBException {
-        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_TELEPHONE);
-        if (information != null) {
-            String contentAsString = information.getContentAsString();
-            String[] split = contentAsString.split(";");
-            return Arrays.asList(split);
-        }
-        return new ArrayList<>();
-    }
-
-    @Override
-    public void addNote(String note) throws SharkKBException {
-        SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_NOTE, note);
-    }
-
-    @Override
-    public String getNote() throws SharkKBException {
-        ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKB, mSpace, CONTACT_NOTE);
-        return information != null ? information.getContentAsString() : null;
-    }
-
     @Override
     public void setEmail(String email) throws SharkKBException {
         SharkNetUtils.setInfoWithName(mSharkKB, mSpace, CONTACT_EMAIL, email);
