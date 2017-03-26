@@ -22,6 +22,11 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     }
 
     @Override
+    public void add(Chat object) {
+
+    }
+
+    @Override
     public List<Chat> getAll() {
         return null;
     }
@@ -38,11 +43,6 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
     @Override
     public void remove(Chat object) {
-
-    }
-
-    @Override
-    public void add(Chat object) {
 
     }
 
