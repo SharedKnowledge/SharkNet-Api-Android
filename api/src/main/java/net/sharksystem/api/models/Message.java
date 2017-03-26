@@ -2,6 +2,9 @@ package net.sharksystem.api.models;
 
 import android.graphics.Bitmap;
 
+import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+
 import java.util.Date;
 
 /**
@@ -9,6 +12,10 @@ import java.util.Date;
  */
 
 public class Message {
+
+    public final static String MESSAGE_ID = "MESSAGE_ID";
+
+    private SemanticTag id;
     private String content;
     private Bitmap imageContent;
     private Date date;
@@ -16,11 +23,21 @@ public class Message {
     private boolean isVerified;
     private boolean isSigned;
     private boolean isEncrypted;
-    private boolean isMine;
 
     public Message(Contact sender) {
         this.sender = sender;
         this.date = new Date(System.currentTimeMillis());
+        this.id = InMemoSharkKB.createInMemoSemanticTag(MESSAGE_ID,sender.getTag().getName() + date.getTime());
+    }
+
+    public Message(SemanticTag id, Date date, Contact sender) {
+        this.id = id;
+        this.date = date;
+        this.sender = sender;
+    }
+
+    public SemanticTag getId() {
+        return id;
     }
 
     public String getContent() {
@@ -41,11 +58,6 @@ public class Message {
 
     public Date getDate() {
         return date;
-    }
-
-    // TODO Just for testing purpose
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     public Contact getSender() {
@@ -76,15 +88,42 @@ public class Message {
         isEncrypted = encrypted;
     }
 
-    public boolean isMine() {
-        return isMine;
-    }
-
-    public void setMine(boolean mine) {
-        isMine = mine;
-    }
-
     public boolean isEmpty(){
         return content.isEmpty() && imageContent==null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Message message = (Message) o;
+
+        if (isVerified() != message.isVerified()) return false;
+        if (isSigned() != message.isSigned()) return false;
+        if (isEncrypted() != message.isEncrypted()) return false;
+        if (getId() != null ? !getId().equals(message.getId()) : message.getId() != null)
+            return false;
+        if (getContent() != null ? !getContent().equals(message.getContent()) : message.getContent() != null)
+            return false;
+        if (getImageContent() != null ? !getImageContent().equals(message.getImageContent()) : message.getImageContent() != null)
+            return false;
+        if (getDate() != null ? !getDate().equals(message.getDate()) : message.getDate() != null)
+            return false;
+        return getSender() != null ? getSender().equals(message.getSender()) : message.getSender() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getContent() != null ? getContent().hashCode() : 0);
+        result = 31 * result + (getImageContent() != null ? getImageContent().hashCode() : 0);
+        result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
+        result = 31 * result + (getSender() != null ? getSender().hashCode() : 0);
+        result = 31 * result + (isVerified() ? 1 : 0);
+        result = 31 * result + (isSigned() ? 1 : 0);
+        result = 31 * result + (isEncrypted() ? 1 : 0);
+        return result;
     }
 }

@@ -34,52 +34,52 @@ public class ContactDaoTest {
 
     PeerSemanticTag charlieTag = InMemoSharkKB.createInMemoPeerSemanticTag(charlieName, charlieSI, charlieMail);
 
-    private ContactDao mContactDao;
+    private ContactDao dao;
 
     @Before
     public void setUp() throws Exception {
         L.setLogLevel(L.LOGLEVEL_ALL);
-        mContactDao = new ContactDao(new InMemoSharkKB());
+        dao = ContactDao.getInstance().init(new InMemoSharkKB());
     }
 
     @Test
     public void addContactTest(){
         Contact contact = new Contact(aliceTag);
-        mContactDao.add(contact);
-        Contact savedContact = mContactDao.get(contact.getTag());
+        dao.add(contact);
+        Contact savedContact = dao.get(contact.getTag());
         Assert.assertTrue(savedContact.equals(contact));
     }
 
     @Test
     public void getContactTest(){
         Contact contact = new Contact(aliceTag);
-        mContactDao.add(contact);
-        mContactDao.add(new Contact(bobTag));
-        mContactDao.add(new Contact(charlieTag));
-        Contact savedContact = mContactDao.get(contact.getTag());
+        dao.add(contact);
+        dao.add(new Contact(bobTag));
+        dao.add(new Contact(charlieTag));
+        Contact savedContact = dao.get(contact.getTag());
         Assert.assertTrue(savedContact.equals(contact));
     }
 
     @Test
     public void updateContactTest(){
         Contact contact = new Contact(aliceTag);
-        mContactDao.add(contact);
+        dao.add(contact);
         contact.setName("Lilly");
-        mContactDao.update(contact);
+        dao.update(contact);
         contact.setEmail("mail@lilly.com");
-        mContactDao.update(contact);
-        Contact savedContact = mContactDao.get(contact.getTag());
+        dao.update(contact);
+        Contact savedContact = dao.get(contact.getTag());
         Assert.assertTrue(savedContact.equals(contact));
     }
 
     @Test
     public void removeContactTest(){
         Contact contact = new Contact(aliceTag);
-        mContactDao.add(contact);
-        mContactDao.add(new Contact(bobTag));
-        mContactDao.add(new Contact(charlieTag));
-        Assert.assertEquals(3, mContactDao.size());
-        mContactDao.remove(contact);
-        Assert.assertEquals(2, mContactDao.size());
+        dao.add(contact);
+        dao.add(new Contact(bobTag));
+        dao.add(new Contact(charlieTag));
+        Assert.assertEquals(3, dao.size());
+        dao.remove(contact);
+        Assert.assertEquals(2, dao.size());
     }
 }
