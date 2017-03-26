@@ -68,7 +68,7 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
     @Override
     public Contact get(PeerSemanticTag id) {
         try {
-            ASIPSpace asipSpace = this.kb.createASIPSpace((SemanticTag) null, null, null, id, null, null, null, ASIPSpace.DIRECTION_NOTHING);
+            ASIPInterest asipSpace = InMemoSharkKB.createInMemoASIPInterest(null, null, id, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
 
             Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(asipSpace);
             while (allInformationSpaces.hasNext()) {
@@ -95,30 +95,44 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
     @Override
     public void update(Contact object) {
         try {
-            ASIPInterest interest = InMemoSharkKB.createInMemoASIPInterest(null, null, object.getTag(), null, null, null, null, ASIPSpace.DIRECTION_NOTHING);
+            ASIPInterest interest = InMemoSharkKB.createInMemoASIPInterest(null, null, object.getTag(), null, null, null, null, ASIPSpace.DIRECTION_INOUT);
             Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(interest);
             while (allInformationSpaces.hasNext()) {
                 ASIPInformationSpace next = allInformationSpaces.next();
                 if (SharkCSAlgebra.identical(interest, next.getASIPSpace())) {
-                    // We probably need to set also the name and the email as info because it can cause
-                    // problems at updating the contact and so changing the PST as well
-                    SharkNetUtils.setInfoWithName(this.kb, interest, CONTACT_NAME, object.getName());
-                    SharkNetUtils.setInfoWithName(this.kb, interest, CONTACT_EMAIL, object.getEmail());
-
-                    Bitmap image = object.getImage();
-                    if (image != null) {
-                        // setImage
-                        // Create an inputStream out of the image
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        image.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
-                        byte[] byteArray = bos.toByteArray();
-                        ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
-                        SharkNetUtils.setInfoWithName(this.kb, interest, CONTACT_IMAGE, bs);
+                    Iterator<ASIPInformation> informations = next.informations();
+                    while (informations.hasNext()){
+                        ASIPInformation information = informations.next();
+                        switch (information.getName()){
+                            case CONTACT_NAME:
+                                if(object.getName()!=null){
+                                    information.setContent(object.getName());
+                                }
+                                break;
+                            case CONTACT_EMAIL:
+                                if(object.getEmail()!=null){
+                                    information.setContent(object.getEmail());
+                                }
+                                break;
+                            case CONTACT_IMAGE:
+                                Bitmap image = object.getImage();
+                                if (image != null) {
+                                    // setImage
+                                    // Create an inputStream out of the image
+                                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                                    image.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                                    byte[] byteArray = bos.toByteArray();
+                                    ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
+                                    information.setContent(bs, bs.available());
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
-            // Okay the contact should be added
-        } catch (SharkKBException | IOException e) {
+        } catch (SharkKBException  e) {
             e.printStackTrace();
         }
     }
@@ -131,7 +145,7 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
     @Override
     public void add(Contact object) {
         try {
-            ASIPSpace asipSpace = this.kb.createASIPSpace((SemanticTag) null, null, null, object.getTag(), null, null, null, ASIPSpace.DIRECTION_NOTHING);
+            ASIPSpace asipSpace = this.kb.createASIPSpace((SemanticTag) null, null, null, object.getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
 
             // We probably need to set also the name and the email as info because it can cause
             // problems at updating the contact and so changing the PST as well

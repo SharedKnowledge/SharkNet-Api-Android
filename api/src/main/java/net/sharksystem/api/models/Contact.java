@@ -3,6 +3,7 @@ package net.sharksystem.api.models;
 import android.graphics.Bitmap;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 
 /**
@@ -26,6 +27,12 @@ public class Contact {
 
     public Contact(PeerSemanticTag tag) {
         this.tag = tag;
+        if(name==null){
+            this.name = tag.getName();
+        }
+        if(email==null){
+            this.email = tag.getAddresses()[0];
+        }
     }
 
     public PeerSemanticTag getTag() {
@@ -54,5 +61,26 @@ public class Contact {
 
     public void setImage(Bitmap image) {
         this.image = image;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Contact contact = (Contact) o;
+
+        if (!SharkCSAlgebra.identical(getTag(), contact.getTag())) return false;
+        if (!getName().equals(contact.getName())) return false;
+        return getEmail().equals(contact.getEmail());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getTag().hashCode();
+        result = 31 * result + getName().hashCode();
+        result = 31 * result + getEmail().hashCode();
+        return result;
     }
 }
