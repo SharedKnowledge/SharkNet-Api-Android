@@ -2,6 +2,7 @@ package net.sharksystem.api.models;
 
 import android.graphics.Bitmap;
 import android.hardware.camera2.params.Face;
+import android.support.annotation.NonNull;
 
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
@@ -13,7 +14,7 @@ import java.util.Date;
  * Created by j4rvis on 3/22/17.
  */
 
-public class Message {
+public class Message implements Comparable<Message> {
 
     public final static String MESSAGE_ID = "MESSAGE_ID";
 
@@ -127,5 +128,10 @@ public class Message {
         result = 31 * result + (isSigned() ? 1 : 0);
         result = 31 * result + (isEncrypted() ? 1 : 0);
         return result;
+    }
+
+    @Override
+    public int compareTo(@NonNull Message o) {
+        return getDate().compareTo(o.getDate());
     }
 }

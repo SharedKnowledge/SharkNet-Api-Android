@@ -38,17 +38,8 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
 
     private SharkKB kb;
 
-    private static ContactDao instance = new ContactDao();
-
-    private ContactDao() {}
-
-    public static ContactDao getInstance(){
-        return instance;
-    }
-
-    public ContactDao init(SharkKB sharkKB){
+    public ContactDao(SharkKB sharkKB) {
         this.kb = sharkKB;
-        return this;
     }
 
     @Override

@@ -4,6 +4,7 @@ import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.system.L;
 import net.sharksystem.api.dao_impl.ContactDao;
+import net.sharksystem.api.dao_impl.SharkNetApi;
 import net.sharksystem.api.models.Contact;
 
 import org.junit.Assert;
@@ -39,7 +40,7 @@ public class ContactDaoTest {
     @Before
     public void setUp() throws Exception {
         L.setLogLevel(L.LOGLEVEL_ALL);
-        dao = ContactDao.getInstance().init(new InMemoSharkKB());
+        dao = SharkNetApi.getInstance().getContactDao();
     }
 
     @Test
