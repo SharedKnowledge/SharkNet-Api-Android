@@ -1,6 +1,7 @@
 package net.sharksystem.api.models;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
@@ -10,7 +11,7 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
  * Created by j4rvis on 3/22/17.
  */
 
-public class Contact {
+public class Contact implements Comparable<Contact>{
     private PeerSemanticTag tag;
     private String name;
     private String email;
@@ -82,5 +83,10 @@ public class Contact {
         result = 31 * result + getName().hashCode();
         result = 31 * result + getEmail().hashCode();
         return result;
+    }
+
+    @Override
+    public int compareTo(@NonNull Contact o) {
+        return getName().compareTo(o.getName());
     }
 }

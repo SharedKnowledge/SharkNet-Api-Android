@@ -29,6 +29,14 @@ public class SharkNetApi {
         return mInstance;
     }
 
+    public void clearContacts(){
+        try {
+            contactDao = new ContactDao(createKBFromRoot());
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+    }
+
     public ContactDao getContactDao(){
         return contactDao;
     }

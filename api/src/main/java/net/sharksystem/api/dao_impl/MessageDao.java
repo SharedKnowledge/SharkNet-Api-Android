@@ -191,6 +191,17 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
         }
     }
 
+    public void update(List<Message> messages){
+        List<Message> all = getAll();
+        for (Message message : messages) {
+            if(all.contains(message)){
+                update(message);
+            } else {
+                add(message);
+            }
+        }
+    }
+
     @Override
     public void remove(Message object) {
         try {

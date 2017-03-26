@@ -16,7 +16,6 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
-import net.sharkfw.system.L;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
@@ -53,10 +52,9 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             // als aller erstes müssen wir nun eine neue kb erzeugen auf Basis der rootKB
             SharkKB sharkKB = createKBFromRoot();
 
-
             // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
             PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
-            for (Contact contact : object.getContacts()){
+            for (Contact contact : object.getContacts()) {
                 contactSet.merge(contact.getTag());
             }
             // Nun müssen wir alle Daten in die kb schreiben! Womöglich bevor die SyncComponent erzeugt wird
@@ -80,7 +78,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             }
 
             MessageDao messageDao = new MessageDao(sharkKB);
-            for(Message message : object.getMessages()){
+            for (Message message : object.getMessages()) {
                 messageDao.add(message);
             }
 
@@ -97,21 +95,63 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
     @Override
     public List<Chat> getAll() {
-        return null;
+        List<Chat> chats = new ArrayList<>();
+        for (SyncComponent component : syncComponentList) {
+            SyncKB kb = component.getKb();
+            try {
+                Chat chat = null;
+                Iterator<ASIPInformationSpace> informationSpaces = kb.getInformationSpaces(generateInterest(null));
+                while (informationSpaces.hasNext()) {
+                    ASIPInformationSpace next = informationSpaces.next();
+                    ASIPSpace asipSpace = next.getASIPSpace();
+
+                    SemanticTag chatId = asipSpace.getTopics().stTags().next();
+
+                    PeerSemanticTag senderTag = asipSpace.getSender();
+                    PeerSTSet receivers = asipSpace.getReceivers();
+
+                    List<Contact> contacts = new ArrayList<>();
+                    Contact owner = null;
+
+                    ContactDao contactDao = SharkNetApi.getInstance().getContactDao();
+                    List<Contact> allContacts = contactDao.getAll();
+                    for (Contact contact : allContacts) {
+                        if (SharkCSAlgebra.identical(contact.getTag(), senderTag)) {
+                            owner = contact;
+                        } else if (SharkCSAlgebra.isIn(receivers, contact.getTag())) {
+                            contacts.add(contact);
+                        }
+                    }
+                    chat = new Chat(owner, contacts, chatId);
+                    chat.setTitle(SharkNetUtils.getInfoAsString(kb, asipSpace, CHAT_TITLE));
+                    ASIPInformation information = SharkNetUtils.getInfoByName(kb, asipSpace, CHAT_IMAGE);
+                    if (information != null) {
+                        chat.setImage(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
+                    }
+                }
+                MessageDao messageDao = new MessageDao(kb);
+                chat.setMessages(messageDao.getAll());
+
+                chats.add(chat);
+            } catch (SharkKBException e) {
+                e.printStackTrace();
+            }
+        }
+        return chats;
     }
 
     @Override
     public Chat get(SemanticTag id) {
 
-        for(SyncComponent component : syncComponentList){
-            if(SharkCSAlgebra.identical(component.getUniqueName(), id)){
+        for (SyncComponent component : syncComponentList) {
+            if (SharkCSAlgebra.identical(component.getUniqueName(), id)) {
 
                 SyncKB kb = component.getKb();
 
                 try {
                     Chat chat = null;
-                    Iterator<ASIPInformationSpace> informationSpaces = kb.getInformationSpaces(generateInterest());
-                    while (informationSpaces.hasNext()){
+                    Iterator<ASIPInformationSpace> informationSpaces = kb.getInformationSpaces(generateInterest(null));
+                    while (informationSpaces.hasNext()) {
                         ASIPInformationSpace next = informationSpaces.next();
                         ASIPSpace asipSpace = next.getASIPSpace();
 
@@ -126,9 +166,9 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                         ContactDao contactDao = SharkNetApi.getInstance().getContactDao();
                         List<Contact> allContacts = contactDao.getAll();
                         for (Contact contact : allContacts) {
-                            if(SharkCSAlgebra.identical(contact.getTag(), senderTag)){
+                            if (SharkCSAlgebra.identical(contact.getTag(), senderTag)) {
                                 owner = contact;
-                            } else if(SharkCSAlgebra.isIn(receivers, contact.getTag())){
+                            } else if (SharkCSAlgebra.isIn(receivers, contact.getTag())) {
                                 contacts.add(contact);
                             }
                         }
@@ -148,20 +188,65 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 }
             }
         }
-
-
-
         return null;
     }
 
     @Override
     public void update(Chat object) {
+        for (SyncComponent component : syncComponentList) {
+            if (SharkCSAlgebra.identical(component.getUniqueName(), object.getId())) {
+                SyncKB kb = component.getKb();
+                MessageDao messageDao = new MessageDao(kb);
+                messageDao.update(object.getMessages());
 
+                try {
+                    kb.removeInformationSpace(generateInterest(null));
+
+                    // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
+                    PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
+                    for (Contact contact : object.getContacts()) {
+                        contactSet.merge(contact.getTag());
+                    }
+
+                    component.getMembers().merge(contactSet);
+
+                    // Nun müssen wir alle Daten in die kb schreiben! Womöglich bevor die SyncComponent erzeugt wird
+                    STSet inMemoSTSet = InMemoSharkKB.createInMemoSTSet();
+                    inMemoSTSet.merge(CONFIG_TYPE);
+                    STSet topicSet = InMemoSharkKB.createInMemoSTSet();
+                    topicSet.merge(object.getId());
+                    ASIPSpace asipSpace = kb.createASIPSpace(topicSet, inMemoSTSet, null, object.getOwner().getTag(), contactSet, null, null, ASIPSpace.DIRECTION_INOUT);
+
+                    SharkNetUtils.setInfoWithName(kb, asipSpace, CHAT_TITLE, object.getTitle());
+
+                    Bitmap image = object.getImage();
+                    if (image != null) {
+                        // setImage
+                        // Create an inputStream out of the image
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        image.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                        byte[] byteArray = bos.toByteArray();
+                        ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
+                        SharkNetUtils.setInfoWithName(kb, asipSpace, CHAT_IMAGE, bs);
+                    }
+                } catch (SharkKBException | IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }
     }
 
+    // TODO care for fileSystemImpl. SharkKb needs to be deleted.
     @Override
     public void remove(Chat object) {
-
+        for (SyncComponent component : syncComponentList) {
+            if (SharkCSAlgebra.identical(component.getUniqueName(), object.getId())) {
+                syncComponentList.remove(component);
+                return;
+            }
+        }
     }
 
     @Override
@@ -173,11 +258,16 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
         return new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), rootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet());
     }
 
-    private ASIPSpace generateInterest(){
+    private ASIPSpace generateInterest(SemanticTag id) {
         try {
             STSet inMemoSTSet = InMemoSharkKB.createInMemoSTSet();
             inMemoSTSet.merge(CONFIG_TYPE);
-            return InMemoSharkKB.createInMemoASIPInterest(null, inMemoSTSet, null, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
+            STSet topicSet = null;
+            if (id != null) {
+                topicSet = InMemoSharkKB.createInMemoSTSet();
+                topicSet.merge(id);
+            }
+            return InMemoSharkKB.createInMemoASIPInterest(topicSet, inMemoSTSet, null, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
         } catch (SharkKBException e) {
             e.printStackTrace();
         }

@@ -40,11 +40,11 @@ public class ContactDaoTest {
     @Before
     public void setUp() throws Exception {
         L.setLogLevel(L.LOGLEVEL_ALL);
-        dao = SharkNetApi.getInstance().getContactDao();
     }
 
     @Test
     public void addContactTest(){
+        dao = new ContactDao(new InMemoSharkKB());
         Contact contact = new Contact(aliceTag);
         dao.add(contact);
         Contact savedContact = dao.get(contact.getTag());
@@ -53,6 +53,7 @@ public class ContactDaoTest {
 
     @Test
     public void getContactTest(){
+        dao = new ContactDao(new InMemoSharkKB());
         Contact contact = new Contact(aliceTag);
         dao.add(contact);
         dao.add(new Contact(bobTag));
@@ -63,6 +64,7 @@ public class ContactDaoTest {
 
     @Test
     public void getAllContactTest(){
+        dao = new ContactDao(new InMemoSharkKB());
         dao.add(new Contact(aliceTag));
         dao.add(new Contact(bobTag));
         dao.add(new Contact(charlieTag));
@@ -71,6 +73,7 @@ public class ContactDaoTest {
 
     @Test
     public void updateContactTest(){
+        dao = new ContactDao(new InMemoSharkKB());
         Contact contact = new Contact(aliceTag);
         dao.add(contact);
         contact.setName("Lilly");
@@ -83,6 +86,7 @@ public class ContactDaoTest {
 
     @Test
     public void removeContactTest(){
+        dao = new ContactDao(new InMemoSharkKB());
         Contact contact = new Contact(aliceTag);
         dao.add(contact);
         dao.add(new Contact(bobTag));
