@@ -8,6 +8,7 @@ import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
@@ -30,6 +31,7 @@ import java.util.List;
 
 public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
 
+    private final static SemanticTag TYPE = InMemoSharkKB.createInMemoSemanticTag("CONTACT", "si:contact");
     private final static String CONTACT_IMAGE = "CONTACT_IMAGE";
     private final static String CONTACT_NAME = "CONTACT_NAME";
     private final static String CONTACT_EMAIL = "CONTACT_EMAIL";
@@ -44,7 +46,8 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
     public List<Contact> getAll() {
         List<Contact> contactList = new ArrayList<>();
         try {
-            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getAllInformationSpaces();
+            ASIPInterest asipInterest = generateInterest(null);
+            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(asipInterest);
             while (allInformationSpaces.hasNext()) {
                 ASIPInformationSpace next = allInformationSpaces.next();
                 ASIPSpace asipSpace = next.getASIPSpace();
@@ -68,7 +71,7 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
     @Override
     public Contact get(PeerSemanticTag id) {
         try {
-            ASIPInterest asipSpace = InMemoSharkKB.createInMemoASIPInterest(null, null, id, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPInterest asipSpace = generateInterest(id);
 
             Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(asipSpace);
             while (allInformationSpaces.hasNext()) {
@@ -95,7 +98,7 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
     @Override
     public void update(Contact object) {
         try {
-            ASIPInterest interest = InMemoSharkKB.createInMemoASIPInterest(null, null, object.getTag(), null, null, null, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPInterest interest = generateInterest(object.getTag());
             Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(interest);
             while (allInformationSpaces.hasNext()) {
                 ASIPInformationSpace next = allInformationSpaces.next();
@@ -139,13 +142,26 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
 
     @Override
     public void remove(Contact object) {
+        try {
 
+            ASIPInterest interest = generateInterest(object.getTag());
+            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(interest);
+            while (allInformationSpaces.hasNext()) {
+                ASIPInformationSpace next = allInformationSpaces.next();
+                if (SharkCSAlgebra.identical(interest, next.getASIPSpace())) {
+                    this.kb.removeInformation(next.getASIPSpace());
+                    this.kb.removeInformationSpace(next.getASIPSpace());
+                }
+            }
+        } catch (SharkKBException  e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void add(Contact object) {
         try {
-            ASIPSpace asipSpace = this.kb.createASIPSpace((SemanticTag) null, null, null, object.getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPSpace asipSpace = this.kb.createASIPSpace(null, TYPE, null, object.getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
 
             // We probably need to set also the name and the email as info because it can cause
             // problems at updating the contact and so changing the PST as well
@@ -162,9 +178,33 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
                 ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
                 SharkNetUtils.setInfoWithName(this.kb, asipSpace, CONTACT_IMAGE, bs);
             }
-            // Okay the contact should be added
+            // Okay the contact should be addednull
         } catch (SharkKBException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public int size() {
+        try {
+            ASIPInterest asipInterest = generateInterest(null);
+            Iterator<ASIPInformationSpace> spaces = this.kb.getInformationSpaces(asipInterest);
+            int number = 0;
+            while (spaces.hasNext()){
+                spaces.next();
+                number++;
+            }
+            return number;
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    private ASIPInterest generateInterest(PeerSemanticTag tag) throws SharkKBException {
+        STSet inMemoSTSet = InMemoSharkKB.createInMemoSTSet();
+        inMemoSTSet.merge(TYPE);
+        return InMemoSharkKB.createInMemoASIPInterest(null, inMemoSTSet, tag, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
     }
 }

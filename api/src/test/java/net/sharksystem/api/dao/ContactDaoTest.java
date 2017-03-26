@@ -72,6 +72,14 @@ public class ContactDaoTest {
         Assert.assertTrue(savedContact.equals(contact));
     }
 
-    
-
+    @Test
+    public void removeContactTest(){
+        Contact contact = new Contact(aliceTag);
+        mContactDao.add(contact);
+        mContactDao.add(new Contact(bobTag));
+        mContactDao.add(new Contact(charlieTag));
+        Assert.assertEquals(3, mContactDao.size());
+        mContactDao.remove(contact);
+        Assert.assertEquals(2, mContactDao.size());
+    }
 }

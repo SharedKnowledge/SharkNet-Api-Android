@@ -12,4 +12,5 @@ public interface DataAccessObject<T, S> {
     void update(T object);
     void remove(T object);
     void add(T object);
+    int size();
 }

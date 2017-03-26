@@ -45,4 +45,9 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     public void add(Chat object) {
 
     }
+
+    @Override
+    public int size() {
+        return 0;
+    }
 }
