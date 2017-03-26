@@ -7,10 +7,10 @@ import java.util.List;
  */
 
 public interface DataAccessObject<T, S> {
+    void add(T object);
     List<T> getAll();
     T get(S id);
     void update(T object);
     void remove(T object);
-    void add(T object);
     int size();
 }
