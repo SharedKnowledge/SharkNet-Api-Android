@@ -101,4 +101,60 @@ public class MessageDaoTest {
 
         Assert.assertFalse(saveMessage.equals(message2));
     }
+
+    @Test
+    public void getAllMessagesTest() throws InterruptedException {
+        Contact contact = new Contact(aliceTag);
+        contactDao.add(contact);
+        Message message1 = new Message(contact);
+        message1.setContent("Test");
+        dao.add(message1);
+        Thread.sleep(2);
+        Message message2 = new Message(contact);
+        message2.setContent("TestTest");
+        dao.add(message2);
+        Thread.sleep(2);
+        Message message3 = new Message(contact);
+        message3.setContent("TestTestTest");
+        dao.add(message3);
+        Assert.assertEquals(3, dao.size());
+    }
+
+    @Test
+    public void updateMessageTest(){
+        Contact contact = new Contact(aliceTag);
+        contactDao.add(contact);
+        Message message = new Message(contact);
+        message.setContent("Test");
+        dao.add(message);
+        Message savedMessage1 = dao.get(message.getId());
+        message.setSigned(true);
+        message.setVerified(true);
+        message.setEncrypted(true);
+        message.setContent("Another test");
+        dao.update(message);
+        Message savedMessage2 = dao.get(message.getId());
+        Assert.assertTrue(savedMessage2.equals(message));
+        Assert.assertFalse(savedMessage1.equals(message));
+    }
+
+    @Test
+    public void removeMessageTest() throws InterruptedException {
+        Contact contact = new Contact(aliceTag);
+        contactDao.add(contact);
+        Message message1 = new Message(contact);
+        message1.setContent("Test");
+        dao.add(message1);
+        Thread.sleep(2);
+        Message message2 = new Message(contact);
+        message2.setContent("TestTest");
+        dao.add(message2);
+        Thread.sleep(2);
+        Message message3 = new Message(contact);
+        message3.setContent("TestTestTest");
+        dao.add(message3);
+        Assert.assertEquals(3, dao.size());
+        dao.remove(message1);
+        Assert.assertEquals(2, dao.size());
+    }
 }

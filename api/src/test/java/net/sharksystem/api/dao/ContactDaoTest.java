@@ -61,6 +61,14 @@ public class ContactDaoTest {
     }
 
     @Test
+    public void getAllContactTest(){
+        dao.add(new Contact(aliceTag));
+        dao.add(new Contact(bobTag));
+        dao.add(new Contact(charlieTag));
+        Assert.assertEquals(3, dao.size());
+    }
+
+    @Test
     public void updateContactTest(){
         Contact contact = new Contact(aliceTag);
         dao.add(contact);

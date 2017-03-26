@@ -1,8 +1,10 @@
 package net.sharksystem.api.models;
 
 import android.graphics.Bitmap;
+import android.hardware.camera2.params.Face;
 
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 
 import java.util.Date;
@@ -20,9 +22,9 @@ public class Message {
     private Bitmap imageContent;
     private Date date;
     private Contact sender;
-    private boolean isVerified;
-    private boolean isSigned;
-    private boolean isEncrypted;
+    private boolean isVerified = false;
+    private boolean isSigned = false;
+    private boolean isEncrypted = false;
 
     public Message(Contact sender) {
         this.sender = sender;
@@ -102,7 +104,7 @@ public class Message {
         if (isVerified() != message.isVerified()) return false;
         if (isSigned() != message.isSigned()) return false;
         if (isEncrypted() != message.isEncrypted()) return false;
-        if (getId() != null ? !getId().equals(message.getId()) : message.getId() != null)
+        if (getId() != null ? !SharkCSAlgebra.identical(getId(),message.getId()) : message.getId() != null)
             return false;
         if (getContent() != null ? !getContent().equals(message.getContent()) : message.getContent() != null)
             return false;
@@ -116,7 +118,7 @@ public class Message {
 
     @Override
     public int hashCode() {
-        int result = getId() != null ? getId().hashCode() : 0;
+        int result = 0;
         result = 31 * result + (getContent() != null ? getContent().hashCode() : 0);
         result = 31 * result + (getImageContent() != null ? getImageContent().hashCode() : 0);
         result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
