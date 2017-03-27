@@ -16,74 +16,120 @@ import java.util.List;
 
 public class SharkNetApi {
 
-    private final ChatDao chatDao;
-    private ContactDao contactDao;
-    private SharkKB root = new InMemoSharkKB();
+    private final ChatDao mChatDao;
+    private ContactDao mContactDao;
+    private SharkKB mRootKb = new InMemoSharkKB();
 
     private static SharkNetApi mInstance = new SharkNetApi();
+    private Contact mAccount;
 
     private SharkNetApi() {
         try {
-            contactDao = new ContactDao(createKBFromRoot());
+            mContactDao = new ContactDao(
+                    new InMemoSharkKB(
+                            InMemoSharkKB.createInMemoSemanticNet(),
+                            InMemoSharkKB.createInMemoSemanticNet(),
+                            mRootKb.getPeersAsTaxonomy(),
+                            InMemoSharkKB.createInMemoSpatialSTSet(),
+                            InMemoSharkKB.createInMemoTimeSTSet()
+                    )
+            );
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
-        chatDao = new ChatDao(root, contactDao);
+        mChatDao = new ChatDao(mRootKb, mContactDao);
     }
 
     public static SharkNetApi getInstance(){
         return mInstance;
     }
 
+    // Account Methods
+
+    public void setAccount(Contact contact){
+        mContactDao.add(contact);
+        mAccount = contact;
+    }
+
+    public Contact getAccount(){
+        return mAccount;
+    }
+
+    // DAO Methods
+
     public List<Chat> getChats(){
-        return chatDao.getAll();
+        return mChatDao.getAll();
     }
 
     public Chat getChat(SemanticTag tag){
-        return chatDao.get(tag);
+        return mChatDao.get(tag);
     }
 
     public void addChat(Chat chat){
-        chatDao.add(chat);
+        mChatDao.add(chat);
     }
 
     public void updateChat(Chat chat){
-        chatDao.update(chat);
+        mChatDao.update(chat);
     }
 
     public void removeChat(Chat chat){
-        chatDao.remove(chat);
-    }
-
-    public List<Contact> getContacts(){
-        return contactDao.getAll();
-    }
-
-    public Contact getContact(PeerSemanticTag tag){
-        return contactDao.get(tag);
-    }
-
-    public void addContact(Contact contact){
-        contactDao.add(contact);
-    }
-
-    public void updateContact(Contact contact){
-        contactDao.update(contact);
-    }
-
-    public void removeContact(Contact contact){
-        contactDao.remove(contact);
+        mChatDao.remove(chat);
     }
 
     public int numberOfChats(){
-        return chatDao.size();
+        return mChatDao.size();
+    }
+
+    public List<Contact> getContacts(){
+        return mContactDao.getAll();
+    }
+
+    public Contact getContact(PeerSemanticTag tag){
+        return mContactDao.get(tag);
+    }
+
+    public void addContact(Contact contact){
+        mContactDao.add(contact);
+    }
+
+    public void updateContact(Contact contact){
+        mContactDao.update(contact);
+    }
+
+    public void removeContact(Contact contact){
+        mContactDao.remove(contact);
     }
 
     public int numberOfContacts(){
-        return contactDao.size();
+        return mContactDao.size();
     }
 
-    private SharkKB createKBFromRoot() throws SharkKBException {
-        return new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), root.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet());
+    // Shark methods
+
+    public void initSharkEngine(){
+
     }
+
+    public void startRadar(){
+
+    }
+
+    public void stopRadar(){
+
+    }
+
+    public void initNFC(){
+
+    }
+
+    public void startNFC(){
+
+    }
+
+    public void stopNFC(){
+
+    }
+
+
 }
