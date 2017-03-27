@@ -5,8 +5,11 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.peer.SharkEngine;
+import net.sharksystem.api.SharkApp;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 
 import java.util.List;
 
@@ -19,6 +22,7 @@ public class SharkNetApi {
     private final ChatDao mChatDao;
     private ContactDao mContactDao;
     private SharkKB mRootKb = new InMemoSharkKB();
+    private AndroidSharkEngine mEngine;
 
     private static SharkNetApi mInstance = new SharkNetApi();
     private Contact mAccount;
@@ -34,6 +38,7 @@ public class SharkNetApi {
                             InMemoSharkKB.createInMemoTimeSTSet()
                     )
             );
+            mEngine = new AndroidSharkEngine(SharkApp.getContext());
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
@@ -42,6 +47,10 @@ public class SharkNetApi {
 
     public static SharkNetApi getInstance(){
         return mInstance;
+    }
+
+    public AndroidSharkEngine getSharkEngine() {
+        return mEngine;
     }
 
     // Account Methods
