@@ -63,6 +63,10 @@ public class Message implements Comparable<Message> {
         return date;
     }
 
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     public Contact getSender() {
         return sender;
     }
