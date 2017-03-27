@@ -37,21 +37,27 @@ public class MessageDaoTest {
 
     PeerSemanticTag charlieTag = InMemoSharkKB.createInMemoPeerSemanticTag(charlieName, charlieSI, charlieMail);
 
-    private MessageDao dao;
     private ContactDao contactDao;
+    private Contact alice;
+    private Contact bob;
+    private Contact charlie;
 
     @Before
     public void setUp() throws Exception {
         L.setLogLevel(L.LOGLEVEL_ALL);
-        contactDao = SharkNetApi.getInstance().getContactDao();
-        dao = new MessageDao(new InMemoSharkKB());
+        contactDao = new ContactDao(new InMemoSharkKB());
+        alice = new Contact(aliceTag);
+        bob = new Contact(bobTag);
+        charlie = new Contact(charlieTag);
+        contactDao.add(alice);
+        contactDao.add(bob);
+        contactDao.add(charlie);
     }
 
     @Test
     public void addMessageTest(){
-        Contact contact = new Contact(aliceTag);
-        contactDao.add(contact);
-        Message message = new Message(contact);
+        MessageDao dao = new MessageDao(new InMemoSharkKB(), contactDao);
+        Message message = new Message(alice);
         message.setContent("Das ist ein Test!");
         dao.add(message);
         Message savedMessage = dao.get(message.getId());
@@ -60,18 +66,16 @@ public class MessageDaoTest {
 
     @Test
     public void getContactTest_success() throws InterruptedException {
-        Contact contact = new Contact(aliceTag);
-        contactDao.add(contact);
-
-        Message message1 = new Message(contact);
+        MessageDao dao = new MessageDao(new InMemoSharkKB(), contactDao);
+        Message message1 = new Message(alice);
         message1.setContent("Test");
         dao.add(message1);
         Thread.sleep(2);
-        Message message2 = new Message(contact);
+        Message message2 = new Message(alice);
         message2.setContent("TestTest");
         dao.add(message2);
         Thread.sleep(2);
-        Message message3 = new Message(contact);
+        Message message3 = new Message(alice);
         message3.setContent("TestTestTest");
         dao.add(message3);
 
@@ -83,18 +87,17 @@ public class MessageDaoTest {
 
     @Test
     public void getContactTest_fail() throws InterruptedException {
-        Contact contact = new Contact(aliceTag);
-        contactDao.add(contact);
+        MessageDao dao = new MessageDao(new InMemoSharkKB(), contactDao);
 
-        Message message1 = new Message(contact);
+        Message message1 = new Message(alice);
         message1.setContent("Test");
         dao.add(message1);
         Thread.sleep(2);
-        Message message2 = new Message(contact);
+        Message message2 = new Message(alice);
         message2.setContent("TestTest");
         dao.add(message2);
         Thread.sleep(2);
-        Message message3 = new Message(contact);
+        Message message3 = new Message(alice);
         message3.setContent("TestTestTest");
         dao.add(message3);
 
@@ -105,17 +108,16 @@ public class MessageDaoTest {
 
     @Test
     public void getAllMessagesTest() throws InterruptedException {
-        Contact contact = new Contact(aliceTag);
-        contactDao.add(contact);
-        Message message1 = new Message(contact);
+        MessageDao dao = new MessageDao(new InMemoSharkKB(), contactDao);
+        Message message1 = new Message(alice);
         message1.setContent("Test");
         dao.add(message1);
         Thread.sleep(2);
-        Message message2 = new Message(contact);
+        Message message2 = new Message(alice);
         message2.setContent("TestTest");
         dao.add(message2);
         Thread.sleep(2);
-        Message message3 = new Message(contact);
+        Message message3 = new Message(alice);
         message3.setContent("TestTestTest");
         dao.add(message3);
         Assert.assertEquals(3, dao.size());
@@ -123,9 +125,8 @@ public class MessageDaoTest {
 
     @Test
     public void updateMessageTest(){
-        Contact contact = new Contact(aliceTag);
-        contactDao.add(contact);
-        Message message = new Message(contact);
+        MessageDao dao = new MessageDao(new InMemoSharkKB(), contactDao);
+        Message message = new Message(alice);
         message.setContent("Test");
         dao.add(message);
         Message savedMessage1 = dao.get(message.getId());
@@ -141,17 +142,16 @@ public class MessageDaoTest {
 
     @Test
     public void removeMessageTest() throws InterruptedException {
-        Contact contact = new Contact(aliceTag);
-        contactDao.add(contact);
-        Message message1 = new Message(contact);
+        MessageDao dao = new MessageDao(new InMemoSharkKB(), contactDao);
+        Message message1 = new Message(alice);
         message1.setContent("Test");
         dao.add(message1);
         Thread.sleep(2);
-        Message message2 = new Message(contact);
+        Message message2 = new Message(alice);
         message2.setContent("TestTest");
         dao.add(message2);
         Thread.sleep(2);
-        Message message3 = new Message(contact);
+        Message message3 = new Message(alice);
         message3.setContent("TestTestTest");
         dao.add(message3);
         Assert.assertEquals(3, dao.size());

@@ -39,25 +39,26 @@ public class ChatDaoTest {
     String charlieMail = "mail://charlie.com";
 
     PeerSemanticTag charlieTag = InMemoSharkKB.createInMemoPeerSemanticTag(charlieName, charlieSI, charlieMail);
-
-    private ChatDao dao;
     private ContactDao contactDao;
+    private Contact alice;
+    private Contact bob;
+    private Contact charlie;
 
     @Before
     public void setUp() throws Exception {
         L.setLogLevel(L.LOGLEVEL_ALL);
-        dao = SharkNetApi.getInstance().getChatDao();
-        contactDao = SharkNetApi.getInstance().getContactDao();
+        contactDao = new ContactDao(new InMemoSharkKB());
+        alice = new Contact(aliceTag);
+        bob = new Contact(bobTag);
+        charlie = new Contact(charlieTag);
+        contactDao.add(alice);
+        contactDao.add(bob);
+        contactDao.add(charlie);
     }
 
     @Test
     public void addChatTest(){
-        Contact alice = new Contact(aliceTag);
-        Contact bob = new Contact(bobTag);
-        Contact charlie = new Contact(charlieTag);
-        contactDao.add(alice);
-        contactDao.add(bob);
-        contactDao.add(charlie);
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
         Chat chat = new Chat(alice, bob);
         chat.setTitle("Chat mit Bob");
         Message message = new Message(alice);
@@ -70,12 +71,7 @@ public class ChatDaoTest {
 
     @Test
     public void getChatTest(){
-        Contact alice = new Contact(aliceTag);
-        Contact bob = new Contact(bobTag);
-        Contact charlie = new Contact(charlieTag);
-        contactDao.add(alice);
-        contactDao.add(bob);
-        contactDao.add(charlie);
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);
@@ -109,12 +105,7 @@ public class ChatDaoTest {
 
     @Test
     public void getAllChatsTest(){
-        Contact alice = new Contact(aliceTag);
-        Contact bob = new Contact(bobTag);
-        Contact charlie = new Contact(charlieTag);
-        contactDao.add(alice);
-        contactDao.add(bob);
-        contactDao.add(charlie);
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);
@@ -140,27 +131,21 @@ public class ChatDaoTest {
         Message message4 = new Message(alice);
         message4.setContent("Hallo ihr zwei");
         chat3.addMessage(message4);
-        int size = dao.size();
+        Assert.assertEquals(2, dao.size());
         dao.add(chat3);
-
-        // TODO no resetting of ChatDao. so more chats cause of multiple execution of tests.
-        Assert.assertEquals(size+1, dao.size());
+        Assert.assertEquals(3, dao.size());
     }
 
     @Test
-    public void removeChatTest(){
-        Contact alice = new Contact(aliceTag);
-        Contact bob = new Contact(bobTag);
-        Contact charlie = new Contact(charlieTag);
-        contactDao.add(alice);
-        contactDao.add(bob);
-        contactDao.add(charlie);
+    public void removeChatTest() throws InterruptedException {
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);
         message1.setContent("Hallo Bob");
         chat1.addMessage(message1);
         dao.add(chat1);
+        Thread.sleep(2);
 
         Chat chat2 = new Chat(alice, charlie);
         chat2.setTitle("Chat mit Charlie");
@@ -168,6 +153,7 @@ public class ChatDaoTest {
         message2.setContent("Hallo Alice");
         chat2.addMessage(message2);
         dao.add(chat2);
+        Thread.sleep(2);
 
         ArrayList<Contact> contacts = new ArrayList<>();
         contacts.add(bob);
@@ -182,20 +168,15 @@ public class ChatDaoTest {
         chat3.addMessage(message4);
         dao.add(chat3);
 
-        int size = dao.size();
+        Assert.assertEquals(3, dao.size());
         dao.remove(chat2);
-        Assert.assertEquals(size-1, dao.size());
+        Assert.assertEquals(2, dao.size());
         Assert.assertNull(dao.get(chat2.getId()));
     }
 
     @Test
     public void updateChatTest(){
-        Contact alice = new Contact(aliceTag);
-        Contact bob = new Contact(bobTag);
-        Contact charlie = new Contact(charlieTag);
-        contactDao.add(alice);
-        contactDao.add(bob);
-        contactDao.add(charlie);
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);

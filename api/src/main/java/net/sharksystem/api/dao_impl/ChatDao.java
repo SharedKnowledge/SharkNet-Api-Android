@@ -38,12 +38,14 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     private final static SemanticTag CONFIG_TYPE = InMemoSharkKB.createInMemoSemanticTag("CONFIG", "si:config");
     private final static String CHAT_IMAGE = "CHAT_IMAGE";
     private final static String CHAT_TITLE = "CHAT_TITLE";
+    private final ContactDao mContactDao;
 
-    private SharkKB rootKb;
+    private SharkKB mRootKb;
     private List<SyncComponent> syncComponentList = new ArrayList<>();
 
-    public ChatDao(SharkKB rootKb) {
-        this.rootKb = rootKb;
+    public ChatDao(SharkKB rootKb, ContactDao contactDao) {
+        mRootKb = rootKb;
+        mContactDao = contactDao;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_IMAGE, bs);
             }
 
-            MessageDao messageDao = new MessageDao(sharkKB);
+            MessageDao messageDao = new MessageDao(sharkKB, mContactDao);
             for (Message message : object.getMessages()) {
                 messageDao.add(message);
             }
@@ -113,8 +115,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                     List<Contact> contacts = new ArrayList<>();
                     Contact owner = null;
 
-                    ContactDao contactDao = SharkNetApi.getInstance().getContactDao();
-                    List<Contact> allContacts = contactDao.getAll();
+                    List<Contact> allContacts = mContactDao.getAll();
                     for (Contact contact : allContacts) {
                         if (SharkCSAlgebra.identical(contact.getTag(), senderTag)) {
                             owner = contact;
@@ -129,7 +130,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                         chat.setImage(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
                     }
                 }
-                MessageDao messageDao = new MessageDao(kb);
+                MessageDao messageDao = new MessageDao(kb, mContactDao);
                 chat.setMessages(messageDao.getAll());
 
                 chats.add(chat);
@@ -163,8 +164,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                         List<Contact> contacts = new ArrayList<>();
                         Contact owner = null;
 
-                        ContactDao contactDao = SharkNetApi.getInstance().getContactDao();
-                        List<Contact> allContacts = contactDao.getAll();
+                        List<Contact> allContacts = mContactDao.getAll();
                         for (Contact contact : allContacts) {
                             if (SharkCSAlgebra.identical(contact.getTag(), senderTag)) {
                                 owner = contact;
@@ -179,7 +179,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                             chat.setImage(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
                         }
                     }
-                    MessageDao messageDao = new MessageDao(kb);
+                    MessageDao messageDao = new MessageDao(kb, mContactDao);
                     chat.setMessages(messageDao.getAll());
 
                     return chat;
@@ -196,7 +196,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
         for (SyncComponent component : syncComponentList) {
             if (SharkCSAlgebra.identical(component.getUniqueName(), object.getId())) {
                 SyncKB kb = component.getKb();
-                MessageDao messageDao = new MessageDao(kb);
+                MessageDao messageDao = new MessageDao(kb, mContactDao);
                 messageDao.update(object.getMessages());
 
                 try {
@@ -255,7 +255,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     }
 
     private SharkKB createKBFromRoot() throws SharkKBException {
-        return new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), rootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet());
+        return new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet());
     }
 
     private ASIPSpace generateInterest(SemanticTag id) {

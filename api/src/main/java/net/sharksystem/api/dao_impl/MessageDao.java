@@ -13,7 +13,6 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
-import net.sharkfw.knowledgeBase.TimeSemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
 import net.sharksystem.api.models.Contact;
@@ -42,11 +41,13 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
     private final static String MESSAGE_VERIFIED = "MESSAGE_VERIFIED";
     private final static String MESSAGE_SIGNED = "MESSAGE_SIGNED";
     private final static String MESSAGE_ENCRYPTED = "MESSAGE_ENCRYPTED";
+    private final ContactDao mContactDao;
 
-    private SharkKB kb;
+    private SharkKB mSharkKb;
 
-    public MessageDao(SharkKB kb) {
-        this.kb = kb;
+    public MessageDao(SharkKB kb, ContactDao contactDao) {
+        mSharkKb = kb;
+        mContactDao = contactDao;
     }
 
     @Override
@@ -54,14 +55,14 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
         try {
 //            TimeSemanticTag timeSemanticTag = InMemoSharkKB.createInMemoTimeSemanticTag(object.getDate().getTime(), 0);
             SemanticTag topic = InMemoSharkKB.createInMemoSemanticTag(Message.MESSAGE_ID, object.getSender().getTag().getName() + object.getDate().getTime());
-//            ASIPSpace asipSpace = this.kb.createASIPSpace(topic, TYPE, null, object.getSender().getTag(), null, timeSemanticTag, null, ASIPSpace.DIRECTION_INOUT);
-            ASIPSpace asipSpace = this.kb.createASIPSpace(topic, TYPE, null, object.getSender().getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
+//            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, TYPE, null, object.getSender().getTag(), null, timeSemanticTag, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, TYPE, null, object.getSender().getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
 
-            SharkNetUtils.setInfoWithName(this.kb, asipSpace, MESSAGE_CONTENT, object.getContent());
-            SharkNetUtils.setInfoWithName(this.kb, asipSpace, MESSAGE_DATE, object.getDate().getTime());
-            SharkNetUtils.setInfoWithName(this.kb, asipSpace, MESSAGE_VERIFIED, object.isVerified());
-            SharkNetUtils.setInfoWithName(this.kb, asipSpace, MESSAGE_SIGNED, object.isSigned());
-            SharkNetUtils.setInfoWithName(this.kb, asipSpace, MESSAGE_ENCRYPTED, object.isEncrypted());
+            SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_CONTENT, object.getContent());
+            SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_DATE, object.getDate().getTime());
+            SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_VERIFIED, object.isVerified());
+            SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_SIGNED, object.isSigned());
+            SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_ENCRYPTED, object.isEncrypted());
 
             Bitmap image = object.getImageContent();
             if (image != null) {
@@ -71,7 +72,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
                 image.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
                 byte[] byteArray = bos.toByteArray();
                 ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
-                SharkNetUtils.setInfoWithName(this.kb, asipSpace, MESSAGE_IMAGE_CONTENT, bs);
+                SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_IMAGE_CONTENT, bs);
             }
         } catch (SharkKBException | IOException e) {
             e.printStackTrace();
@@ -83,21 +84,21 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
         List<Message> messageList = new ArrayList<>();
         try {
             ASIPInterest asipInterest = (ASIPInterest) generateInterest(null, null);
-            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(asipInterest);
+            Iterator<ASIPInformationSpace> allInformationSpaces = mSharkKb.getInformationSpaces(asipInterest);
             while (allInformationSpaces.hasNext()) {
                 ASIPInformationSpace next = allInformationSpaces.next();
                 ASIPSpace asipSpace = next.getASIPSpace();
 
-                Contact contact = SharkNetApi.getInstance().getContactDao().get(asipSpace.getSender());
-                Date date = new Date(SharkNetUtils.getInfoAsLong(this.kb, asipSpace, MESSAGE_DATE));
+                Contact contact = mContactDao.get(asipSpace.getSender());
+                Date date = new Date(SharkNetUtils.getInfoAsLong(mSharkKb, asipSpace, MESSAGE_DATE));
                 SemanticTag id = asipSpace.getTopics().stTags().next();
                 Message message = new Message(id, date, contact);
-                message.setContent(SharkNetUtils.getInfoAsString(this.kb, asipSpace, MESSAGE_CONTENT));
-                message.setEncrypted(SharkNetUtils.getInfoAsBoolean(this.kb, asipSpace, MESSAGE_ENCRYPTED));
-                message.setSigned(SharkNetUtils.getInfoAsBoolean(this.kb, asipSpace, MESSAGE_SIGNED));
-                message.setVerified(SharkNetUtils.getInfoAsBoolean(this.kb, asipSpace, MESSAGE_VERIFIED));
+                message.setContent(SharkNetUtils.getInfoAsString(mSharkKb, asipSpace, MESSAGE_CONTENT));
+                message.setEncrypted(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_ENCRYPTED));
+                message.setSigned(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_SIGNED));
+                message.setVerified(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_VERIFIED));
 
-                ASIPInformation information = SharkNetUtils.getInfoByName(this.kb, asipSpace, MESSAGE_IMAGE_CONTENT);
+                ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKb, asipSpace, MESSAGE_IMAGE_CONTENT);
                 if (information != null) {
                     message.setImageContent(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
                 }
@@ -113,20 +114,20 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
     public Message get(SemanticTag id) {
         try {
             ASIPSpace interest = generateInterest(id, null);
-            Iterator<ASIPInformationSpace> informationSpaces = this.kb.getInformationSpaces(interest);
+            Iterator<ASIPInformationSpace> informationSpaces = mSharkKb.getInformationSpaces(interest);
             while (informationSpaces.hasNext()) {
                 ASIPInformationSpace informationSpace = informationSpaces.next();
                 ASIPSpace asipSpace = informationSpace.getASIPSpace();
 
-                Contact contact = SharkNetApi.getInstance().getContactDao().get(asipSpace.getSender());
-                Date date = new Date(SharkNetUtils.getInfoAsLong(this.kb, asipSpace, MESSAGE_DATE));
+                Contact contact = mContactDao.get(asipSpace.getSender());
+                Date date = new Date(SharkNetUtils.getInfoAsLong(mSharkKb, asipSpace, MESSAGE_DATE));
                 Message message = new Message(id, date, contact);
-                message.setContent(SharkNetUtils.getInfoAsString(this.kb, asipSpace, MESSAGE_CONTENT));
-                message.setEncrypted(SharkNetUtils.getInfoAsBoolean(this.kb, asipSpace, MESSAGE_ENCRYPTED));
-                message.setSigned(SharkNetUtils.getInfoAsBoolean(this.kb, asipSpace, MESSAGE_SIGNED));
-                message.setVerified(SharkNetUtils.getInfoAsBoolean(this.kb, asipSpace, MESSAGE_VERIFIED));
+                message.setContent(SharkNetUtils.getInfoAsString(mSharkKb, asipSpace, MESSAGE_CONTENT));
+                message.setEncrypted(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_ENCRYPTED));
+                message.setSigned(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_SIGNED));
+                message.setVerified(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_VERIFIED));
 
-                ASIPInformation information = SharkNetUtils.getInfoByName(this.kb, asipSpace, MESSAGE_IMAGE_CONTENT);
+                ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKb, asipSpace, MESSAGE_IMAGE_CONTENT);
                 if (information != null) {
                     message.setImageContent(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
                 }
@@ -143,7 +144,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
     public void update(Message object) {
         try {
             ASIPSpace interest = generateInterest(object.getId(), object.getSender().getTag());
-            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(interest);
+            Iterator<ASIPInformationSpace> allInformationSpaces = mSharkKb.getInformationSpaces(interest);
             while (allInformationSpaces.hasNext()) {
                 ASIPInformationSpace next = allInformationSpaces.next();
                 if (SharkCSAlgebra.identical(interest, next.getASIPSpace())) {
@@ -206,12 +207,12 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
     public void remove(Message object) {
         try {
             ASIPSpace interest = generateInterest(object.getId(), object.getSender().getTag());
-            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(interest);
+            Iterator<ASIPInformationSpace> allInformationSpaces = mSharkKb.getInformationSpaces(interest);
             while (allInformationSpaces.hasNext()) {
                 ASIPInformationSpace next = allInformationSpaces.next();
                 if (SharkCSAlgebra.identical(interest, next.getASIPSpace())) {
-                    this.kb.removeInformation(next.getASIPSpace());
-                    this.kb.removeInformationSpace(next.getASIPSpace());
+                    mSharkKb.removeInformation(next.getASIPSpace());
+                    mSharkKb.removeInformationSpace(next.getASIPSpace());
                 }
             }
         } catch (SharkKBException e) {
@@ -223,7 +224,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
     public int size() {
         try {
             ASIPSpace asipInterest = generateInterest(null, null);
-            Iterator<ASIPInformationSpace> spaces = this.kb.getInformationSpaces(asipInterest);
+            Iterator<ASIPInformationSpace> spaces = mSharkKb.getInformationSpaces(asipInterest);
             int number = 0;
             while (spaces.hasNext()) {
                 spaces.next();
