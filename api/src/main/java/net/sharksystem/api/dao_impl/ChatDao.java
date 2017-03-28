@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
+import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
@@ -16,11 +17,14 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
+import net.sharkfw.system.L;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
 import net.sharksystem.api.utils.SharkNetUtils;
+
+import org.json.JSONException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,6 +42,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     private final static SemanticTag CONFIG_TYPE = InMemoSharkKB.createInMemoSemanticTag("CONFIG", "si:config");
     private final static String CHAT_IMAGE = "CHAT_IMAGE";
     private final static String CHAT_TITLE = "CHAT_TITLE";
+    private final static String CHAT_OWNER = "CHAT_OWNER";
     private final ContactDao mContactDao;
 
     private SharkKB mRootKb;
@@ -66,7 +71,11 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             topicSet.merge(object.getId());
             ASIPSpace asipSpace = sharkKB.createASIPSpace(topicSet, inMemoSTSet, null, object.getOwner().getTag(), contactSet, null, null, ASIPSpace.DIRECTION_INOUT);
 
-            SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_TITLE, object.getTitle());
+            if(object.getTitle()!=null){
+                SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_TITLE, object.getTitle());
+            }
+
+            SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_OWNER, "Owner");
 
             Bitmap image = object.getImage();
             if (image != null) {
@@ -97,11 +106,11 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
     @Override
     public List<Chat> getAll() {
+        L.d("Number of components: " + syncComponentList.size(), this);
         List<Chat> chats = new ArrayList<>();
         for (SyncComponent component : syncComponentList) {
             SyncKB kb = component.getKb();
             try {
-                Chat chat = null;
                 Iterator<ASIPInformationSpace> informationSpaces = kb.getInformationSpaces(generateInterest(null));
                 while (informationSpaces.hasNext()) {
                     ASIPInformationSpace next = informationSpaces.next();
@@ -123,17 +132,17 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                             contacts.add(contact);
                         }
                     }
-                    chat = new Chat(owner, contacts, chatId);
+                    Chat chat = new Chat(owner, contacts, chatId);
                     chat.setTitle(SharkNetUtils.getInfoAsString(kb, asipSpace, CHAT_TITLE));
                     ASIPInformation information = SharkNetUtils.getInfoByName(kb, asipSpace, CHAT_IMAGE);
                     if (information != null) {
                         chat.setImage(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
                     }
-                }
-                MessageDao messageDao = new MessageDao(kb, mContactDao);
-                chat.setMessages(messageDao.getAll());
+                    MessageDao messageDao = new MessageDao(kb, mContactDao);
+                    chat.setMessages(messageDao.getAll());
 
-                chats.add(chat);
+                    chats.add(chat);
+                }
             } catch (SharkKBException e) {
                 e.printStackTrace();
             }
@@ -178,9 +187,9 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                         if (information != null) {
                             chat.setImage(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
                         }
+                        MessageDao messageDao = new MessageDao(kb, mContactDao);
+                        chat.setMessages(messageDao.getAll());
                     }
-                    MessageDao messageDao = new MessageDao(kb, mContactDao);
-                    chat.setMessages(messageDao.getAll());
 
                     return chat;
                 } catch (SharkKBException e) {

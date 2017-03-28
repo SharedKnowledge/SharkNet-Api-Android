@@ -44,7 +44,7 @@ public class Chat {
     public Chat(Contact owner, Contact contact) {
         this.owner = owner;
         this.contacts.add(contact);
-        this.id = InMemoSharkKB.createInMemoSemanticTag(CHAT_ID, this.contacts.size() + owner.getName() + System.currentTimeMillis());
+        this.id = InMemoSharkKB.createInMemoSemanticTag(CHAT_ID, this.contacts.size() + this.owner.getName() + System.currentTimeMillis());
     }
 
     public SemanticTag getId() {

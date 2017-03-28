@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by j4rvis on 3/26/17.
@@ -104,7 +105,7 @@ public class ChatDaoTest {
     }
 
     @Test
-    public void getAllChatsTest(){
+    public void getSizeTest(){
         ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
@@ -134,6 +135,42 @@ public class ChatDaoTest {
         Assert.assertEquals(2, dao.size());
         dao.add(chat3);
         Assert.assertEquals(3, dao.size());
+    }
+
+    @Test
+    public void getAllChatsTest(){
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        Chat chat1 = new Chat(alice, bob);
+        chat1.setTitle("Chat mit Bob");
+        Message message1 = new Message(alice);
+        message1.setContent("Hallo Bob");
+        chat1.addMessage(message1);
+        dao.add(chat1);
+
+        Chat chat2 = new Chat(alice, charlie);
+        chat2.setTitle("Chat mit Charlie");
+        Message message2 = new Message(charlie);
+        message2.setContent("Hallo Alice");
+        chat2.addMessage(message2);
+        dao.add(chat2);
+
+        ArrayList<Contact> contacts = new ArrayList<>();
+        contacts.add(bob);
+        contacts.add(charlie);
+        Chat chat3 = new Chat(alice, contacts);
+        chat3.setTitle("Chat mit Bob und Charlie");
+        Message message3 = new Message(charlie);
+        message3.setContent("Hallo Alice");
+        chat3.addMessage(message3);
+        Message message4 = new Message(alice);
+        message4.setContent("Hallo ihr zwei");
+        chat3.addMessage(message4);
+        dao.add(chat3);
+
+        List<Chat> all = dao.getAll();
+        Assert.assertTrue(all.contains(chat1));
+        Assert.assertTrue(all.contains(chat2));
+        Assert.assertTrue(all.contains(chat3));
     }
 
     @Test
@@ -214,5 +251,46 @@ public class ChatDaoTest {
         Assert.assertEquals(3, dao.size());
         Chat savedChat = dao.get(chat2.getId());
         Assert.assertTrue(chat2.equals(savedChat));
+    }
+
+    @Test
+    public void addChatWithoutTitleAndMessagesTest(){
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        Chat chat = new Chat(alice, bob);
+        dao.add(chat);
+        List<Chat> all = dao.getAll();
+        Assert.assertEquals(1, all.size());
+        Chat savedChat = all.get(0);
+
+        Assert.assertTrue(chat.equals(savedChat));
+    }
+
+    @Test
+    public void addChatWithoutTitleTest(){
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        Chat chat = new Chat(alice, bob);
+        Message message = new Message(bob);
+        message.setContent("Message");
+        chat.addMessage(message);
+//        chat.setTitle("Title");
+        dao.add(chat);
+        Chat savedChat = dao.get(chat.getId());
+        Assert.assertTrue(chat.equals(savedChat));
+    }
+
+    @Test
+    public void addChatWithoutMessageTest(){
+        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        Chat chat = new Chat(alice, bob);
+//        Message message = new Message(bob);
+//        message.setContent("Message");
+//        chat.addMessage(message);
+        chat.setTitle("Title");
+        dao.add(chat);
+        List<Chat> all = dao.getAll();
+        Assert.assertEquals(1, all.size());
+        Chat savedChat = all.get(0);
+
+        Assert.assertTrue(chat.equals(savedChat));
     }
 }
