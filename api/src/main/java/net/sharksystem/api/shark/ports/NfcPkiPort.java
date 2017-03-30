@@ -15,6 +15,9 @@ import net.sharkfw.security.SharkPkiStorage;
 import net.sharkfw.security.SharkPublicKey;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkException;
+import net.sharksystem.api.dao_impl.ContactDao;
+import net.sharksystem.api.dao_impl.SharkNetApi;
+import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 
 import java.util.ArrayList;
@@ -26,16 +29,18 @@ import java.util.List;
 
 public class NfcPkiPort extends KnowledgePort implements NfcPkiPortEventListener, NfcMessageStub.NFCMessageListener{
 
-    private final NfcPkiPortListener portListener;
-    private final PkiStorage myPkiStorage;
-    private SharkPkiStorage tempPkiStorage;
-    private SharkPublicKey publicKey;
-    private List<SharkCertificate> certificates;
+    private final NfcPkiPortListener mPortListener;
+    private final PkiStorage mPkiStorage;
+    private SharkPkiStorage mTempPkiStorage;
+    private SharkPublicKey mPublicKey;
+    private List<SharkCertificate> mCertificates;
+    private ASIPKnowledge mKnowledge;
+    private List<Contact> mContacts;
 
     public NfcPkiPort(SharkEngine se, NfcPkiPortListener portListener) {
         super(se);
-        this.portListener = portListener;
-        this.myPkiStorage = this.se.getPKIStorage();
+        this.mPortListener = portListener;
+        this.mPkiStorage = this.se.getPKIStorage();
     }
 
     @Override
@@ -45,13 +50,15 @@ public class NfcPkiPort extends KnowledgePort implements NfcPkiPortEventListener
             return;
         }
 
-        // Now retrieve the key and the certificates out of the knowledge
-        // best way should be to create a new PkiStorage and use the knowledge as inMemokb.
+        // Now retrieve the key and the mCertificates out of the mKnowledge
+        // best way should be to create a new PkiStorage and use the mKnowledge as inMemokb.
 
-        tempPkiStorage = new SharkPkiStorage((SharkKB) asipKnowledge);
+        mKnowledge = asipKnowledge;
+
+        mTempPkiStorage = new SharkPkiStorage((SharkKB) asipKnowledge);
         List<SharkPublicKey> unsignedPublicKeys = new ArrayList<>();
         try {
-            unsignedPublicKeys = tempPkiStorage.getUnsignedPublicKeys();
+            unsignedPublicKeys = mTempPkiStorage.getUnsignedPublicKeys();
         } catch (SharkKBException e) {
             // shouldn't throw any errors
             e.printStackTrace();
@@ -61,8 +68,8 @@ public class NfcPkiPort extends KnowledgePort implements NfcPkiPortEventListener
             if(unsignedPublicKeys.size() > 1){
                 L.d("Something is really weird. We should only have one key", this);
             } else {
-                this.publicKey = unsignedPublicKeys.get(0);
-                this.portListener.onPublicKeyReceived(this.publicKey.getOwner());
+                this.mPublicKey = unsignedPublicKeys.get(0);
+                this.mPortListener.onPublicKeyReceived(this.mPublicKey.getOwner());
             }
         }
     }
@@ -75,9 +82,11 @@ public class NfcPkiPort extends KnowledgePort implements NfcPkiPortEventListener
     public void onPublicKeyDecision(boolean accepted) {
         if(accepted){
             try {
-                this.myPkiStorage.sign(this.publicKey);
-                this.certificates = this.tempPkiStorage.getAllSharkCertificates();
-                this.portListener.onCertificatesReceived(this.certificates);
+                mPkiStorage.sign(mPublicKey);
+                mCertificates = mTempPkiStorage.getAllSharkCertificates();
+                ContactDao contactDao = new ContactDao((SharkKB) mKnowledge);
+                mContacts = contactDao.getAll();
+                mPortListener.onCertificatesReceived(mCertificates, mContacts);
             } catch (SharkKBException e) {
                 e.printStackTrace();
             }
@@ -89,12 +98,15 @@ public class NfcPkiPort extends KnowledgePort implements NfcPkiPortEventListener
     @Override
     public void onCertificatesDecision(boolean accepted) {
         if(accepted){
-            L.d("certificates: " + certificates.size(), this);
-            for (SharkCertificate certificate : this.certificates) {
+            L.d("mCertificates: " + mCertificates.size(), this);
+            for (SharkCertificate certificate : mCertificates) {
                 L.d("Add certificate from " + certificate.getOwner().getName()
                         + " and signed by " + certificate.getSigner().getName(), this);
                 try {
-                    this.myPkiStorage.addSharkCertificate(certificate);
+                    mPkiStorage.addSharkCertificate(certificate);
+                    for (Contact contact : mContacts) {
+                        SharkNetApi.getInstance().addContact(contact);
+                    }
                 } catch (SharkKBException e) {
                     e.printStackTrace();
                 }
@@ -114,11 +126,11 @@ public class NfcPkiPort extends KnowledgePort implements NfcPkiPortEventListener
 
     @Override
     public void onMessageReceived() {
-        this.portListener.onMessageReceived();
+        this.mPortListener.onMessageReceived();
     }
 
     @Override
     public void onExchangeFailure(String reason) {
-        this.portListener.onExchangeFailed(reason);
+        this.mPortListener.onExchangeFailed(reason);
     }
 }

@@ -44,6 +44,13 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
 
     @Override
     public void add(Contact object) {
+
+        //TODO: to be fixed due to checking cached items
+        if(get(object.getTag())==null){
+            return;
+        }
+
+
         try {
             ASIPSpace asipSpace = this.kb.createASIPSpace(null, TYPE, null, object.getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
 
@@ -62,7 +69,6 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
                 ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
                 SharkNetUtils.setInfoWithName(this.kb, asipSpace, CONTACT_IMAGE, bs);
             }
-            // Okay the contact should be addednull
         } catch (SharkKBException | IOException e) {
             e.printStackTrace();
         }

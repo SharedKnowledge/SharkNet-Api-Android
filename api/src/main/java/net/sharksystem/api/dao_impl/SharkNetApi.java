@@ -1,16 +1,26 @@
 package net.sharksystem.api.dao_impl;
 
+import android.app.Activity;
 import android.content.Context;
 
+import net.sharkfw.asip.ASIPKnowledge;
+import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.security.PkiStorage;
+import net.sharkfw.security.SharkCertificate;
+import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
+import net.sharksystem.api.shark.ports.NfcPkiPort;
+import net.sharksystem.api.shark.ports.NfcPkiPortListener;
+import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +52,7 @@ public class SharkNetApi {
 
     public void initSharkEngine(Context context) {
         mEngine = new AndroidSharkEngine(context);
+        mEngine.setEngineOwnerPeer(mAccount.getTag());
     }
 
     public AndroidSharkEngine getSharkEngine() {
@@ -119,16 +130,42 @@ public class SharkNetApi {
 
     }
 
-    public void initNFC() {
+    public void initNFC(Activity activity) {
+        PkiStorage pkiStorage = mEngine.getPKIStorage();
+        try {
+            List<SharkCertificate> sharkCertificatesBySigner =
+                    pkiStorage.getSharkCertificatesBySigner(mAccount.getTag());
+            ASIPKnowledge knowledge = pkiStorage.getPublicKeyAsKnowledge(true);
+            ContactDao contactDao = new ContactDao((SharkKB) knowledge);
+            for (SharkCertificate sharkCertificate : sharkCertificatesBySigner) {
+                contactDao.add(getContact(sharkCertificate.getOwner()));
+            }
+            contactDao.add(mAccount);
 
+            NfcPkiPort nfcPkiPort = new NfcPkiPort(mEngine, (NfcPkiPortListener) activity);
+            mEngine.setupNfc(activity, nfcPkiPort);
+            mEngine.stopNfc();
+            mEngine.offer(knowledge);
+        } catch (SharkKBException | SharkProtocolNotSupportedException | SharkNotSupportedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startNFC() {
+        try {
+            mEngine.startNfc();
+        } catch (SharkProtocolNotSupportedException | IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
     public void stopNFC() {
-
+        try {
+            mEngine.stopNfc();
+        } catch (SharkProtocolNotSupportedException e) {
+            e.printStackTrace();
+        }
     }
 
 

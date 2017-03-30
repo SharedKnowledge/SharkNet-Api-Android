@@ -2,6 +2,7 @@ package net.sharksystem.api.shark.ports;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.security.SharkCertificate;
+import net.sharksystem.api.models.Contact;
 
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface NfcPkiPortListener {
     void onMessageReceived();
     void onExchangeFailed(String reason);
     void onPublicKeyReceived(PeerSemanticTag owner);
-    void onCertificatesReceived(List<SharkCertificate> certificates);
+    void onCertificatesReceived(List<SharkCertificate> certificates, List<Contact> contacts);
 }
