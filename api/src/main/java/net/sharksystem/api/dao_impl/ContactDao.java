@@ -46,9 +46,9 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
     public void add(Contact object) {
 
         //TODO: to be fixed due to checking cached items
-        if(get(object.getTag())==null){
-            return;
-        }
+//        if(get(object.getTag())==null){
+//            return;
+//        }
 
 
         try {

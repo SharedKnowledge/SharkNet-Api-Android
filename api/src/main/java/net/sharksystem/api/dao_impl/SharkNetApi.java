@@ -52,7 +52,7 @@ public class SharkNetApi {
 
     public void initSharkEngine(Context context) {
         mEngine = new AndroidSharkEngine(context);
-        mEngine.setEngineOwnerPeer(mAccount.getTag());
+//        mEngine.setEngineOwnerPeer(mAccount.getTag());
     }
 
     public AndroidSharkEngine getSharkEngine() {
@@ -68,6 +68,7 @@ public class SharkNetApi {
     public void setAccount(Contact contact) {
         mContactDao.add(contact);
         mAccount = contact;
+        mEngine.setEngineOwnerPeer(mAccount.getTag());
     }
 
     // DAO Methods
