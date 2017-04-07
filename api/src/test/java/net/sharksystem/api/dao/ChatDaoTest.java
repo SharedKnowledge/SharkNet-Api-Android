@@ -1,12 +1,10 @@
 package net.sharksystem.api.dao;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
-import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.system.L;
 import net.sharksystem.api.dao_impl.ChatDao;
 import net.sharksystem.api.dao_impl.ContactDao;
-import net.sharksystem.api.dao_impl.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;

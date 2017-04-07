@@ -13,31 +13,30 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.security.PkiStorage;
 import net.sharkfw.security.SharkCertificate;
 import net.sharkfw.system.SharkNotSupportedException;
+import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.ports.NfcPkiPort;
 import net.sharksystem.api.shark.ports.NfcPkiPortListener;
-import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by j4rvis on 3/26/17.
  */
 
-public class SharkNetApi {
+public class SharkNetApiImpl implements SharkNetApi {
 
-    private static SharkNetApi mInstance = new SharkNetApi();
+    private static SharkNetApiImpl mInstance = new SharkNetApiImpl();
     private ChatDao mChatDao;
     private ContactDao mContactDao;
     private SharkKB mRootKb = new InMemoSharkKB();
     private AndroidSharkEngine mEngine;
     private Contact mAccount;
 
-    private SharkNetApi() {
+    public SharkNetApiImpl() {
         try {
             mContactDao = new ContactDao(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
             mChatDao = new ChatDao(mRootKb, mContactDao);
@@ -46,7 +45,7 @@ public class SharkNetApi {
         }
     }
 
-    public static SharkNetApi getInstance() {
+    public static SharkNetApiImpl getInstance() {
         return mInstance;
     }
 

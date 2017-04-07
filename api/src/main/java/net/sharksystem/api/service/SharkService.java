@@ -7,6 +7,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import net.sharkfw.system.L;
+import net.sharksystem.api.dao_impl.SharkNetApiImpl;
+import net.sharksystem.api.dao_impl.ThreadedSharkNetApiImpl;
+import net.sharksystem.api.dao_interfaces.SharkNetApi;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,13 +22,15 @@ public class SharkService extends Service implements Runnable {
 
     private LocalBinder mBinder = new LocalBinder();
     private ExecutorService mExecutor;
+    private ThreadedSharkNetApiImpl mApi;
 
     @Override
     public void onCreate() {
         super.onCreate();
         L.d("Service created.", this);
         mExecutor = Executors.newSingleThreadExecutor();
-        mExecutor.execute(this);
+//        mExecutor.execute(this);
+        mApi = new ThreadedSharkNetApiImpl(mExecutor);
     }
 
     @Override
@@ -40,6 +45,10 @@ public class SharkService extends Service implements Runnable {
         return mBinder;
     }
 
+    public SharkNetApi getApi() {
+        return SharkNetApiImpl.getInstance();
+    }
+
     @Override
     public void run() {
         try {
@@ -52,7 +61,7 @@ public class SharkService extends Service implements Runnable {
     }
 
     public class LocalBinder extends Binder {
-        public SharkService getService(){
+        public SharkService getService() {
             return SharkService.this;
         }
     }

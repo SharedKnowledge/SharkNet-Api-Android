@@ -16,7 +16,7 @@ import net.sharkfw.security.SharkPublicKey;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkException;
 import net.sharksystem.api.dao_impl.ContactDao;
-import net.sharksystem.api.dao_impl.SharkNetApi;
+import net.sharksystem.api.dao_impl.SharkNetApiImpl;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.protocols.nfc.NfcMessageStub;
 
@@ -105,7 +105,7 @@ public class NfcPkiPort extends KnowledgePort implements NfcPkiPortEventListener
                 try {
                     mPkiStorage.addSharkCertificate(certificate);
                     for (Contact contact : mContacts) {
-                        SharkNetApi.getInstance().addContact(contact);
+                        SharkNetApiImpl.getInstance().addContact(contact);
                     }
                 } catch (SharkKBException e) {
                     e.printStackTrace();
