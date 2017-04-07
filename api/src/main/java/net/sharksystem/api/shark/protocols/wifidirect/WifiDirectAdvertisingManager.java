@@ -10,7 +10,10 @@ import android.os.Handler;
 import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
+import net.sharkfw.knowledgeBase.STSet;
+import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.protocols.Protocols;
 import net.sharkfw.system.L;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
@@ -21,39 +24,19 @@ import java.util.Map;
 /**
  * Created by j4rvis on 22.07.16.
  */
-public class WifiDirectAdvertisingManager
-        implements WifiP2pManager.DnsSdTxtRecordListener, Runnable {
+public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtRecordListener, Runnable {
 
     private final AndroidSharkEngine mEngine;
     private final String mBluetoothAddress;
-
-    private boolean mIsDiscovering = false;
-
-    private WifiP2pDnsSdServiceInfo mServiceInfo;
-
     private final WifiP2pManager mManager;
     private final WifiP2pManager.Channel mChannel;
-
+    private boolean mIsDiscovering = false;
+    private WifiP2pDnsSdServiceInfo mServiceInfo;
     private int mDiscoveryInterval = 10000;
-
-    private class WifiActionListener implements WifiP2pManager.ActionListener {
-
-        private String title = "";
-
-        public WifiActionListener(String title) {
-            this.title = title;
-        }
-
-        @Override
-        public void onSuccess() {
-
-        }
-
-        @Override
-        public void onFailure(int reason) {
-            L.e(this.title + " failed. ReasonCode: " + reason, this);
-        }
-    }
+    private Handler mHandler = new Handler();
+    private static final String TYPE_NAME = "RADAR";
+    public static final String TYPE_SI = "si:radar";
+    public static final SemanticTag TYPE_TAG = InMemoSharkKB.createInMemoSemanticTag(TYPE_NAME, TYPE_SI);
 
     public WifiDirectAdvertisingManager(Context context, AndroidSharkEngine engine) {
         mEngine = engine;
@@ -73,14 +56,24 @@ public class WifiDirectAdvertisingManager
         return mIsDiscovering;
     }
 
-    public void startAdvertising(ASIPSpace space) {
+    public void startAdvertising() {
 
-        PeerSemanticTag sender = space.getSender();
+        PeerSemanticTag sender = mEngine.getOwner();
+        ASIPInterest interest = null;
+
+        try {
+            STSet typeSTSet = InMemoSharkKB.createInMemoSTSet();
+            typeSTSet.merge(TYPE_TAG);
+            interest = InMemoSharkKB.createInMemoASIPInterest(null, typeSTSet, sender, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+
         sender.addAddress(Protocols.BLUETOOTH_PREFIX + mBluetoothAddress);
 
         if (!mIsDiscovering) {
             mManager.clearLocalServices(mChannel, new WifiActionListener("Clear LocalServices"));
-            HashMap<String, String> map = WifiDirectUtil.interest2RecordMap((ASIPInterest) space);
+            HashMap<String, String> map = WifiDirectUtil.interest2RecordMap(interest);
             mServiceInfo = WifiP2pDnsSdServiceInfo.newInstance("_sbc", "_presence._tcp", map);
             mManager.addLocalService(mChannel, mServiceInfo, new WifiActionListener("Add LocalService"));
 
@@ -98,18 +91,13 @@ public class WifiDirectAdvertisingManager
     public void stopAdvertising() {
         if (mIsDiscovering) {
             mHandler.removeCallbacks(this);
-            mManager.clearServiceRequests(mChannel,
-                    new WifiActionListener("Clear ServiceRequests"));
-            mManager.removeLocalService(mChannel, mServiceInfo,
-                    new WifiActionListener("Remove LocalService"));
-            mManager.clearLocalServices(mChannel,
-                    new WifiActionListener("Clear LocalServices"));
+            mManager.clearServiceRequests(mChannel, new WifiActionListener("Clear ServiceRequests"));
+            mManager.removeLocalService(mChannel, mServiceInfo, new WifiActionListener("Remove LocalService"));
+            mManager.clearLocalServices(mChannel, new WifiActionListener("Clear LocalServices"));
 
             mIsDiscovering = false;
         }
     }
-
-    private Handler mHandler = new Handler();
 
     // called to trigger the discovery on a certain basis
     @Override
@@ -119,9 +107,7 @@ public class WifiDirectAdvertisingManager
     }
 
     @Override
-    public void onDnsSdTxtRecordAvailable(String fullDomainName,
-                                          Map<String, String> txtRecordMap,
-                                          WifiP2pDevice srcDevice) {
+    public void onDnsSdTxtRecordAvailable(String fullDomainName, Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
 
 
         if (srcDevice == null || txtRecordMap.isEmpty()) return;
@@ -130,6 +116,25 @@ public class WifiDirectAdvertisingManager
             mEngine.handleASIPInterest(interest);
         } catch (SharkKBException e) {
             e.printStackTrace();
+        }
+    }
+
+    private class WifiActionListener implements WifiP2pManager.ActionListener {
+
+        private String title = "";
+
+        public WifiActionListener(String title) {
+            this.title = title;
+        }
+
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onFailure(int reason) {
+            L.e(this.title + " failed. ReasonCode: " + reason, this);
         }
     }
 }

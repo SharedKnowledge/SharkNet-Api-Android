@@ -30,16 +30,7 @@ public class NearbyPeerManager implements Runnable{
 
     private Handler mHandler = new Handler();
 
-    public static NearbyPeerManager mInstance = null;
-
-    public static NearbyPeerManager getInstance(){
-        if(mInstance == null){
-            mInstance = new NearbyPeerManager();
-        }
-        return mInstance;
-    }
-
-    private NearbyPeerManager() {
+    public NearbyPeerManager() {
         mTaskExecutor = SharkTaskExecutor.getInstance();
     }
 
@@ -107,6 +98,7 @@ public class NearbyPeerManager implements Runnable{
         }
         Collections.sort(mPeers);
 
+        // TODO implement syncronization
 //        mHandler.post(this);
 
         for (NearbyPeerListener listener : mListeners){

@@ -6,10 +6,12 @@ import net.sharkfw.asip.engine.ASIPConnection;
 import net.sharkfw.asip.engine.ASIPInMessage;
 import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.ports.KnowledgePort;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
+import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectAdvertisingManager;
 
 /**
  * Created by j4rvis on 11/22/16.
@@ -19,9 +21,9 @@ public class RadarDiscoveryPort extends KnowledgePort {
 
     private final NearbyPeerManager mNearbyPeerManager;
 
-    public RadarDiscoveryPort(AndroidSharkEngine se) {
+    public RadarDiscoveryPort(AndroidSharkEngine se, NearbyPeerManager peerManager) {
         super(se);
-        mNearbyPeerManager = NearbyPeerManager.getInstance();
+        mNearbyPeerManager = peerManager;
     }
 
     @Override
@@ -32,16 +34,17 @@ public class RadarDiscoveryPort extends KnowledgePort {
     @Override
     protected void handleExpose(ASIPInMessage message, ASIPConnection asipConnection, ASIPInterest interest) throws SharkKBException {
 
-        if(interest == null) return;
+        if (interest == null) return;
 
-        STSet topics = interest.getTopics();
+        STSet types = interest.getTypes();
 
-        if(topics == null || topics.isEmpty()) return;
+        if (types == null || types.isEmpty()) return;
 
-        SemanticTag topicsSemanticTag = topics.getSemanticTag(AndroidSharkEngine.DISCOVERY_SI);
+        SemanticTag typeSemanticTag = types.getSemanticTag(WifiDirectAdvertisingManager.TYPE_SI);
 
-        if(topicsSemanticTag == null) return;
+        if (SharkCSAlgebra.identical(typeSemanticTag, typeSemanticTag)) {
+            mNearbyPeerManager.addPeer(interest);
+        }
 
-        mNearbyPeerManager.addPeer(interest);
     }
 }

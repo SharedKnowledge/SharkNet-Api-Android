@@ -4,16 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 
 import net.sharkfw.asip.ASIPKnowledge;
-import net.sharkfw.asip.ASIPSpace;
 import net.sharkfw.asip.ASIPStub;
 import net.sharkfw.asip.SharkStub;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
-import net.sharkfw.knowledgeBase.Knowledge;
-import net.sharkfw.knowledgeBase.STSet;
-import net.sharkfw.knowledgeBase.SharkKB;
-import net.sharkfw.knowledgeBase.SharkKBException;
-import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.J2SEAndroidSharkEngine;
+import net.sharkfw.protocols.Protocols;
 import net.sharkfw.protocols.RequestHandler;
 import net.sharkfw.protocols.Stub;
 import net.sharkfw.system.SharkNotSupportedException;
@@ -26,11 +21,8 @@ import java.io.IOException;
 
 public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
 
-    public final static String DISCOVERY_TOPIC = "DISCOVERY_INTEREST";
-    public final static String DISCOVERY_SI = "www.sharksystem.net/discovery";
+    private final NearbyPeerManager mPeerManager;
     private Context mContext;
-    private Stub currentStub;
-    private ASIPSpace mSpace;
     private WifiDirectAdvertisingManager mAdvertisingManager;
     private Activity activity;
     private NfcMessageStub.NFCMessageListener nfcMessageListener;
@@ -38,45 +30,22 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
     public AndroidSharkEngine(Context context) {
         super();
         mContext = context;
-        NearbyPeerManager.getInstance().setEngine(this);
-    }
-
-    public AndroidSharkEngine(Context context, SharkKB sharkKB) {
-        super(sharkKB);
-        mContext = context;
-        NearbyPeerManager.getInstance().setEngine(this);
+        mPeerManager = new NearbyPeerManager();
+        mPeerManager.setEngine(this);
     }
 
     public Context getContext() {
         return mContext;
     }
 
-    public ASIPSpace getSpace() {
-        return mSpace;
-    }
-
-    public void setSpace(ASIPSpace space) throws SharkKBException {
-
-        STSet topicSet = InMemoSharkKB.createInMemoSTSet();
-        topicSet.createSemanticTag(DISCOVERY_TOPIC, DISCOVERY_SI);
-
-        if (space == null) {
-            mSpace = InMemoSharkKB.createInMemoASIPInterest(topicSet, null, getOwner(), null, null, null, null, ASIPSpace.DIRECTION_INOUT);
-        } else {
-            mSpace = space;
-            mSpace.getSender().merge(getOwner());
-            mSpace.getTopics().merge(topicSet);
-        }
-    }
-
     public void addNearbyPeerListener(NearbyPeerManager.NearbyPeerListener listener) {
-        NearbyPeerManager.getInstance().addNearbyPeerListener(listener);
+        mPeerManager.addNearbyPeerListener(listener);
     }
 
     public void startDiscovery() {
-        new RadarDiscoveryPort(this);
+        new RadarDiscoveryPort(this, mPeerManager);
         mAdvertisingManager = new WifiDirectAdvertisingManager(mContext, this);
-        mAdvertisingManager.startAdvertising(mSpace);
+        mAdvertisingManager.startAdvertising();
     }
 
     public void stopDiscovery() {
@@ -90,12 +59,6 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
     public void setupNfc(Activity activity, NfcMessageStub.NFCMessageListener listener){
         this.activity = activity;
         this.nfcMessageListener = listener;
-    }
-
-    @Override
-    public Stub getProtocolStub(int type) throws SharkProtocolNotSupportedException {
-        return super.getProtocolStub(type);
-        //TODO this function is called by the parent but the parent function itself looks likes a big mess
     }
 
     @Override
@@ -120,18 +83,22 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
 
     @Override
     protected Stub createNFCMessageStub(SharkStub stub) throws SharkProtocolNotSupportedException {
-        if (currentStub == null) {
-            currentStub = new NfcMessageStub(this, mContext, activity, nfcMessageListener);
-            currentStub.setHandler((RequestHandler) stub);
+        Stub protocolStub = getProtocolStub(Protocols.NFC);
+        if(protocolStub == null){
+            protocolStub = new NfcMessageStub(this, mContext, activity, nfcMessageListener);
+            protocolStub.setHandler((RequestHandler) stub);
+            setProtocolStub(protocolStub, Protocols.NFC);
         }
-        return currentStub;
+        return protocolStub;
     }
 
     @Override
     protected Stub createBluetoothStreamStub(ASIPStub stub) throws SharkProtocolNotSupportedException {
-        if (currentStub == null) {
-            currentStub = new BluetoothStreamStub(this, stub);
+        Stub protocolStub = getProtocolStub(Protocols.NFC);
+        if(protocolStub == null){
+            protocolStub = new BluetoothStreamStub(this, stub);
+            setProtocolStub(protocolStub, Protocols.NFC);
         }
-        return currentStub;
+        return protocolStub;
     }
 }
