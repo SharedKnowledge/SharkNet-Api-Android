@@ -46,7 +46,7 @@ public class SharkService extends Service implements Runnable {
     }
 
     public SharkNetApi getApi() {
-        return SharkNetApiImpl.getInstance();
+        return mApi;
     }
 
     @Override

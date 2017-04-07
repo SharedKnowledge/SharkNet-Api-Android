@@ -5,6 +5,7 @@ import android.content.Context;
 
 import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
+import net.sharkfw.asip.serialization.ASIPKnowledgeConverter;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
@@ -12,12 +13,14 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.security.PkiStorage;
 import net.sharkfw.security.SharkCertificate;
+import net.sharkfw.system.L;
 import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.ports.NfcPkiPort;
+import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 import net.sharksystem.api.shark.ports.NfcPkiPortListener;
 
 import java.io.IOException;
@@ -29,7 +32,6 @@ import java.util.List;
 
 public class SharkNetApiImpl implements SharkNetApi {
 
-    private static SharkNetApiImpl mInstance = new SharkNetApiImpl();
     private ChatDao mChatDao;
     private ContactDao mContactDao;
     private SharkKB mRootKb = new InMemoSharkKB();
@@ -43,10 +45,6 @@ public class SharkNetApiImpl implements SharkNetApi {
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
-    }
-
-    public static SharkNetApiImpl getInstance() {
-        return mInstance;
     }
 
     public void initSharkEngine(Context context) {
@@ -130,24 +128,40 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     }
 
-    public void initNFC(Activity activity) {
+    public NfcPkiPortEventListener initNFC(Activity activity) {
         PkiStorage pkiStorage = mEngine.getPKIStorage();
         try {
-            List<SharkCertificate> sharkCertificatesBySigner =
-                    pkiStorage.getSharkCertificatesBySigner(mAccount.getTag());
+//            List<SharkCertificate> sharkCertificatesBySigner =
+//                    pkiStorage.getSharkCertificatesBySigner(mAccount.getTag());
             ASIPKnowledge knowledge = pkiStorage.getPublicKeyAsKnowledge(true);
+
+            // TODO remove logs
+
+            ASIPKnowledgeConverter asipKnowledgeConverter = new ASIPKnowledgeConverter(knowledge);
+            L.d("Initial length: " +
+                    (asipKnowledgeConverter.getContent().length + asipKnowledgeConverter.getSerializedKnowledge().length()), this);
             ContactDao contactDao = new ContactDao((SharkKB) knowledge);
-            for (SharkCertificate sharkCertificate : sharkCertificatesBySigner) {
-                contactDao.add(getContact(sharkCertificate.getOwner()));
-            }
+//            for (SharkCertificate sharkCertificate : sharkCertificatesBySigner) {
+//                contactDao.add(getContact(sharkCertificate.getOwner()));
+//            }
             contactDao.add(mAccount);
 
-            NfcPkiPort nfcPkiPort = new NfcPkiPort(mEngine, (NfcPkiPortListener) activity);
+            ASIPKnowledgeConverter asipKnowledgeConverter2 = new ASIPKnowledgeConverter(knowledge);
+            L.d("contact added length: " +
+                    (asipKnowledgeConverter2.getContent().length + asipKnowledgeConverter2.getSerializedKnowledge().length()), this);
+//            L.d("Merged contact data into keys", this);
+            L.d(L.kb2String((SharkKB) knowledge), this);
+
+            // TODO remove logs
+
+            NfcPkiPort nfcPkiPort = new NfcPkiPort(mEngine, this, (NfcPkiPortListener) activity);
             mEngine.setupNfc(activity, nfcPkiPort);
             mEngine.stopNfc();
             mEngine.offer(knowledge);
+            return nfcPkiPort;
         } catch (SharkKBException | SharkProtocolNotSupportedException | SharkNotSupportedException e) {
             e.printStackTrace();
+            return null;
         }
     }
 

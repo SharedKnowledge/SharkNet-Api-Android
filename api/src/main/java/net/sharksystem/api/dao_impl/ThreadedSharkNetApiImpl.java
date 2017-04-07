@@ -9,6 +9,7 @@ import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
+import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -233,8 +234,8 @@ public class ThreadedSharkNetApiImpl implements SharkNetApi {
     }
 
     @Override
-    public void initNFC(Activity activity) {
-        mApi.initNFC(activity);
+    public NfcPkiPortEventListener initNFC(Activity activity) {
+        return mApi.initNFC(activity);
     }
 
     @Override

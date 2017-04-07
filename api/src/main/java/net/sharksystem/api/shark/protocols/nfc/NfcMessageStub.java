@@ -88,7 +88,8 @@ public class NfcMessageStub implements MessageStub {
     @Override
     public void sendMessage(byte[] msg, String recAddress) throws IOException {
         sendRequestHandler.setData(msg);
-        sendRequestHandler.setMaxSize(1024);
+        L.d("Message length: " + msg.length, this);
+        sendRequestHandler.setMaxSize(2048);
     }
 
     @Override

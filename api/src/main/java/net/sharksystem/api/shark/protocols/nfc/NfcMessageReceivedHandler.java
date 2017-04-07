@@ -17,6 +17,7 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
     private RequestHandler handler;
     private NfcMessageStub nfcMessageStub;
     private byte[] byteBuffer;
+    private long init = 0;
 
     public NfcMessageReceivedHandler(NfcMessageStub nfcMessageStub, NfcMessageStub.NFCMessageListener listener) {
         this.nfcMessageStub = nfcMessageStub;
@@ -27,10 +28,13 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
     public void onMessage(byte[] message) {
         if (byteBuffer == null) {
             byteBuffer = message;
+            init = System.currentTimeMillis();
         } else {
             byteBuffer = concat(byteBuffer, message);
         }
-//        L.d("onMessage: " + byteBuffer, this);
+        // TODO remove logs
+        L.d("onMessage: " + byteBuffer.length, this);
+        L.d("Duration: " + (System.currentTimeMillis() - init) + "ms", this);
         this.nfcMessageListener.onMessageReceived();
     }
 

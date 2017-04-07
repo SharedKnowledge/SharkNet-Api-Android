@@ -8,6 +8,7 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
+import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public interface SharkNetApi {
 
     void stopRadar();
 
-    void initNFC(Activity activity);
+    NfcPkiPortEventListener initNFC(Activity activity);
 
     void startNFC();
 
