@@ -3,6 +3,7 @@ package net.sharksystem.api.dao_impl;
 import android.app.Activity;
 import android.content.Context;
 
+import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
@@ -222,6 +223,16 @@ public class ThreadedSharkNetApiImpl implements SharkNetApi {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    @Override
+    public void pingMailServer(final SemanticTag type, final PeerSemanticTag receiver) {
+        mExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                mApi.pingMailServer(type, receiver);
+            }
+        });
     }
 
     @Override

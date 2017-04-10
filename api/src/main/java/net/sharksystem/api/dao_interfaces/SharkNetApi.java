@@ -3,6 +3,7 @@ package net.sharksystem.api.dao_interfaces;
 import android.app.Activity;
 import android.content.Context;
 
+import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharksystem.api.models.Chat;
@@ -50,6 +51,8 @@ public interface SharkNetApi {
     void removeContact(Contact contact);
 
     int numberOfContacts();
+
+    void pingMailServer(SemanticTag type, PeerSemanticTag receiver);
 
     void addRadarListener(NearbyPeerManager.NearbyPeerListener peerListener);
 

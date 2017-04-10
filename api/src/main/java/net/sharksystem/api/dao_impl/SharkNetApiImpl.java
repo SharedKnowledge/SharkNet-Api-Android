@@ -3,7 +3,9 @@ package net.sharksystem.api.dao_impl;
 import android.app.Activity;
 import android.content.Context;
 
+import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPKnowledge;
+import net.sharkfw.asip.engine.ASIPOutMessage;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.asip.serialization.ASIPKnowledgeConverter;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
@@ -14,6 +16,7 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.security.PkiStorage;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkNotSupportedException;
+import net.sharkfw.system.SharkSecurityException;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
@@ -118,6 +121,17 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     public int numberOfContacts() {
         return mContactDao.size();
+    }
+
+    @Override
+    public void pingMailServer(SemanticTag type, PeerSemanticTag receiver) {
+        try {
+            mEngine.startMail();
+            ASIPOutMessage message = mEngine.createASIPOutMessage(receiver.getAddresses(), mEngine.getOwner(), receiver, null, null, null, type, 1);
+            message.expose(InMemoSharkKB.createInMemoASIPInterest());
+        } catch (SharkKBException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Shark methods
