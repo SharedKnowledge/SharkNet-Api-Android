@@ -14,7 +14,7 @@ import java.util.Collections;
  * Created by j4rvis on 11/22/16.
  */
 
-public class NearbyPeerManager implements Runnable{
+public class NearbyPeerManager {
 
     private final SharkTaskExecutor mTaskExecutor;
     private long mSyncInterval = 1000 * 60; // five minutes
@@ -28,7 +28,6 @@ public class NearbyPeerManager implements Runnable{
     private ArrayList<NearbyPeer> mPeers = new ArrayList<>();
     private ArrayList<NearbyPeerListener> mListeners = new ArrayList<>();
 
-    private Handler mHandler = new Handler();
 
     public NearbyPeerManager() {
         mTaskExecutor = SharkTaskExecutor.getInstance();
@@ -48,35 +47,6 @@ public class NearbyPeerManager implements Runnable{
         mEngine = engine;
     }
 
-    @Override
-    public void run() {
-        if(mPeers.isEmpty()) return;
-
-        for (NearbyPeer peer : mPeers){
-            long current = System.currentTimeMillis();
-            if(current - peer.getLastSeen() <= mPeerTimeout){
-                L.d("The Peer is still reachable", this);
-
-                if(peer.getTimesSynced() > 0){
-                    L.d("We synced with the peer once.", this);
-
-                    if(current - peer.getLastSynced() >= mSyncInterval){
-                        L.d("It's been longer than " + mSyncInterval/1000 + " seconds since the last Sync.", this);
-                        // TODO Start syncing!!
-                        SyncTask syncTask = new SyncTask(mEngine, "Hey, nice to see you again!", peer);
-                        mTaskExecutor.submit(syncTask);
-                        peer.updateSynced();
-                    }
-                } else {
-                    L.d("We haven't synced with the peer, so initialise syncing!", this);
-                    SyncTask syncTask = new SyncTask(mEngine, "Wow. Hey, nice to meet you!", peer);
-                    mTaskExecutor.submit(syncTask);
-                    peer.updateSynced();
-                }
-
-            }
-        }
-    }
 
     public void addNearbyPeerListener(NearbyPeerListener listener) {
         mListeners.add(listener);

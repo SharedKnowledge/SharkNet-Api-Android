@@ -9,6 +9,7 @@ import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
+import net.sharksystem.api.shark.peer.NearbyPeerManager;
 import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 
 import java.util.List;
@@ -221,6 +222,11 @@ public class ThreadedSharkNetApiImpl implements SharkNetApi {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    @Override
+    public void addRadarListener(NearbyPeerManager.NearbyPeerListener peerListener){
+        mApi.addRadarListener(peerListener);
     }
 
     @Override

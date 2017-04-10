@@ -56,7 +56,7 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
         this.createNFCMessageStub(this.getAsipStub()).offer(knowledge);
     }
 
-    public void setupNfc(Activity activity, NfcMessageStub.NFCMessageListener listener){
+    public void setupNfc(Activity activity, NfcMessageStub.NFCMessageListener listener) {
         this.activity = activity;
         this.nfcMessageListener = listener;
     }
@@ -83,22 +83,16 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
 
     @Override
     protected Stub createNFCMessageStub(SharkStub stub) throws SharkProtocolNotSupportedException {
-        Stub protocolStub = getProtocolStub(Protocols.NFC);
-        if(protocolStub == null){
-            protocolStub = new NfcMessageStub(this, mContext, activity, nfcMessageListener);
-            protocolStub.setHandler((RequestHandler) stub);
-            setProtocolStub(protocolStub, Protocols.NFC);
-        }
-        return protocolStub;
+        NfcMessageStub nfcMessageStub = new NfcMessageStub(this, mContext, activity, nfcMessageListener);
+        nfcMessageStub.setHandler((RequestHandler) stub);
+        setProtocolStub(nfcMessageStub, Protocols.NFC);
+        return nfcMessageStub;
     }
 
     @Override
     protected Stub createBluetoothStreamStub(ASIPStub stub) throws SharkProtocolNotSupportedException {
-        Stub protocolStub = getProtocolStub(Protocols.NFC);
-        if(protocolStub == null){
-            protocolStub = new BluetoothStreamStub(this, stub);
-            setProtocolStub(protocolStub, Protocols.NFC);
-        }
-        return protocolStub;
+        BluetoothStreamStub bluetoothStreamStub = new BluetoothStreamStub(this, stub);
+        setProtocolStub(bluetoothStreamStub, Protocols.BLUETOOTH);
+        return bluetoothStreamStub;
     }
 }

@@ -12,13 +12,13 @@ import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.security.PkiStorage;
-import net.sharkfw.security.SharkCertificate;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
+import net.sharksystem.api.shark.peer.NearbyPeerManager;
 import net.sharksystem.api.shark.ports.NfcPkiPort;
 import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 import net.sharksystem.api.shark.ports.NfcPkiPortListener;
@@ -120,12 +120,16 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     // Shark methods
 
-    public void startRadar() {
+    public void addRadarListener(NearbyPeerManager.NearbyPeerListener peerListener) {
+        mEngine.addNearbyPeerListener(peerListener);
+    }
 
+    public void startRadar() {
+        mEngine.startDiscovery();
     }
 
     public void stopRadar() {
-
+        mEngine.stopDiscovery();
     }
 
     public NfcPkiPortEventListener initNFC(Activity activity) {
@@ -138,8 +142,7 @@ public class SharkNetApiImpl implements SharkNetApi {
             // TODO remove logs
 
             ASIPKnowledgeConverter asipKnowledgeConverter = new ASIPKnowledgeConverter(knowledge);
-            L.d("Initial length: " +
-                    (asipKnowledgeConverter.getContent().length + asipKnowledgeConverter.getSerializedKnowledge().length()), this);
+            L.d("Initial length: " + (asipKnowledgeConverter.getContent().length + asipKnowledgeConverter.getSerializedKnowledge().length()), this);
             ContactDao contactDao = new ContactDao((SharkKB) knowledge);
 //            for (SharkCertificate sharkCertificate : sharkCertificatesBySigner) {
 //                contactDao.add(getContact(sharkCertificate.getOwner()));
@@ -147,8 +150,7 @@ public class SharkNetApiImpl implements SharkNetApi {
             contactDao.add(mAccount);
 
             ASIPKnowledgeConverter asipKnowledgeConverter2 = new ASIPKnowledgeConverter(knowledge);
-            L.d("contact added length: " +
-                    (asipKnowledgeConverter2.getContent().length + asipKnowledgeConverter2.getSerializedKnowledge().length()), this);
+            L.d("contact added length: " + (asipKnowledgeConverter2.getContent().length + asipKnowledgeConverter2.getSerializedKnowledge().length()), this);
 //            L.d("Merged contact data into keys", this);
             L.d(L.kb2String((SharkKB) knowledge), this);
 

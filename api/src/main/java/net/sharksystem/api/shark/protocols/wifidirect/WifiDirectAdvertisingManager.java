@@ -6,6 +6,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Handler;
+import android.os.Looper;
 
 import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPSpace;
@@ -26,6 +27,9 @@ import java.util.Map;
  */
 public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtRecordListener, Runnable {
 
+    public static final String TYPE_SI = "si:radar";
+    private static final String TYPE_NAME = "RADAR";
+    public static final SemanticTag TYPE_TAG = InMemoSharkKB.createInMemoSemanticTag(TYPE_NAME, TYPE_SI);
     private final AndroidSharkEngine mEngine;
     private final String mBluetoothAddress;
     private final WifiP2pManager mManager;
@@ -34,9 +38,6 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
     private WifiP2pDnsSdServiceInfo mServiceInfo;
     private int mDiscoveryInterval = 10000;
     private Handler mHandler = new Handler();
-    private static final String TYPE_NAME = "RADAR";
-    public static final String TYPE_SI = "si:radar";
-    public static final SemanticTag TYPE_TAG = InMemoSharkKB.createInMemoSemanticTag(TYPE_NAME, TYPE_SI);
 
     public WifiDirectAdvertisingManager(Context context, AndroidSharkEngine engine) {
         mEngine = engine;
@@ -44,6 +45,7 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
         mBluetoothAddress = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
 
         mManager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
+//        Looper.prepare();
         mChannel = mManager.initialize(context, context.getMainLooper(), null);
         mManager.setDnsSdResponseListeners(mChannel, null, this);
     }
@@ -85,7 +87,6 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
 
             mIsDiscovering = true;
         }
-
     }
 
     public void stopAdvertising() {

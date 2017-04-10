@@ -8,6 +8,7 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
+import net.sharksystem.api.shark.peer.NearbyPeerManager;
 import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 
 import java.util.List;
@@ -49,6 +50,8 @@ public interface SharkNetApi {
     void removeContact(Contact contact);
 
     int numberOfContacts();
+
+    void addRadarListener(NearbyPeerManager.NearbyPeerListener peerListener);
 
     void startRadar();
 
