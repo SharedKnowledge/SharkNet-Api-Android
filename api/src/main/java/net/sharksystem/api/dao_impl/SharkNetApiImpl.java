@@ -37,6 +37,8 @@ public class SharkNetApiImpl implements SharkNetApi {
     private SharkKB mRootKb = new InMemoSharkKB();
     private AndroidSharkEngine mEngine;
     private Contact mAccount;
+    private boolean mIsDiscovering = false;
+
 
     public SharkNetApiImpl() {
         try {
@@ -125,11 +127,17 @@ public class SharkNetApiImpl implements SharkNetApi {
     }
 
     public void startRadar() {
-        mEngine.startDiscovery();
+        if(!mIsDiscovering){
+            mEngine.startDiscovery();
+            mIsDiscovering = true;
+        }
     }
 
     public void stopRadar() {
-        mEngine.stopDiscovery();
+        if(mIsDiscovering){
+            mEngine.stopDiscovery();
+            mIsDiscovering = false;
+        }
     }
 
     public NfcPkiPortEventListener initNFC(Activity activity) {

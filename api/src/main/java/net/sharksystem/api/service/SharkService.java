@@ -22,6 +22,7 @@ public class SharkService extends Service {
     private LocalBinder mBinder = new LocalBinder();
     private ExecutorService mExecutor;
     private ThreadedSharkNetApiImpl mApi;
+    private int mBoundClients = 0;
 
     @Override
     public void onCreate() {
@@ -29,18 +30,29 @@ public class SharkService extends Service {
         L.d("Service created.", this);
         mExecutor = Executors.newSingleThreadExecutor();
         mApi = new ThreadedSharkNetApiImpl(mExecutor);
+        mApi.initSharkEngine(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         L.d("Service startCommand.", this);
-        return Service.START_NOT_STICKY;
+        return Service.START_STICKY;
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        mBoundClients++;
         return mBinder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        if(--mBoundClients == 0){
+            L.d("Stopping the service.", this);
+            stopSelf();
+        }
+        return super.onUnbind(intent);
     }
 
     public SharkNetApi getApi() {
