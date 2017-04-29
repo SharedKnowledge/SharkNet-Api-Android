@@ -31,8 +31,8 @@ public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
     public AndroidSharkEngine(Context context) {
         super();
         mContext = context;
-        mPeerManager = new NearbyPeerManager();
-        mPeerManager.setEngine(this);
+        getSyncManager();
+        mPeerManager = new NearbyPeerManager(this);
     }
 
     public Context getContext() {

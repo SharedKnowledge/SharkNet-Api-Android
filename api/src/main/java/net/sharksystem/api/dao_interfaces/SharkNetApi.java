@@ -20,8 +20,6 @@ import java.util.List;
 
 public interface SharkNetApi {
 
-    void initSharkEngine(Context context);
-
     AndroidSharkEngine getSharkEngine();
 
     Contact getAccount();
@@ -55,6 +53,8 @@ public interface SharkNetApi {
     void pingMailServer(SemanticTag type, PeerSemanticTag receiver);
 
     void addRadarListener(NearbyPeerManager.NearbyPeerListener peerListener);
+
+    void allowSyncInvitation(boolean allow);
 
     void startRadar();
 

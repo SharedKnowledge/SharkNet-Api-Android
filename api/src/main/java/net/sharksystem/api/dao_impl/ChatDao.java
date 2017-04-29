@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPSpace;
-import net.sharkfw.asip.serialization.ASIPMessageSerializerHelper;
 import net.sharkfw.knowledgeBase.PeerSTSet;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
@@ -17,14 +16,13 @@ import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
+import net.sharkfw.peer.SharkEngine;
 import net.sharkfw.system.L;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
 import net.sharksystem.api.utils.SharkNetUtils;
-
-import org.json.JSONException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,9 +42,17 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     private final static String CHAT_TITLE = "CHAT_TITLE";
     private final static String CHAT_OWNER = "CHAT_OWNER";
     private final ContactDao mContactDao;
+    private SharkEngine mEngine;
 
     private SharkKB mRootKb;
-    private List<SyncComponent> syncComponentList = new ArrayList<>();
+    private List<SyncComponent> mSyncComponentList = new ArrayList<>();
+
+    public ChatDao(SharkEngine engine, SharkKB rootKb, ContactDao contactDao) {
+        mEngine = engine;
+        mRootKb = rootKb;
+        mContactDao = contactDao;
+        mSyncComponentList = mEngine.getSyncManager().getSyncComponents();
+    }
 
     public ChatDao(SharkKB rootKb, ContactDao contactDao) {
         mRootKb = rootKb;
@@ -97,8 +103,12 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             PeerSemanticTag owner = object.getOwner().getTag();
             // Und nun noch eine möglichst einzigartige ID!!
             // Anzahl contacts + title + date
-            SyncComponent syncComponent = new SyncComponent(sharkKB, object.getId(), contactSet, owner, true);
-            syncComponentList.add(syncComponent);
+            if(mEngine!=null){
+                mEngine.getSyncManager().createSyncComponent(sharkKB, object.getId(), contactSet, owner, true);
+            } else {
+                SyncComponent syncComponent = new SyncComponent(sharkKB, object.getId(), contactSet, owner, true);
+                mSyncComponentList.add(syncComponent);
+            }
         } catch (SharkKBException | IOException e) {
             e.printStackTrace();
         }
@@ -106,9 +116,9 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
     @Override
     public List<Chat> getAll() {
-        L.d("Number of components: " + syncComponentList.size(), this);
+        L.d("Number of components: " + mEngine.getSyncManager().getSyncComponents().size(), this);
         List<Chat> chats = new ArrayList<>();
-        for (SyncComponent component : syncComponentList) {
+        for (SyncComponent component : mEngine.getSyncManager().getSyncComponents()) {
             SyncKB kb = component.getKb();
             try {
                 Iterator<ASIPInformationSpace> informationSpaces = kb.getInformationSpaces(generateInterest(null));
@@ -153,7 +163,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     @Override
     public Chat get(SemanticTag id) {
 
-        for (SyncComponent component : syncComponentList) {
+        for (SyncComponent component : mSyncComponentList) {
             if (SharkCSAlgebra.identical(component.getUniqueName(), id)) {
 
                 SyncKB kb = component.getKb();
@@ -202,7 +212,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
     @Override
     public void update(Chat object) {
-        for (SyncComponent component : syncComponentList) {
+        for (SyncComponent component : mSyncComponentList) {
             if (SharkCSAlgebra.identical(component.getUniqueName(), object.getId())) {
                 SyncKB kb = component.getKb();
                 MessageDao messageDao = new MessageDao(kb, mContactDao);
@@ -250,9 +260,13 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     // TODO care for fileSystemImpl. SharkKb needs to be deleted.
     @Override
     public void remove(Chat object) {
-        for (SyncComponent component : syncComponentList) {
+        for (SyncComponent component : mSyncComponentList) {
             if (SharkCSAlgebra.identical(component.getUniqueName(), object.getId())) {
-                syncComponentList.remove(component);
+                mSyncComponentList.remove(component);
+                if(mEngine!=null){
+                    mEngine.getSyncManager().removeSyncComponent(component);
+                    mSyncComponentList = mEngine.getSyncManager().getSyncComponents();
+                }
                 return;
             }
         }
@@ -260,7 +274,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
     @Override
     public int size() {
-        return syncComponentList.size();
+        return mSyncComponentList.size();
     }
 
     private SharkKB createKBFromRoot() throws SharkKBException {

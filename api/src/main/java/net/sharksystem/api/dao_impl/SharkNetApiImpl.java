@@ -46,18 +46,14 @@ public class SharkNetApiImpl implements SharkNetApi {
     private boolean mIsDiscovering = false;
 
 
-    public SharkNetApiImpl() {
+    public SharkNetApiImpl(Context context) {
+        mEngine = new AndroidSharkEngine(context);
         try {
             mContactDao = new ContactDao(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
-            mChatDao = new ChatDao(mRootKb, mContactDao);
+            mChatDao = new ChatDao(mEngine, mRootKb, mContactDao);
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
-    }
-
-    public void initSharkEngine(Context context) {
-        mEngine = new AndroidSharkEngine(context);
-//        mEngine.setEngineOwnerPeer(mAccount.getTag());
     }
 
     public AndroidSharkEngine getSharkEngine() {
@@ -141,6 +137,11 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     public void addRadarListener(NearbyPeerManager.NearbyPeerListener peerListener) {
         mEngine.addNearbyPeerListener(peerListener);
+    }
+
+    @Override
+    public void allowSyncInvitation(boolean allow) {
+        mEngine.getSyncManager().allowInvitation(allow);
     }
 
     public void startRadar() {

@@ -3,6 +3,7 @@ package net.sharksystem.api.shark.peer;
 import android.os.Handler;
 
 import net.sharkfw.asip.ASIPInterest;
+import net.sharkfw.knowledgeBase.sync.manager.SyncManager;
 import net.sharkfw.peer.SharkEngine;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkTaskExecutor;
@@ -16,37 +17,19 @@ import java.util.Collections;
 
 public class NearbyPeerManager {
 
-    private final SharkTaskExecutor mTaskExecutor;
-    private long mSyncInterval = 1000 * 60; // five minutes
-    private long mPeerTimeout = 1000 * 60 ; // one minute
     private SharkEngine mEngine;
 
     public interface NearbyPeerListener {
-        void onNearbyPeerFound(ArrayList<NearbyPeer> peers);
+        void onNearbyPeersFound(ArrayList<NearbyPeer> peers);
+        void onNearbyPeerFound(NearbyPeer peer);
     }
 
     private ArrayList<NearbyPeer> mPeers = new ArrayList<>();
     private ArrayList<NearbyPeerListener> mListeners = new ArrayList<>();
 
-
-    public NearbyPeerManager() {
-        mTaskExecutor = SharkTaskExecutor.getInstance();
-    }
-
-    /**
-     *
-     * @param syncInterval - describes the interval when a peer should be synced again
-     * @param peerTimeout - describes the timeout when a peer is described as not available
-     */
-    public void configureManager(long syncInterval, long peerTimeout){
-        mSyncInterval = syncInterval;
-        mPeerTimeout = peerTimeout;
-    }
-
-    public void setEngine(SharkEngine engine){
+    public NearbyPeerManager(SharkEngine engine) {
         mEngine = engine;
     }
-
 
     public void addNearbyPeerListener(NearbyPeerListener listener) {
         mListeners.add(listener);
@@ -68,11 +51,13 @@ public class NearbyPeerManager {
         }
         Collections.sort(mPeers);
 
-        // TODO implement syncronization
-//        mHandler.post(this);
+        L.d("Found Peer: " + peer.getSender().getName(), this);
+
+        mEngine.getSyncManager().doInviteOrSync(peer.getSender());
 
         for (NearbyPeerListener listener : mListeners){
-            listener.onNearbyPeerFound(mPeers);
+            listener.onNearbyPeersFound(mPeers);
+            listener.onNearbyPeerFound(peer);
         }
     }
 

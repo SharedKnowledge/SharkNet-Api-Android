@@ -30,7 +30,7 @@ public class Chat {
         if(contactList!=null){
             this.contacts = contactList;
         }
-        this.id = InMemoSharkKB.createInMemoSemanticTag(CHAT_ID, this.contacts.size() + this.owner.getName() + System.currentTimeMillis());
+        this.id = generateId();
     }
 
     public Chat(Contact owner, List<Contact> contactList, SemanticTag id) {
@@ -44,7 +44,7 @@ public class Chat {
     public Chat(Contact owner, Contact contact) {
         this.owner = owner;
         this.contacts.add(contact);
-        this.id = InMemoSharkKB.createInMemoSemanticTag(CHAT_ID, this.contacts.size() + this.owner.getName() + System.currentTimeMillis());
+        this.id = generateId();
     }
 
     public SemanticTag getId() {
@@ -144,12 +144,19 @@ public class Chat {
         }
 
         //to avoid messing the order of the lists we will use a copy
-        //as noted in comments by A. R. S.
         one = new ArrayList<>(one);
         two = new ArrayList<>(two);
 
         Collections.sort(one);
         Collections.sort(two);
         return one.equals(two);
+    }
+
+    private SemanticTag generateId(){
+        String contactNames = "";
+        for (Contact contact : contacts) {
+            contactNames += contact.getName().replace(" ", "");
+        }
+        return InMemoSharkKB.createInMemoSemanticTag(CHAT_ID, contactNames + this.owner.getName() + System.currentTimeMillis());
     }
 }

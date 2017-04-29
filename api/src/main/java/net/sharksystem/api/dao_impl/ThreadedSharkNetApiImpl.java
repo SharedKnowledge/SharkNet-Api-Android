@@ -28,14 +28,9 @@ public class ThreadedSharkNetApiImpl implements SharkNetApi {
     private final ExecutorService mExecutorService;
     private final SharkNetApiImpl mApi;
 
-    public ThreadedSharkNetApiImpl(ExecutorService executorService) {
+    public ThreadedSharkNetApiImpl(Context context, ExecutorService executorService) {
         mExecutorService = executorService;
-        mApi = new SharkNetApiImpl();
-    }
-
-    @Override
-    public void initSharkEngine(Context context) {
-        mApi.initSharkEngine(context);
+        mApi = new SharkNetApiImpl(context);
     }
 
     @Override
@@ -238,6 +233,11 @@ public class ThreadedSharkNetApiImpl implements SharkNetApi {
     @Override
     public void addRadarListener(NearbyPeerManager.NearbyPeerListener peerListener){
         mApi.addRadarListener(peerListener);
+    }
+
+    @Override
+    public void allowSyncInvitation(boolean allow) {
+        mApi.allowSyncInvitation(allow);
     }
 
     @Override

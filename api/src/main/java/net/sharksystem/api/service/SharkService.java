@@ -29,14 +29,13 @@ public class SharkService extends Service {
         super.onCreate();
         L.d("Service created.", this);
         mExecutor = Executors.newSingleThreadExecutor();
-        mApi = new ThreadedSharkNetApiImpl(mExecutor);
-        mApi.initSharkEngine(this);
+        mApi = new ThreadedSharkNetApiImpl(this, mExecutor);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         L.d("Service startCommand.", this);
-        return Service.START_STICKY;
+        return Service.START_NOT_STICKY;
     }
 
     @Nullable
