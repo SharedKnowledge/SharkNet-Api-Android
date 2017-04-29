@@ -14,6 +14,7 @@ import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.security.PkiStorage;
+import net.sharkfw.security.SharkPkiStorage;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkNotSupportedException;
 import net.sharkfw.system.SharkSecurityException;
@@ -27,6 +28,8 @@ import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 import net.sharksystem.api.shark.ports.NfcPkiPortListener;
 
 import java.io.IOException;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 /**
@@ -173,10 +176,7 @@ public class SharkNetApiImpl implements SharkNetApi {
 
             ASIPKnowledgeConverter asipKnowledgeConverter2 = new ASIPKnowledgeConverter(knowledge);
             L.d("contact added length: " + (asipKnowledgeConverter2.getContent().length + asipKnowledgeConverter2.getSerializedKnowledge().length()), this);
-//            L.d("Merged contact data into keys", this);
-            L.d(L.kb2String((SharkKB) knowledge), this);
-
-            // TODO remove logs
+            L.d("Image length: " + asipKnowledgeConverter2.getContent().length, this);
 
             NfcPkiPort nfcPkiPort = new NfcPkiPort(mEngine, this, (NfcPkiPortListener) activity);
             mEngine.setupNfc(activity, nfcPkiPort);
@@ -206,5 +206,21 @@ public class SharkNetApiImpl implements SharkNetApi {
         }
     }
 
+    @Override
+    public void initPki() {
+        SharkPkiStorage pkiStorage = (SharkPkiStorage) getSharkEngine().getPKIStorage();
 
+        try {
+            pkiStorage.setPkiStorageOwner(getAccount().getTag());
+            pkiStorage.generateNewKeyPair(1000 * 60 * 60 * 24 * 365);
+        } catch (SharkKBException | NoSuchAlgorithmException | IOException e) {
+            L.e(e.getMessage());
+        }
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
 }

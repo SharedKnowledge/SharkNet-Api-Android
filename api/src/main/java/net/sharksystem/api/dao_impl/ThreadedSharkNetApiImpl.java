@@ -264,4 +264,14 @@ public class ThreadedSharkNetApiImpl implements SharkNetApi {
     public void stopNFC() {
         mApi.stopNFC();
     }
+
+    @Override
+    public void initPki() {
+        mExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                mApi.initPki();
+            }
+        });
+    }
 }

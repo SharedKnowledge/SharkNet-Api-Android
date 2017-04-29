@@ -30,7 +30,6 @@ public class NfcMessageSendHandler implements OnMessageSend {
     }
 
     public void setData(byte[] data) {
-        L.d("Data will be set", this);
         synchronized (lock) {
             if (byteBuffer != null && byteBuffer.length > 0) {
                 throw new IllegalStateException("Buffer not empty. Data loss on attempt to overwrite existing data");

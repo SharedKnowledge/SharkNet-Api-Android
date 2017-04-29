@@ -66,4 +66,6 @@ public interface SharkNetApi {
 
     void stopNFC();
 
+    void initPki();
+
 }
