@@ -28,6 +28,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -116,7 +118,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
     @Override
     public List<Chat> getAll() {
-        L.d("Number of components: " + mEngine.getSyncManager().getSyncComponents().size(), this);
+//        L.d("Number of components: " + mEngine.getSyncManager().getSyncComponents().size(), this);
         List<Chat> chats = new ArrayList<>();
         for (SyncComponent component : mEngine.getSyncManager().getSyncComponents()) {
             SyncKB kb = component.getKb();
@@ -157,6 +159,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 e.printStackTrace();
             }
         }
+        Collections.reverse(chats);
         return chats;
     }
 

@@ -20,7 +20,6 @@ import java.util.concurrent.Executors;
 public class SharkService extends Service {
 
     private LocalBinder mBinder = new LocalBinder();
-    private ExecutorService mExecutor;
     private ThreadedSharkNetApiImpl mApi;
     private int mBoundClients = 0;
 
@@ -28,8 +27,7 @@ public class SharkService extends Service {
     public void onCreate() {
         super.onCreate();
         L.d("Service created.", this);
-        mExecutor = Executors.newSingleThreadExecutor();
-        mApi = new ThreadedSharkNetApiImpl(this, mExecutor);
+        mApi = new ThreadedSharkNetApiImpl(this, Executors.newSingleThreadExecutor());
     }
 
     @Override

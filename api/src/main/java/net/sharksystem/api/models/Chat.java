@@ -1,6 +1,7 @@
 package net.sharksystem.api.models;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
@@ -14,7 +15,7 @@ import java.util.List;
  * Created by j4rvis on 3/22/17.
  */
 
-public class Chat {
+public class Chat implements Comparable<Chat> {
 
     public final static String CHAT_ID = "CHAT_ID";
 
@@ -158,5 +159,10 @@ public class Chat {
             contactNames += contact.getName().replace(" ", "");
         }
         return InMemoSharkKB.createInMemoSemanticTag(CHAT_ID, contactNames + this.owner.getName() + System.currentTimeMillis());
+    }
+
+    @Override
+    public int compareTo(@NonNull Chat o) {
+        return Collections.max(getMessages()).compareTo(Collections.max(o.getMessages()));
     }
 }
