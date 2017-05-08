@@ -21,7 +21,7 @@ public class ThreadedSharkNetImplTest {
         L.setLogLevel(L.LOGLEVEL_ALL);
         ExecutorService executor = Executors.newSingleThreadExecutor();
 //        mExecutor.execute(this);
-        ThreadedSharkNetApiImpl api = new ThreadedSharkNetApiImpl(executor);
+        ThreadedSharkNetApiImpl api = new ThreadedSharkNetApiImpl(null, executor);
 
         Contact contact = new Contact("Alice", "mail@alice.com");
         Assert.assertEquals(0, api.numberOfContacts());
