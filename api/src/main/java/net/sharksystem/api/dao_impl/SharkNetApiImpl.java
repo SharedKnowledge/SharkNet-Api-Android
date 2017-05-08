@@ -1,23 +1,29 @@
 package net.sharksystem.api.dao_impl;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 
-import net.sharkfw.asip.ASIPInterest;
+import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.engine.ASIPOutMessage;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.asip.serialization.ASIPKnowledgeConverter;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
+import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharkfw.security.PkiStorage;
 import net.sharkfw.security.SharkPkiStorage;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkNotSupportedException;
-import net.sharkfw.system.SharkSecurityException;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
@@ -30,7 +36,10 @@ import net.sharksystem.api.shark.ports.NfcPkiPortListener;
 import java.io.IOException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.Iterator;
 import java.util.List;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by j4rvis on 3/26/17.
@@ -38,6 +47,7 @@ import java.util.List;
 
 public class SharkNetApiImpl implements SharkNetApi {
 
+    private final Context mContext;
     private ChatDao mChatDao;
     private ContactDao mContactDao;
     private SharkKB mRootKb = new InMemoSharkKB();
@@ -48,6 +58,8 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     public SharkNetApiImpl(Context context) {
         mEngine = new AndroidSharkEngine(context);
+        mEngine.getSyncManager().addSyncMergeListener(this);
+        mContext = context;
         try {
             mContactDao = new ContactDao(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
             mChatDao = new ChatDao(mEngine, mRootKb, mContactDao);
@@ -145,14 +157,14 @@ public class SharkNetApiImpl implements SharkNetApi {
     }
 
     public void startRadar() {
-        if(!mIsDiscovering){
+        if (!mIsDiscovering) {
             mEngine.startDiscovery();
             mIsDiscovering = true;
         }
     }
 
     public void stopRadar() {
-        if(mIsDiscovering){
+        if (mIsDiscovering) {
             mEngine.stopDiscovery();
             mIsDiscovering = false;
         }
@@ -166,25 +178,24 @@ public class SharkNetApiImpl implements SharkNetApi {
             ASIPKnowledge knowledge = pkiStorage.getPublicKeyAsKnowledge(true);
 
             // TODO remove logs
-
-            ASIPKnowledgeConverter asipKnowledgeConverter = new ASIPKnowledgeConverter(knowledge);
-            L.d("Initial length: " + (asipKnowledgeConverter.getContent().length + asipKnowledgeConverter.getSerializedKnowledge().length()), this);
-            ContactDao contactDao = new ContactDao((SharkKB) knowledge);
+//            ASIPKnowledgeConverter asipKnowledgeConverter = new ASIPKnowledgeConverter(knowledge);
+//            L.d("Initial length: " + (asipKnowledgeConverter.getContent().length + asipKnowledgeConverter.getSerializedKnowledge().length()), this);
+//            ContactDao contactDao = new ContactDao((SharkKB) knowledge);
 //            for (SharkCertificate sharkCertificate : sharkCertificatesBySigner) {
 //                contactDao.add(getContact(sharkCertificate.getOwner()));
 //            }
-            contactDao.add(mAccount);
+//            contactDao.add(mAccount);
 
-            ASIPKnowledgeConverter asipKnowledgeConverter2 = new ASIPKnowledgeConverter(knowledge);
-            L.d("contact added length: " + (asipKnowledgeConverter2.getContent().length + asipKnowledgeConverter2.getSerializedKnowledge().length()), this);
-            L.d("Image length: " + asipKnowledgeConverter2.getContent().length, this);
+//            ASIPKnowledgeConverter asipKnowledgeConverter2 = new ASIPKnowledgeConverter(knowledge);
+//            L.d("contact added length: " + (asipKnowledgeConverter2.getContent().length + asipKnowledgeConverter2.getSerializedKnowledge().length()), this);
+//            L.d("Image length: " + asipKnowledgeConverter2.getContent().length, this);
 
             NfcPkiPort nfcPkiPort = new NfcPkiPort(mEngine, this, (NfcPkiPortListener) activity);
             mEngine.setupNfc(activity, nfcPkiPort);
             mEngine.stopNfc();
             mEngine.offer(knowledge);
             return nfcPkiPort;
-        } catch (SharkKBException | SharkProtocolNotSupportedException | SharkNotSupportedException e) {
+        } catch (SharkProtocolNotSupportedException | SharkNotSupportedException e) {
             e.printStackTrace();
             return null;
         }
@@ -223,5 +234,45 @@ public class SharkNetApiImpl implements SharkNetApi {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onNewMerge(SyncComponent component, SharkKB changes) {
+        int numberOfMessages = 0;
+        try {
+            Iterator<ASIPInformationSpace> iterator = changes.getAllInformationSpaces();
+            while (iterator.hasNext()) {
+                ASIPInformationSpace next = iterator.next();
+                if (SharkCSAlgebra.isIn(next.getASIPSpace().getTypes(), MessageDao.MESSAGE_TYPE)) {
+                    numberOfMessages++;
+                }
+            }
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
+                .setSmallIcon(android.R.drawable.ic_menu_compass);
+
+        Chat chat = getChat(component.getUniqueName());
+        if(chat != null){
+            String chatTitle = "";
+            if (chat.getTitle() != null) {
+                List<Contact> contacts = chat.getContacts();
+                contacts.remove(mAccount);
+                if (contacts.size() == 1) chatTitle = "mit " + contacts.get(0).getName();
+            } else {
+                chatTitle = chat.getTitle();
+            }
+            String messageHeader = (numberOfMessages > 1 ? "Nachrichten" : "Nachricht");
+            mBuilder.setContentTitle("Neue " + messageHeader);
+            mBuilder.setContentText("Du hast " + numberOfMessages + " neue " + messageHeader + " in dem Chat " + chatTitle);
+        } else {
+            mBuilder.setContentTitle("Neuer Chat").setContentText(" Du hast einen neuen Chat.");
+        }
+
+        NotificationManager mNotifyMgr = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
+        // Builds the notification and   issues it.
+        mNotifyMgr.notify(001, mBuilder.build());
     }
 }

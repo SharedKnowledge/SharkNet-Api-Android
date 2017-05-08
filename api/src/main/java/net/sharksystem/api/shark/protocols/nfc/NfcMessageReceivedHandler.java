@@ -61,7 +61,7 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
             // Pass to the handler for the ports
             try {
                 handler.handleMessage(byteBuffer, nfcMessageStub);
-            } catch (ASIPSerializerException e) {
+            } catch (ASIPSerializerException | ArrayIndexOutOfBoundsException e) {
                 e.printStackTrace();
                 this.nfcMessageListener.onExchangeFailure("Message can't be serialized to ASIP.");
             }

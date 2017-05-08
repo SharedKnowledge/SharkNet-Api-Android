@@ -33,7 +33,7 @@ import java.util.List;
 
 public class MessageDao implements DataAccessObject<Message, SemanticTag> {
 
-    private final static SemanticTag TYPE = InMemoSharkKB.createInMemoSemanticTag("MESSAGE", "si:message");
+    public final static SemanticTag MESSAGE_TYPE = InMemoSharkKB.createInMemoSemanticTag("MESSAGE", "si:message");
     private final static String MESSAGE_CONTENT = "MESSAGE_CONTENT";
     private final static String MESSAGE_IMAGE_CONTENT = "MESSAGE_IMAGE_CONTENT";
     //    private final static String MESSAGE_SENDER = "MESSAGE_SENDER";
@@ -55,8 +55,8 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
         try {
 //            TimeSemanticTag timeSemanticTag = InMemoSharkKB.createInMemoTimeSemanticTag(object.getDate().getTime(), 0);
             SemanticTag topic = InMemoSharkKB.createInMemoSemanticTag(Message.MESSAGE_ID, object.getSender().getTag().getName() + object.getDate().getTime());
-//            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, TYPE, null, object.getSender().getTag(), null, timeSemanticTag, null, ASIPSpace.DIRECTION_INOUT);
-            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, TYPE, null, object.getSender().getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
+//            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, MESSAGE_TYPE, null, object.getSender().getTag(), null, timeSemanticTag, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, MESSAGE_TYPE, null, object.getSender().getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
 
             SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_CONTENT, object.getContent());
             SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_DATE, object.getDate().getTime());
@@ -195,9 +195,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
     public void update(List<Message> messages){
         List<Message> all = getAll();
         for (Message message : messages) {
-            if(all.contains(message)){
-                update(message);
-            } else {
+            if(!all.contains(message)){
                 add(message);
             }
         }
@@ -239,7 +237,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
 
     private ASIPSpace generateInterest(SemanticTag tag, PeerSemanticTag sender) throws SharkKBException {
         STSet typeSet = InMemoSharkKB.createInMemoSTSet();
-        typeSet.merge(TYPE);
+        typeSet.merge(MESSAGE_TYPE);
         STSet topicSet = InMemoSharkKB.createInMemoSTSet();
         topicSet.merge(tag);
         return InMemoSharkKB.createInMemoASIPInterest(topicSet, typeSet, sender, null, null, null, null, ASIPSpace.DIRECTION_INOUT);

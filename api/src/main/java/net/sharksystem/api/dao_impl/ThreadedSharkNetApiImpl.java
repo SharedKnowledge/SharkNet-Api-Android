@@ -6,6 +6,8 @@ import android.content.Context;
 import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkKB;
+import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
@@ -273,5 +275,10 @@ public class ThreadedSharkNetApiImpl implements SharkNetApi {
                 mApi.initPki();
             }
         });
+    }
+
+    @Override
+    public void onNewMerge(SyncComponent component, SharkKB changes) {
+        mApi.onNewMerge(component, changes);
     }
 }

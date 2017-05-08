@@ -118,7 +118,6 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
     @Override
     public List<Chat> getAll() {
-//        L.d("Number of components: " + mEngine.getSyncManager().getSyncComponents().size(), this);
         List<Chat> chats = new ArrayList<>();
         for (SyncComponent component : mEngine.getSyncManager().getSyncComponents()) {
             SyncKB kb = component.getKb();
@@ -223,7 +222,6 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
                 try {
                     kb.removeInformationSpace(generateInterest(null));
-
                     // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
                     PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
                     for (Contact contact : object.getContacts()) {

@@ -7,7 +7,7 @@ import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.ASIPStub;
 import net.sharkfw.asip.SharkStub;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
-import net.sharkfw.peer.J2SEAndroidSharkEngine;
+import net.sharkfw.peer.J2SESharkEngine;
 import net.sharkfw.protocols.Protocols;
 import net.sharkfw.protocols.RequestHandler;
 import net.sharkfw.protocols.Stub;
@@ -20,7 +20,7 @@ import net.sharksystem.api.shark.protocols.wifidirect.WifiDirectAdvertisingManag
 
 import java.io.IOException;
 
-public class AndroidSharkEngine extends J2SEAndroidSharkEngine {
+public class AndroidSharkEngine extends J2SESharkEngine {
 
     private final NearbyPeerManager mPeerManager;
     private Context mContext;

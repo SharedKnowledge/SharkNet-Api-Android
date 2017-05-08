@@ -46,8 +46,15 @@ public class SharkService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         if(--mBoundClients == 0){
-            L.d("Stopping the service.", this);
-            stopSelf();
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(mBoundClients == 0){
+                L.d("Stopping the service.", this);
+                stopSelf();
+            }
         }
         return super.onUnbind(intent);
     }
