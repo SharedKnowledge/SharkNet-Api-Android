@@ -14,6 +14,7 @@ import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
@@ -192,15 +193,6 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
         }
     }
 
-    public void update(List<Message> messages){
-        List<Message> all = getAll();
-        for (Message message : messages) {
-            if(!all.contains(message)){
-                add(message);
-            }
-        }
-    }
-
     @Override
     public void remove(Message object) {
         try {
@@ -233,6 +225,15 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public void update(List<Message> messages) {
+        List<Message> all = getAll();
+        for (Message message : messages) {
+            if (!all.contains(message)) {
+                add(message);
+            }
+        }
     }
 
     private ASIPSpace generateInterest(SemanticTag tag, PeerSemanticTag sender) throws SharkKBException {

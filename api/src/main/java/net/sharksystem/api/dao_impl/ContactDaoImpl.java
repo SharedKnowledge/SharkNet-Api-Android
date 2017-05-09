@@ -14,6 +14,7 @@ import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.utils.SharkNetUtils;
@@ -29,7 +30,7 @@ import java.util.List;
  * Created by j4rvis on 3/22/17.
  */
 
-public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
+public class ContactDaoImpl implements ContactDao {
 
     private final static SemanticTag TYPE = InMemoSharkKB.createInMemoSemanticTag("CONTACT", "si:contact");
     private final static String CONTACT_IMAGE = "CONTACT_IMAGE";
@@ -38,18 +39,12 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
 
     private SharkKB kb;
 
-    public ContactDao(SharkKB sharkKB) {
+    public ContactDaoImpl(SharkKB sharkKB) {
         this.kb = sharkKB;
     }
 
     @Override
     public void add(Contact object) {
-
-        //TODO: to be fixed due to checking cached items
-//        if(get(object.getTag())==null){
-//            return;
-//        }
-
 
         try {
             ASIPSpace asipSpace = this.kb.createASIPSpace(null, TYPE, null, object.getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
@@ -59,12 +54,11 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
             SharkNetUtils.setInfoWithName(this.kb, asipSpace, CONTACT_NAME, object.getName());
             SharkNetUtils.setInfoWithName(this.kb, asipSpace, CONTACT_EMAIL, object.getEmail());
 
-            Bitmap image = object.getImage();
-            if (image != null) {
+            if (object.getImage() != null) {
                 // setImage
                 // Create an inputStream out of the image
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                image.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                object.getImage().compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
                 byte[] byteArray = bos.toByteArray();
                 ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
                 SharkNetUtils.setInfoWithName(this.kb, asipSpace, CONTACT_IMAGE, bs);
@@ -150,12 +144,11 @@ public class ContactDao implements DataAccessObject<Contact, PeerSemanticTag> {
                                 }
                                 break;
                             case CONTACT_IMAGE:
-                                Bitmap image = object.getImage();
-                                if (image != null) {
+                                if (object.getImage() != null) {
                                     // setImage
                                     // Create an inputStream out of the image
                                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                                    image.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                                    object.getImage().compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
                                     byte[] byteArray = bos.toByteArray();
                                     ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
                                     information.setContent(bs, bs.available());

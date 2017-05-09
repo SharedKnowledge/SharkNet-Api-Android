@@ -3,7 +3,7 @@ package net.sharksystem.api.dao;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.system.L;
-import net.sharksystem.api.dao_impl.ContactDao;
+import net.sharksystem.api.dao_impl.ContactDaoImpl;
 import net.sharksystem.api.models.Contact;
 
 import org.junit.Assert;
@@ -34,7 +34,7 @@ public class ContactDaoTest {
 
     PeerSemanticTag charlieTag = InMemoSharkKB.createInMemoPeerSemanticTag(charlieName, charlieSI, charlieMail);
 
-    private ContactDao dao;
+    private ContactDaoImpl dao;
 
     @Before
     public void setUp() throws Exception {
@@ -43,7 +43,7 @@ public class ContactDaoTest {
 
     @Test
     public void addContactTest(){
-        dao = new ContactDao(new InMemoSharkKB());
+        dao = new ContactDaoImpl(new InMemoSharkKB());
         Contact contact = new Contact(aliceTag);
         dao.add(contact);
         Contact savedContact = dao.get(contact.getTag());
@@ -52,7 +52,7 @@ public class ContactDaoTest {
 
     @Test
     public void getContactTest(){
-        dao = new ContactDao(new InMemoSharkKB());
+        dao = new ContactDaoImpl(new InMemoSharkKB());
         Contact contact = new Contact(aliceTag);
         dao.add(contact);
         dao.add(new Contact(bobTag));
@@ -63,7 +63,7 @@ public class ContactDaoTest {
 
     @Test
     public void getAllContactTest(){
-        dao = new ContactDao(new InMemoSharkKB());
+        dao = new ContactDaoImpl(new InMemoSharkKB());
         dao.add(new Contact(aliceTag));
         dao.add(new Contact(bobTag));
         dao.add(new Contact(charlieTag));
@@ -72,7 +72,7 @@ public class ContactDaoTest {
 
     @Test
     public void updateContactTest(){
-        dao = new ContactDao(new InMemoSharkKB());
+        dao = new ContactDaoImpl(new InMemoSharkKB());
         Contact contact = new Contact(aliceTag);
         dao.add(contact);
         contact.setName("Lilly");
@@ -85,7 +85,7 @@ public class ContactDaoTest {
 
     @Test
     public void removeContactTest(){
-        dao = new ContactDao(new InMemoSharkKB());
+        dao = new ContactDaoImpl(new InMemoSharkKB());
         Contact contact = new Contact(aliceTag);
         dao.add(contact);
         dao.add(new Contact(bobTag));

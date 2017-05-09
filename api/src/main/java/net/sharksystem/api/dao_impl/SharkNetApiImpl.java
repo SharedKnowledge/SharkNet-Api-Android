@@ -2,16 +2,13 @@ package net.sharksystem.api.dao_impl;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.engine.ASIPOutMessage;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
-import net.sharkfw.asip.serialization.ASIPKnowledgeConverter;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
@@ -19,11 +16,11 @@ import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
-import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharkfw.security.PkiStorage;
 import net.sharkfw.security.SharkPkiStorage;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkNotSupportedException;
+import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
@@ -61,7 +58,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         mEngine.getSyncManager().addSyncMergeListener(this);
         mContext = context;
         try {
-            mContactDao = new ContactDao(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
+            mContactDao = new CachedContactDaoImpl(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
             mChatDao = new ChatDao(mEngine, mRootKb, mContactDao);
         } catch (SharkKBException e) {
             e.printStackTrace();
@@ -180,7 +177,7 @@ public class SharkNetApiImpl implements SharkNetApi {
             // TODO remove logs
 //            ASIPKnowledgeConverter asipKnowledgeConverter = new ASIPKnowledgeConverter(knowledge);
 //            L.d("Initial length: " + (asipKnowledgeConverter.getContent().length + asipKnowledgeConverter.getSerializedKnowledge().length()), this);
-//            ContactDao contactDao = new ContactDao((SharkKB) knowledge);
+//            ContactDaoImpl contactDao = new ContactDaoImpl((SharkKB) knowledge);
 //            for (SharkCertificate sharkCertificate : sharkCertificatesBySigner) {
 //                contactDao.add(getContact(sharkCertificate.getOwner()));
 //            }

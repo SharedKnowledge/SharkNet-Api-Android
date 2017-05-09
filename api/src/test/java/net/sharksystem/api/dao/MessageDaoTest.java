@@ -3,7 +3,7 @@ package net.sharksystem.api.dao;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.system.L;
-import net.sharksystem.api.dao_impl.ContactDao;
+import net.sharksystem.api.dao_impl.ContactDaoImpl;
 import net.sharksystem.api.dao_impl.MessageDao;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
@@ -36,7 +36,7 @@ public class MessageDaoTest {
 
     PeerSemanticTag charlieTag = InMemoSharkKB.createInMemoPeerSemanticTag(charlieName, charlieSI, charlieMail);
 
-    private ContactDao contactDao;
+    private ContactDaoImpl contactDao;
     private Contact alice;
     private Contact bob;
     private Contact charlie;
@@ -44,7 +44,7 @@ public class MessageDaoTest {
     @Before
     public void setUp() throws Exception {
         L.setLogLevel(L.LOGLEVEL_ALL);
-        contactDao = new ContactDao(new InMemoSharkKB());
+        contactDao = new ContactDaoImpl(new InMemoSharkKB());
         alice = new Contact(aliceTag);
         bob = new Contact(bobTag);
         charlie = new Contact(charlieTag);

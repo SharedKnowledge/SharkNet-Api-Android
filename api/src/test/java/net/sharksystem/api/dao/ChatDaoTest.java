@@ -2,9 +2,10 @@ package net.sharksystem.api.dao;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.peer.J2SESharkEngine;
 import net.sharkfw.system.L;
 import net.sharksystem.api.dao_impl.ChatDao;
-import net.sharksystem.api.dao_impl.ContactDao;
+import net.sharksystem.api.dao_impl.ContactDaoImpl;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
@@ -38,7 +39,7 @@ public class ChatDaoTest {
     String charlieMail = "mail://charlie.com";
 
     PeerSemanticTag charlieTag = InMemoSharkKB.createInMemoPeerSemanticTag(charlieName, charlieSI, charlieMail);
-    private ContactDao contactDao;
+    private ContactDaoImpl contactDao;
     private Contact alice;
     private Contact bob;
     private Contact charlie;
@@ -46,7 +47,7 @@ public class ChatDaoTest {
     @Before
     public void setUp() throws Exception {
         L.setLogLevel(L.LOGLEVEL_ALL);
-        contactDao = new ContactDao(new InMemoSharkKB());
+        contactDao = new ContactDaoImpl(new InMemoSharkKB());
         alice = new Contact(aliceTag);
         bob = new Contact(bobTag);
         charlie = new Contact(charlieTag);
@@ -57,7 +58,7 @@ public class ChatDaoTest {
 
     @Test
     public void addChatTest(){
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat = new Chat(alice, bob);
         chat.setTitle("Chat mit Bob");
         Message message = new Message(alice);
@@ -70,7 +71,7 @@ public class ChatDaoTest {
 
     @Test
     public void getChatTest(){
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);
@@ -104,7 +105,7 @@ public class ChatDaoTest {
 
     @Test
     public void getSizeTest(){
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);
@@ -137,7 +138,7 @@ public class ChatDaoTest {
 
     @Test
     public void getAllChatsTest(){
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);
@@ -173,7 +174,7 @@ public class ChatDaoTest {
 
     @Test
     public void removeChatTest() throws InterruptedException {
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);
@@ -211,7 +212,7 @@ public class ChatDaoTest {
 
     @Test
     public void updateChatTest(){
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat1 = new Chat(alice, bob);
         chat1.setTitle("Chat mit Bob");
         Message message1 = new Message(alice);
@@ -253,7 +254,7 @@ public class ChatDaoTest {
 
     @Test
     public void addChatWithoutTitleAndMessagesTest(){
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat = new Chat(alice, bob);
         dao.add(chat);
         List<Chat> all = dao.getAll();
@@ -265,7 +266,7 @@ public class ChatDaoTest {
 
     @Test
     public void addChatWithoutTitleTest(){
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat = new Chat(alice, bob);
         Message message = new Message(bob);
         message.setContent("Message");
@@ -278,13 +279,14 @@ public class ChatDaoTest {
 
     @Test
     public void addChatWithoutMessageTest(){
-        ChatDao dao = new ChatDao(new InMemoSharkKB(), contactDao);
+        ChatDao dao = new ChatDao(new J2SESharkEngine(), new InMemoSharkKB(), contactDao);
         Chat chat = new Chat(alice, bob);
 //        Message message = new Message(bob);
 //        message.setContent("Message");
 //        chat.addMessage(message);
         chat.setTitle("Title");
         dao.add(chat);
+        if(dao==null) System.out.println("IS NULL!");
         List<Chat> all = dao.getAll();
         Assert.assertEquals(1, all.size());
         Chat savedChat = all.get(0);
