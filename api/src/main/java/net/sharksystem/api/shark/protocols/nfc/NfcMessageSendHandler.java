@@ -1,17 +1,14 @@
 package net.sharksystem.api.shark.protocols.nfc;
 
-import net.sharkfw.system.L;
-import net.sharksystem.api.AndroidUtils;
-
 import java.util.Arrays;
 
 /**
  * Created by mn-io on 25.01.2016.
  */
 public class NfcMessageSendHandler implements OnMessageSend {
+    private final Object lock = new Object();
     byte[] byteBuffer = null;
     private int size;
-    private final Object lock = new Object();
 
     @Override
     public byte[] getNextMessage() {

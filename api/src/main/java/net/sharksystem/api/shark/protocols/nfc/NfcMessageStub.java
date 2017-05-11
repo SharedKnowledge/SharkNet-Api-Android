@@ -35,6 +35,7 @@ public class NfcMessageStub implements MessageStub {
 
     public interface NFCMessageListener{
         void onMessageReceived();
+        void onMessageCompleted();
         void onExchangeFailure(String failure);
     }
 

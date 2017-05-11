@@ -69,6 +69,11 @@ public class NfcMessageReceivedHandler implements OnMessageReceived {
         }
     }
 
+    @Override
+    public void onComplete() {
+        this.nfcMessageListener.onMessageCompleted();
+    }
+
     public void setHandler(RequestHandler handler) {
         this.handler = handler;
     }

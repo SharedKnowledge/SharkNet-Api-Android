@@ -128,11 +128,16 @@ public class NfcPkiPort extends KnowledgePort implements NfcPkiPortEventListener
 
     @Override
     public void onMessageReceived() {
-        this.mPortListener.onMessageReceived();
+        mPortListener.onMessageReceived();
+    }
+
+    @Override
+    public void onMessageCompleted() {
+        mPortListener.onMessageCompleted();
     }
 
     @Override
     public void onExchangeFailure(String reason) {
-        this.mPortListener.onExchangeFailed(reason);
+        mPortListener.onExchangeFailed(reason);
     }
 }

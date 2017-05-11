@@ -16,6 +16,7 @@ import java.util.List;
  */
 public interface NfcPkiPortListener {
     void onMessageReceived();
+    void onMessageCompleted();
     void onExchangeFailed(String reason);
     void onPublicKeyReceived(PeerSemanticTag owner);
     void onCertificatesReceived(List<SharkCertificate> certificates, List<Contact> contacts);

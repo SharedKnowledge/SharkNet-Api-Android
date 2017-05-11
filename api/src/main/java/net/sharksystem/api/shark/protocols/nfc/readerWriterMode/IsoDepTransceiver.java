@@ -65,6 +65,8 @@ public class IsoDepTransceiver implements Runnable {
                 response = isoDep.transceive(nextMessage); // TODO: tag lost if null response = therefore always send data to allow bidirectional...
                 if (!Arrays.equals(SmartCardEmulationService.KEEP_CHANNEL_OPEN_SIGNAL_PASSIVE, response)) {
                     onMessageReceived.onMessage(response);
+                } else {
+                    onMessageReceived.onComplete();
                 }
             }
 

@@ -14,4 +14,6 @@ public interface OnMessageReceived {
     void newTag(Tag tag);
 
     void tagLost();
+
+    void onComplete();
 }

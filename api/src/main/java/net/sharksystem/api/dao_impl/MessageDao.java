@@ -91,6 +91,10 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
                 ASIPSpace asipSpace = next.getASIPSpace();
 
                 Contact contact = mContactDao.get(asipSpace.getSender());
+                if(contact==null){
+                    contact = new Contact(asipSpace.getSender());
+                    mContactDao.add(contact);
+                }
                 Date date = new Date(SharkNetUtils.getInfoAsLong(mSharkKb, asipSpace, MESSAGE_DATE));
                 SemanticTag id = asipSpace.getTopics().stTags().next();
                 Message message = new Message(id, date, contact);
@@ -121,6 +125,10 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
                 ASIPSpace asipSpace = informationSpace.getASIPSpace();
 
                 Contact contact = mContactDao.get(asipSpace.getSender());
+                if(contact==null){
+                     contact = new Contact(asipSpace.getSender());
+                    mContactDao.add(contact);
+                }
                 Date date = new Date(SharkNetUtils.getInfoAsLong(mSharkKb, asipSpace, MESSAGE_DATE));
                 Message message = new Message(id, date, contact);
                 message.setContent(SharkNetUtils.getInfoAsString(mSharkKb, asipSpace, MESSAGE_CONTENT));

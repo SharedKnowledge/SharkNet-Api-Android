@@ -60,6 +60,8 @@ public class SmartCardEmulationService extends HostApduService {
 
         if (sink != null && !Arrays.equals(IsoDepTransceiver.KEEP_CHANNEL_OPEN_SIGNAL_ACTIVE, data)) {
             sink.onMessage(data);
+        } else if (Arrays.equals(IsoDepTransceiver.KEEP_CHANNEL_OPEN_SIGNAL_ACTIVE, data)){
+            sink.onComplete();
         }
 
         byte[] nextMessage = src.getNextMessage();
