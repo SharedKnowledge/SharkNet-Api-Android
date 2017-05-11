@@ -237,6 +237,8 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                         ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
                         SharkNetUtils.setInfoWithName(kb, asipSpace, CHAT_IMAGE, bs);
                     }
+
+                    mEngine.getSyncManager().doInviteOrSync(component);
                 } catch (SharkKBException | IOException e) {
                     e.printStackTrace();
                 }
