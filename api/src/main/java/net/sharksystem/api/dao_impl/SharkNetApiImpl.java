@@ -46,14 +46,13 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class SharkNetApiImpl implements SharkNetApi {
 
     private final Context mContext;
-    private SettingsDao mSettingsDao;
-    private ChatDao mChatDao;
-    private ContactDao mContactDao;
     private SharkKB mRootKb = new InMemoSharkKB();
     private AndroidSharkEngine mEngine;
+    private ChatDao mChatDao;
+    private ContactDao mContactDao;
+    private SettingsDao mSettingsDao;
     private Contact mAccount;
     private boolean mIsDiscovering = false;
-
 
     public SharkNetApiImpl(Context context) {
         mEngine = new AndroidSharkEngine(context);
@@ -65,6 +64,9 @@ public class SharkNetApiImpl implements SharkNetApi {
             mSettingsDao = new SettingsDao(mRootKb);
         } catch (SharkKBException e) {
             e.printStackTrace();
+        }
+        if(getSettings().getAccountTag()!=null){
+            mAccount = mContactDao.get(getSettings().getAccountTag());
         }
     }
 
@@ -79,9 +81,24 @@ public class SharkNetApiImpl implements SharkNetApi {
     }
 
     public void setAccount(Contact contact) {
-        mContactDao.add(contact);
+        if(mAccount==null){
+            mContactDao.add(contact);
+            mEngine.setEngineOwnerPeer(mAccount.getTag());
+        } else {
+            mContactDao.update(contact);
+        }
         mAccount = contact;
-        mEngine.setEngineOwnerPeer(mAccount.getTag());
+        // Update Account in Settings
+        Settings settings = getSettings();
+        settings.setAccountTag(contact.getTag());
+        setSettings(settings);
+
+        mEngine.setBasicMailConfiguration(
+                settings.getMailSmtpServer(),
+                settings.getMailUsername(),
+                settings.getMailPassword(),
+                settings.getMailPopServer(),
+                settings.getMailAddress());
     }
 
     @Override
