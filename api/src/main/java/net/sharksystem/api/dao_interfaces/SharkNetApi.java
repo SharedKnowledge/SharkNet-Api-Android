@@ -9,6 +9,7 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
 import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
@@ -26,6 +27,10 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
     Contact getAccount();
 
     void setAccount(Contact contact);
+
+    void setSettings(Settings settings);
+
+    Settings getSettings();
 
     List<Chat> getChats();
 

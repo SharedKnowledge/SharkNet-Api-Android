@@ -6,6 +6,12 @@ package net.sharksystem.api.models;
 
 public class Settings {
 
+    public final static String MAIL_ADDRESS_LABEL = "MAIL_ADDRESS";
+    public final static String MAIL_PASSWORD_LABEL = "MAIL_PASSWORD";
+    public final static String MAIL_USERNAME_LABEL = "MAIL_USERNAME";
+    public final static String MAIL_POP_SERVER_LABEL = "MAIL_POP_SERVER";
+    public final static String MAIL_SMTP_SERVER_LABEL = "MAIL_SMTP_SERVER";
+
     private String mMailAddress;
     private String mMailPassword;
     private String mMailUsername;

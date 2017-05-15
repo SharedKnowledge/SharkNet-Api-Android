@@ -12,6 +12,7 @@ import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
 import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
@@ -59,6 +60,16 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     public void setAccount(Contact contact) {
         mApi.setAccount(contact);
         mAccountChanged = true;
+    }
+
+    @Override
+    public void setSettings(Settings settings) {
+        mApi.setSettings(settings);
+    }
+
+    @Override
+    public Settings getSettings() {
+        return mApi.getSettings();
     }
 
     private void refreshChats(){

@@ -24,6 +24,7 @@ import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
 import net.sharksystem.api.shark.ports.NfcPkiPort;
@@ -45,6 +46,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class SharkNetApiImpl implements SharkNetApi {
 
     private final Context mContext;
+    private SettingsDao mSettingsDao;
     private ChatDao mChatDao;
     private ContactDao mContactDao;
     private SharkKB mRootKb = new InMemoSharkKB();
@@ -60,6 +62,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         try {
             mContactDao = new CachedContactDaoImpl(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
             mChatDao = new ChatDao(mEngine, mRootKb, mContactDao);
+            mSettingsDao = new SettingsDao(mRootKb);
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
@@ -79,6 +82,16 @@ public class SharkNetApiImpl implements SharkNetApi {
         mContactDao.add(contact);
         mAccount = contact;
         mEngine.setEngineOwnerPeer(mAccount.getTag());
+    }
+
+    @Override
+    public void setSettings(Settings settings) {
+        mSettingsDao.setSettings(settings);
+    }
+
+    @Override
+    public Settings getSettings() {
+        return mSettingsDao.getSettings();
     }
 
     // DAO Methods
