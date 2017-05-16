@@ -24,6 +24,7 @@ import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.models.Message;
 import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
@@ -291,18 +292,25 @@ public class SharkNetApiImpl implements SharkNetApi {
     public void onNewMerge(SyncComponent component, SharkKB changes) {
         changesHaveContacts(changes);
 
+        MessageDao messageDao = new MessageDao(changes, mContactDao);
+        List<Message> all = messageDao.getAll();
         int numberOfMessages = 0;
-        try {
-            Iterator<ASIPInformationSpace> iterator = changes.getAllInformationSpaces();
-            while (iterator.hasNext()) {
-                ASIPInformationSpace next = iterator.next();
-                if (SharkCSAlgebra.isIn(next.getASIPSpace().getTypes(), MessageDao.MESSAGE_TYPE)) {
-                    numberOfMessages++;
-                }
-            }
-        } catch (SharkKBException e) {
-            e.printStackTrace();
+        if(all!=null || !all.isEmpty()) {
+            L.d("We have " + all.size() + " new Messages", this);
+            numberOfMessages = all.size();
         }
+
+//        try {
+//            Iterator<ASIPInformationSpace> iterator = changes.getAllInformationSpaces();
+//            while (iterator.hasNext()) {
+//                ASIPInformationSpace next = iterator.next();
+//                if (SharkCSAlgebra.isIn(next.getASIPSpace().getTypes(), MessageDao.MESSAGE_TYPE)) {
+//                    numberOfMessages++;
+//                }
+//            }
+//        } catch (SharkKBException e) {
+//            e.printStackTrace();
+//        }
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
                 .setSmallIcon(android.R.drawable.ic_menu_compass);
@@ -310,7 +318,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         Chat chat = getChat(component.getUniqueName());
         if(chat != null){
             String chatTitle = "";
-            if (chat.getTitle() != null) {
+            if (chat.getTitle() == null) {
                 List<Contact> contacts = chat.getContacts();
                 contacts.remove(mAccount);
                 if (contacts.size() == 1) chatTitle = "mit " + contacts.get(0).getName();
@@ -335,6 +343,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         if(all == null || all.isEmpty()) return;
 
         for (Contact contact : all){
+            L.d("New contact: " + contact.getName(), this);
             updateContact(contact);
         }
     }

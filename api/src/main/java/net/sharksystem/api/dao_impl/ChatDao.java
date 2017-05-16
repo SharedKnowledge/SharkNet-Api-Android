@@ -95,7 +95,6 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 messageDao.add(message);
             }
 
-
             PeerSemanticTag owner = object.getOwner().getTag();
             contactDao.add(object.getOwner());
             // Anzahl contacts + title + date
@@ -210,9 +209,6 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 messageDao.update(object.getMessages());
 
                 ContactDaoImpl contactDao = new ContactDaoImpl(kb);
-                for (Contact contact: object.getContacts()){
-                    contactDao.update(contact);
-                }
 
                 try {
                     kb.removeInformationSpace(generateInterest(null));
@@ -220,6 +216,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                     PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
                     for (Contact contact : object.getContacts()) {
                         contactSet.merge(contact.getTag());
+                        contactDao.update(contact);
                     }
 
                     component.getMembers().merge(contactSet);
