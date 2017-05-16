@@ -83,15 +83,17 @@ public class SharkNetApiImpl implements SharkNetApi {
     public void setAccount(Contact contact) {
         if(mAccount==null){
             mContactDao.add(contact);
-            mEngine.setEngineOwnerPeer(mAccount.getTag());
+            mEngine.setEngineOwnerPeer(contact.getTag());
         } else {
             mContactDao.update(contact);
         }
+
         mAccount = contact;
         // Update Account in Settings
         Settings settings = getSettings();
         settings.setAccountTag(contact.getTag());
         setSettings(settings);
+
 
         mEngine.setBasicMailConfiguration(
                 settings.getMailSmtpServer(),
@@ -162,14 +164,24 @@ public class SharkNetApiImpl implements SharkNetApi {
     }
 
     @Override
-    public void pingMailServer(SemanticTag type, PeerSemanticTag receiver) {
+    public void pingMailServer(final SemanticTag type, final PeerSemanticTag receiver) {
         try {
             mEngine.startMail();
-            ASIPOutMessage message = mEngine.createASIPOutMessage(receiver.getAddresses(), mEngine.getOwner(), receiver, null, null, null, type, 1);
-            message.expose(InMemoSharkKB.createInMemoASIPInterest());
-        } catch (SharkKBException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ASIPOutMessage message = mEngine.createASIPOutMessage(receiver.getAddresses(), mEngine.getOwner(), receiver, null, null, null, type, 1);
+                try {
+                    message.expose(InMemoSharkKB.createInMemoASIPInterest());
+                } catch (SharkKBException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
     }
 
     // Shark methods

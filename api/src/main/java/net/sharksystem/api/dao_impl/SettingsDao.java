@@ -10,7 +10,6 @@ import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.utils.SharkNetUtils;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by j4rvis on 5/15/17.
@@ -35,25 +34,8 @@ public class SettingsDao {
         }
     }
 
-    public void setSettings(Settings settings){
-        try {
-            SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_ADDRESS_LABEL, settings.getMailAddress());
-            SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_USERNAME_LABEL, settings.getMailUsername());
-            SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_PASSWORD_LABEL, settings.getMailPassword());
-            SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_POP_SERVER_LABEL, settings.getMailPopServer());
-            SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_SMTP_SERVER_LABEL, settings.getMailSmtpServer());
-            String serializedTag = ASIPMessageSerializerHelper.serializeTag(settings.getAccountTag()).toString();
-            SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.ACCOUNT_TAG, serializedTag);
-            mHasChanged = true;
-        } catch (SharkKBException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Settings getSettings(){
-        if(mHasChanged){
+    public Settings getSettings() {
+        if (mHasChanged || mCachedSettings == null) {
             Settings settings = new Settings();
             try {
                 settings.setMailAddress(SharkNetUtils.getInfoAsString(mSharkKB, mAsipSpace, Settings.MAIL_ADDRESS_LABEL));
@@ -70,5 +52,29 @@ public class SettingsDao {
             mHasChanged = false;
         }
         return mCachedSettings;
+    }
+
+    public void setSettings(Settings settings) {
+        try {
+            if(settings.getMailAddress() != null)
+                SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_ADDRESS_LABEL, settings.getMailAddress());
+            if(settings.getMailUsername() != null)
+                SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_USERNAME_LABEL, settings.getMailUsername());
+            if(settings.getMailPassword() != null)
+                SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_PASSWORD_LABEL, settings.getMailPassword());
+            if(settings.getMailPopServer() != null)
+                SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_POP_SERVER_LABEL, settings.getMailPopServer());
+            if(settings.getMailSmtpServer() != null)
+                SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.MAIL_SMTP_SERVER_LABEL, settings.getMailSmtpServer());
+            if(settings.getAccountTag() != null){
+                String serializedTag = ASIPMessageSerializerHelper.serializeTag(settings.getAccountTag()).toString();
+                SharkNetUtils.setInfoWithName(mSharkKB, mAsipSpace, Settings.ACCOUNT_TAG, serializedTag);
+            }
+            mHasChanged = true;
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
