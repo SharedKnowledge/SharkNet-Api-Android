@@ -245,7 +245,8 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                         SharkNetUtils.setInfoWithName(kb, asipSpace, CHAT_IMAGE, bs);
                     }
 
-                    mEngine.getSyncManager().doInviteOrSync(component);
+                    // TODO Causes Concurrent Thread Problem because of multiple BTConnections.
+//                    mEngine.getSyncManager().doInviteOrSync(component);
                 } catch (SharkKBException | IOException e) {
                     e.printStackTrace();
                 }
