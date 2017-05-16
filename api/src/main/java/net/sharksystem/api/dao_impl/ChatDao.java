@@ -61,8 +61,10 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
             // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
             PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
+            ContactDaoImpl contactDao = new ContactDaoImpl(sharkKB);
             for (Contact contact : object.getContacts()) {
                 contactSet.merge(contact.getTag());
+                contactDao.add(contact);
             }
             // Nun müssen wir alle Daten in die kb schreiben! Womöglich bevor die SyncComponent erzeugt wird
             STSet inMemoSTSet = InMemoSharkKB.createInMemoSTSet();
@@ -93,9 +95,9 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 messageDao.add(message);
             }
 
-            // wir benötigen noch den owner des chats
+
             PeerSemanticTag owner = object.getOwner().getTag();
-            // Und nun noch eine möglichst einzigartige ID!!
+            contactDao.add(object.getOwner());
             // Anzahl contacts + title + date
             mEngine.getSyncManager().createSyncComponent(sharkKB, object.getId(), contactSet, owner, true);
         } catch (SharkKBException | IOException e) {
@@ -206,6 +208,11 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 SyncKB kb = component.getKb();
                 MessageDao messageDao = new MessageDao(kb, mContactDao);
                 messageDao.update(object.getMessages());
+
+                ContactDaoImpl contactDao = new ContactDaoImpl(kb);
+                for (Contact contact: object.getContacts()){
+                    contactDao.update(contact);
+                }
 
                 try {
                     kb.removeInformationSpace(generateInterest(null));

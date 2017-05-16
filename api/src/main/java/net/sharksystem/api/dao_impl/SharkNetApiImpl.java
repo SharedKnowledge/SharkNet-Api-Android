@@ -94,13 +94,25 @@ public class SharkNetApiImpl implements SharkNetApi {
         settings.setAccountTag(contact.getTag());
         setSettings(settings);
 
+        if(settings.getMailSmtpServer() != null && !settings.getMailSmtpServer().isEmpty()
+                || settings.getMailUsername() != null && !settings.getMailUsername().isEmpty()
+                || settings.getMailPassword() != null && !settings.getMailPassword().isEmpty()
+                || settings.getMailPopServer() != null && !settings.getMailPopServer().isEmpty()
+                || settings.getMailAddress() != null && !settings.getMailAddress().isEmpty()){
 
-        mEngine.setBasicMailConfiguration(
-                settings.getMailSmtpServer(),
-                settings.getMailUsername(),
-                settings.getMailPassword(),
-                settings.getMailPopServer(),
-                settings.getMailAddress());
+            // TODO
+            mEngine.setBasicMailConfiguration(
+                    settings.getMailSmtpServer(),
+                    settings.getMailUsername(),
+                    settings.getMailPassword(),
+                    settings.getMailPopServer(),
+                    settings.getMailAddress());
+            try {
+                mEngine.startMail();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -277,6 +289,8 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     @Override
     public void onNewMerge(SyncComponent component, SharkKB changes) {
+        changesHaveContacts(changes);
+
         int numberOfMessages = 0;
         try {
             Iterator<ASIPInformationSpace> iterator = changes.getAllInformationSpaces();
@@ -313,5 +327,15 @@ public class SharkNetApiImpl implements SharkNetApi {
         NotificationManager mNotifyMgr = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and   issues it.
         mNotifyMgr.notify(001, mBuilder.build());
+    }
+
+    private void changesHaveContacts(SharkKB changes){
+        ContactDaoImpl contactDao = new ContactDaoImpl(changes);
+        List<Contact> all = contactDao.getAll();
+        if(all == null || all.isEmpty()) return;
+
+        for (Contact contact : all){
+            updateContact(contact);
+        }
     }
 }
