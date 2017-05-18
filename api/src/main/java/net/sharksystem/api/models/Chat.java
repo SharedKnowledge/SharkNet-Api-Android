@@ -4,8 +4,10 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkAlgebra;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.system.L;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -163,5 +165,10 @@ public class Chat implements Comparable<Chat> {
     @Override
     public int compareTo(@NonNull Chat o) {
         return Collections.max(getMessages()).compareTo(Collections.max(o.getMessages()));
+    }
+
+    @Override
+    public String toString() {
+        return "Chat{" + "\nid=" + id.getName() + ", \nmessages=" + messages.size() + ", \ncontacts=" + contacts + ", \nowner=" + owner + ", \ntitle='" + title + '\'' + ", \nimage=" + (image!=null) + '}';
     }
 }

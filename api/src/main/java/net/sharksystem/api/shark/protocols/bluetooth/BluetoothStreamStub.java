@@ -136,17 +136,19 @@ public class BluetoothStreamStub implements StreamStub {
     public void streamClosed(BluetoothConnection bluetoothConnection) {
         // Check if bluetoothConnection is identical
         mBluetoothConnection = null;
-        Thread thread = mWaitThreads.remove(0);
-        if(thread!=null){
-            thread.interrupt();
-        }
-        try {
-            Thread.sleep(10);
-            for (Thread waitThread : mWaitThreads) {
-                waitThread.interrupt();
+        if(!mWaitThreads.isEmpty()){
+            Thread thread = mWaitThreads.remove(0);
+            if(thread!=null){
+                thread.interrupt();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            try {
+                Thread.sleep(10);
+                for (Thread waitThread : mWaitThreads) {
+                    waitThread.interrupt();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

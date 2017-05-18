@@ -102,9 +102,10 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
+        this.notifyClose();
     }
 
     public void notifyClose(){
-        this.mStreamStub.streamClosed(this);
+        if(this.mStreamStub != null) this.mStreamStub.streamClosed(this);
     }
 }

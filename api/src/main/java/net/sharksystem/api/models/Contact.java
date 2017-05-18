@@ -71,23 +71,28 @@ public class Contact implements Comparable<Contact>{
 
         Contact contact = (Contact) o;
 
-        if (!SharkCSAlgebra.identical(getTag(), contact.getTag())) return false;
-        if (!getName().equals(contact.getName())) return false;
-        return getEmail().equals(contact.getEmail());
+//        if (!)) return false;
+//        if (!getName().equals(contact.getName())) return false;
+        return SharkCSAlgebra.identical(getTag(), contact.getTag());
     }
 
 
 
     @Override
     public int hashCode() {
-        int result = getTag().hashCode();
-        result = 31 * result + getName().hashCode();
-        result = 31 * result + getEmail().hashCode();
-        return result;
+//        int result = getTag().hashCode();
+//        result = 31 * result + getName().hashCode();
+//        result = 31 * result + getEmail().hashCode();
+        return 31 * getTag().getSI()[0].hashCode();
     }
 
     @Override
     public int compareTo(@NonNull Contact o) {
         return getName().compareTo(o.getName());
+    }
+
+    @Override
+    public String toString() {
+        return "Contact{" + "\ntag=" + tag.getName() + ", \nname='" + name + '\'' + ", \nemail='" + email + '\'' + ", \nimage=" + (image!=null) + '}';
     }
 }
