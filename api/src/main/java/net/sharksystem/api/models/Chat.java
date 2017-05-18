@@ -119,7 +119,6 @@ public class Chat implements Comparable<Chat> {
         if (getTitle() != null ? !getTitle().equals(chat.getTitle()) : chat.getTitle() != null)
             return false;
         return getImage() != null ? getImage().equals(chat.getImage()) : chat.getImage() == null;
-
     }
 
     @Override

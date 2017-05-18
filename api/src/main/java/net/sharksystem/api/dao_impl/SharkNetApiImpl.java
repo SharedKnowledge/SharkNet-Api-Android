@@ -5,13 +5,11 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 
-import net.sharkfw.asip.ASIPInformationSpace;
 import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.engine.ASIPOutMessage;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
-import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
@@ -35,7 +33,6 @@ import net.sharksystem.api.shark.ports.NfcPkiPortListener;
 import java.io.IOException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.util.Iterator;
 import java.util.List;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
@@ -290,7 +287,7 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     @Override
     public void onNewMerge(SyncComponent component, SharkKB changes) {
-        changesHaveContacts(changes);
+        changesIncludeContacts(changes);
 
         MessageDao messageDao = new MessageDao(changes, mContactDao);
         List<Message> all = messageDao.getAll();
@@ -337,14 +334,18 @@ public class SharkNetApiImpl implements SharkNetApi {
         mNotifyMgr.notify(001, mBuilder.build());
     }
 
-    private void changesHaveContacts(SharkKB changes){
+    private void changesIncludeContacts(SharkKB changes){
         ContactDaoImpl contactDao = new ContactDaoImpl(changes);
         List<Contact> all = contactDao.getAll();
         if(all == null || all.isEmpty()) return;
-
         for (Contact contact : all){
-            L.d("New contact: " + contact.getName(), this);
-            updateContact(contact);
+            if(!contact.equals(mAccount)){
+                updateContact(contact);
+                L.d("New contact: " + contact.getName(), this);
+                if(contact.getImage()!=null){
+                    L.d("Image size: " + contact.getImage().getByteCount(), this);
+                }
+            }
         }
     }
 }

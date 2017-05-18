@@ -16,6 +16,8 @@ import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,6 +34,10 @@ public class BluetoothStreamStub implements StreamStub {
 
     private RequestHandler mRequestHandler;
     private BluetoothServer mBluetoothServer;
+    private BluetoothConnection mBluetoothConnection;
+    private List<Thread> mWaitThreads = new ArrayList<>();
+    private long mLastCall;
+
 
     public BluetoothStreamStub(AndroidSharkEngine engine, RequestHandler requestHandler) {
         mEngine = engine;
@@ -53,7 +59,32 @@ public class BluetoothStreamStub implements StreamStub {
 
         L.d("trying to create an outgoing connection!", this);
 
-        return new BluetoothConnection(remoteDevice, this.getLocalAddress());
+        if(mBluetoothConnection==null){
+            mBluetoothConnection = new BluetoothConnection(this, remoteDevice, this.getLocalAddress());
+        } else {
+            Thread waitThreadTemp = Thread.currentThread();
+            mWaitThreads.add(waitThreadTemp);
+            try {
+                waitThreadTemp.wait(60*60*1000);
+                this.killConnection();
+                return this.createStreamConnection(addressString);
+            } catch (InterruptedException e) {
+                return this.createStreamConnection(addressString);
+            }
+        }
+
+        return mBluetoothConnection;
+    }
+
+    private synchronized void killConnection() {
+        long now = System.currentTimeMillis();
+
+        if(mLastCall == 0 || now - mLastCall >= 60*60*1000){
+            // Do not notify the streamStub.streamClosed method
+            mBluetoothConnection.close(false);
+            mBluetoothConnection = null;
+            mLastCall = now;
+        }
     }
 
     @Override
@@ -100,5 +131,22 @@ public class BluetoothStreamStub implements StreamStub {
     @Override
     public void offer(ASIPKnowledge knowledge) throws SharkNotSupportedException {
 
+    }
+
+    public void streamClosed(BluetoothConnection bluetoothConnection) {
+        // Check if bluetoothConnection is identical
+        mBluetoothConnection = null;
+        Thread thread = mWaitThreads.remove(0);
+        if(thread!=null){
+            thread.interrupt();
+        }
+        try {
+            Thread.sleep(10);
+            for (Thread waitThread : mWaitThreads) {
+                waitThread.interrupt();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

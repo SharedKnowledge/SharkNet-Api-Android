@@ -22,9 +22,11 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
     private String mLocalAddress;
     private String mRemoteAddress;
     private BluetoothSocket mSocket;
+    private BluetoothStreamStub mStreamStub;
 
-    public BluetoothConnection(BluetoothDevice device, String localAddress) throws IOException {
+    public BluetoothConnection(BluetoothStreamStub stub, BluetoothDevice device, String localAddress) throws IOException {
         try {
+            mStreamStub = stub;
             mSocket = device.createInsecureRfcommSocketToServiceRecord(BluetoothStreamStub.BT_UUID);
             mSocket.connect();
             mInputStream = mSocket.getInputStream();
@@ -82,13 +84,27 @@ public class BluetoothConnection extends ConnectionListenerManager implements St
         mLocalAddress = localAddress;
     }
 
-    @Override
-    public void close() {
+    public void close(boolean notify) {
         L.d("Closing Bluetooth-Connection from: " + this.getReplyAddressString() + " to: " + this.getReceiverAddressString(), this);
         try {
             mSocket.close();
+            if(notify) notifyClose();
         } catch (IOException e) {
             L.e("Socket can not be closed. Reason: " + e.getMessage(), this);
         }
+    }
+
+    @Override
+    public void close() {
+        this.close(true);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+    }
+
+    public void notifyClose(){
+        this.mStreamStub.streamClosed(this);
     }
 }

@@ -95,6 +95,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 messageDao.add(message);
             }
 
+
             PeerSemanticTag owner = object.getOwner().getTag();
             contactDao.add(object.getOwner());
             // Anzahl contacts + title + date

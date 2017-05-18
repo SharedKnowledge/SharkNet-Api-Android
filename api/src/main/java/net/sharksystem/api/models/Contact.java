@@ -74,8 +74,9 @@ public class Contact implements Comparable<Contact>{
         if (!SharkCSAlgebra.identical(getTag(), contact.getTag())) return false;
         if (!getName().equals(contact.getName())) return false;
         return getEmail().equals(contact.getEmail());
-
     }
+
+
 
     @Override
     public int hashCode() {
