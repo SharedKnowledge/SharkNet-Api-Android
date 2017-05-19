@@ -2,7 +2,9 @@ package net.sharksystem.api.dao_impl;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import net.sharkfw.asip.ASIPKnowledge;
@@ -24,6 +26,7 @@ import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
 import net.sharksystem.api.models.Settings;
+import net.sharksystem.api.service.SharkService;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
 import net.sharksystem.api.shark.ports.NfcPkiPort;
@@ -51,6 +54,7 @@ public class SharkNetApiImpl implements SharkNetApi {
     private SettingsDao mSettingsDao;
     private Contact mAccount;
     private boolean mIsDiscovering = false;
+    private Intent mIntent;
 
     public SharkNetApiImpl(Context context) {
         mEngine = new AndroidSharkEngine(context);
@@ -63,7 +67,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
-        if(getSettings().getAccountTag()!=null){
+        if (getSettings().getAccountTag() != null) {
             mAccount = mContactDao.get(getSettings().getAccountTag());
         }
     }
@@ -79,7 +83,7 @@ public class SharkNetApiImpl implements SharkNetApi {
     }
 
     public void setAccount(Contact contact) {
-        if(mAccount==null){
+        if (mAccount == null) {
             mContactDao.add(contact);
             mEngine.setEngineOwnerPeer(contact.getTag());
         } else {
@@ -92,19 +96,10 @@ public class SharkNetApiImpl implements SharkNetApi {
         settings.setAccountTag(contact.getTag());
         setSettings(settings);
 
-        if(settings.getMailSmtpServer() != null && !settings.getMailSmtpServer().isEmpty()
-                || settings.getMailUsername() != null && !settings.getMailUsername().isEmpty()
-                || settings.getMailPassword() != null && !settings.getMailPassword().isEmpty()
-                || settings.getMailPopServer() != null && !settings.getMailPopServer().isEmpty()
-                || settings.getMailAddress() != null && !settings.getMailAddress().isEmpty()){
+        if (settings.getMailSmtpServer() != null && !settings.getMailSmtpServer().isEmpty() || settings.getMailUsername() != null && !settings.getMailUsername().isEmpty() || settings.getMailPassword() != null && !settings.getMailPassword().isEmpty() || settings.getMailPopServer() != null && !settings.getMailPopServer().isEmpty() || settings.getMailAddress() != null && !settings.getMailAddress().isEmpty()) {
 
             // TODO
-            mEngine.setBasicMailConfiguration(
-                    settings.getMailSmtpServer(),
-                    settings.getMailUsername(),
-                    settings.getMailPassword(),
-                    settings.getMailPopServer(),
-                    settings.getMailAddress());
+            mEngine.setBasicMailConfiguration(settings.getMailSmtpServer(), settings.getMailUsername(), settings.getMailPassword(), settings.getMailPopServer(), settings.getMailAddress());
             try {
                 mEngine.startMail();
             } catch (IOException e) {
@@ -114,11 +109,66 @@ public class SharkNetApiImpl implements SharkNetApi {
     }
 
     @Override
+    public void setNotificationResultActivity(Intent intent){
+        mIntent = intent;
+    }
+
+    @Override
+    public void onNewMerge(SyncComponent component, SharkKB changes) {
+        changesIncludeContacts(changes);
+
+        MessageDao messageDao = new MessageDao(changes, mContactDao);
+        List<Message> all = messageDao.getAll();
+        int numberOfMessages = 0;
+        if (all != null || !all.isEmpty()) {
+            L.d("We have " + all.size() + " new Messages", this);
+            numberOfMessages = all.size();
+        }
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext).setSmallIcon(android.R.drawable.ic_menu_compass);
+
+        Chat chat = getChat(component.getUniqueName());
+        if (chat != null) {
+            String chatTitle = "";
+            if (chat.getTitle() == null) {
+                List<Contact> contacts = chat.getContacts();
+                contacts.remove(mAccount);
+                if (contacts.size() == 1) chatTitle = "mit " + contacts.get(0).getName();
+            } else {
+                chatTitle = chat.getTitle();
+            }
+            mBuilder.setContentTitle("Neue Nachrichten");
+            mBuilder.setContentText("Der Chat " + chatTitle + " hat neue Nachrichten");
+        } else {
+            mBuilder.setContentTitle("Neuer Chat").setContentText(" Du hast einen neuen Chat.");
+        }
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(mContext, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+        mBuilder.setAutoCancel(true);
+        NotificationManager mNotifyMgr = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
+        // Builds the notification and   issues it.
+        mNotifyMgr.notify(001, mBuilder.build());
+    }    @Override
     public void setSettings(Settings settings) {
         mSettingsDao.setSettings(settings);
     }
 
-    @Override
+    private void changesIncludeContacts(SharkKB changes) {
+        ContactDaoImpl contactDao = new ContactDaoImpl(changes);
+        List<Contact> all = contactDao.getAll();
+        if (all == null || all.isEmpty()) return;
+        for (Contact contact : all) {
+            if (!contact.equals(mAccount)) {
+                updateContact(contact);
+                L.d("New contact: " + contact.getName(), this);
+                if (contact.getImage() != null) {
+                    L.d("Image size: " + contact.getImage().getByteCount(), this);
+                }
+            }
+        }
+    }    @Override
     public Settings getSettings() {
         return mSettingsDao.getSettings();
     }
@@ -285,67 +335,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         }
     }
 
-    @Override
-    public void onNewMerge(SyncComponent component, SharkKB changes) {
-        changesIncludeContacts(changes);
 
-        MessageDao messageDao = new MessageDao(changes, mContactDao);
-        List<Message> all = messageDao.getAll();
-        int numberOfMessages = 0;
-        if(all!=null || !all.isEmpty()) {
-            L.d("We have " + all.size() + " new Messages", this);
-            numberOfMessages = all.size();
-        }
 
-//        try {
-//            Iterator<ASIPInformationSpace> iterator = changes.getAllInformationSpaces();
-//            while (iterator.hasNext()) {
-//                ASIPInformationSpace next = iterator.next();
-//                if (SharkCSAlgebra.isIn(next.getASIPSpace().getTypes(), MessageDao.MESSAGE_TYPE)) {
-//                    numberOfMessages++;
-//                }
-//            }
-//        } catch (SharkKBException e) {
-//            e.printStackTrace();
-//        }
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
-                .setSmallIcon(android.R.drawable.ic_menu_compass);
-
-        Chat chat = getChat(component.getUniqueName());
-        if(chat != null){
-            String chatTitle = "";
-            if (chat.getTitle() == null) {
-                List<Contact> contacts = chat.getContacts();
-                contacts.remove(mAccount);
-                if (contacts.size() == 1) chatTitle = "mit " + contacts.get(0).getName();
-            } else {
-                chatTitle = chat.getTitle();
-            }
-            String messageHeader = (numberOfMessages > 1 ? "Nachrichten" : "Nachricht");
-            mBuilder.setContentTitle("Neue " + messageHeader);
-            mBuilder.setContentText("Du hast " + numberOfMessages + " neue " + messageHeader + " in dem Chat " + chatTitle);
-        } else {
-            mBuilder.setContentTitle("Neuer Chat").setContentText(" Du hast einen neuen Chat.");
-        }
-
-        NotificationManager mNotifyMgr = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
-        // Builds the notification and   issues it.
-        mNotifyMgr.notify(001, mBuilder.build());
-    }
-
-    private void changesIncludeContacts(SharkKB changes){
-        ContactDaoImpl contactDao = new ContactDaoImpl(changes);
-        List<Contact> all = contactDao.getAll();
-        if(all == null || all.isEmpty()) return;
-        for (Contact contact : all){
-            if(!contact.equals(mAccount)){
-                updateContact(contact);
-                L.d("New contact: " + contact.getName(), this);
-                if(contact.getImage()!=null){
-                    L.d("Image size: " + contact.getImage().getByteCount(), this);
-                }
-            }
-        }
-    }
 }

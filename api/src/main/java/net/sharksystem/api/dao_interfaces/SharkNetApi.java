@@ -2,6 +2,7 @@ package net.sharksystem.api.dao_interfaces;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 
 import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
@@ -74,4 +75,5 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
 
     void initPki();
 
+    void setNotificationResultActivity(Intent intent);
 }

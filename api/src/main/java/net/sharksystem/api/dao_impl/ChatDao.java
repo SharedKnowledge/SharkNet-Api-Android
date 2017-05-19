@@ -61,10 +61,10 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
             // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
             PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
-            ContactDaoImpl contactDao = new ContactDaoImpl(sharkKB);
+//            ContactDaoImpl contactDao = new ContactDaoImpl(sharkKB);
             for (Contact contact : object.getContacts()) {
                 contactSet.merge(contact.getTag());
-                contactDao.add(contact);
+//                contactDao.add(contact);
             }
             // Nun müssen wir alle Daten in die kb schreiben! Womöglich bevor die SyncComponent erzeugt wird
             STSet inMemoSTSet = InMemoSharkKB.createInMemoSTSet();
@@ -97,7 +97,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
 
             PeerSemanticTag owner = object.getOwner().getTag();
-            contactDao.add(object.getOwner());
+//            contactDao.add(object.getOwner());
             // Anzahl contacts + title + date
             mEngine.getSyncManager().createSyncComponent(sharkKB, object.getId(), contactSet, owner, true);
         } catch (SharkKBException | IOException e) {
@@ -119,7 +119,6 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                     if (!asipSpace.getTopics().stTags().hasNext()) continue;
                     SemanticTag chatId = asipSpace.getTopics().stTags().next();
 
-                    PeerSemanticTag senderTag = asipSpace.getSender();
                     PeerSTSet receivers = asipSpace.getReceivers();
 
                     List<Contact> contacts = new ArrayList<>();
@@ -127,7 +126,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
                     List<Contact> allContacts = mContactDao.getAll();
                     for (Contact contact : allContacts) {
-                        if (SharkCSAlgebra.identical(contact.getTag(), senderTag)) {
+                        if (SharkCSAlgebra.identical(contact.getTag(), component.getOwner())) {
                             owner = contact;
                         } else if (SharkCSAlgebra.isIn(receivers, contact.getTag())) {
                             contacts.add(contact);
@@ -208,7 +207,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             MessageDao messageDao = new MessageDao(kb, mContactDao);
             messageDao.update(object.getMessages());
 
-            ContactDaoImpl contactDao = new ContactDaoImpl(kb);
+//            ContactDaoImpl contactDao = new ContactDaoImpl(kb);
 
             try {
                 kb.removeInformationSpace(generateInterest(null));
@@ -216,7 +215,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
                 for (Contact contact : object.getContacts()) {
                     contactSet.merge(contact.getTag());
-                    contactDao.update(contact);
+//                    contactDao.update(contact);
                 }
 
                 component.getMembers().merge(contactSet);

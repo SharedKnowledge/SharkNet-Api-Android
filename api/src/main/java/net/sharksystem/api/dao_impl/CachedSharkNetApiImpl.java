@@ -2,6 +2,7 @@ package net.sharksystem.api.dao_impl;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
@@ -207,6 +208,11 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     @Override
     public void initPki() {
         mApi.initPki();
+    }
+
+    @Override
+    public void setNotificationResultActivity(Intent intent) {
+        mApi.setNotificationResultActivity(intent);
     }
 
     @Override
