@@ -150,7 +150,9 @@ public class SharkNetApiImpl implements SharkNetApi {
         NotificationManager mNotifyMgr = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and   issues it.
         mNotifyMgr.notify(001, mBuilder.build());
-    }    @Override
+    }
+
+    @Override
     public void setSettings(Settings settings) {
         mSettingsDao.setSettings(settings);
     }

@@ -51,7 +51,7 @@ public class NearbyPeerManager {
         }
         Collections.sort(mPeers);
 
-        L.d("Found Peer: " + peer.getSender().getName(), this);
+//        L.d("Found Peer: " + peer.getSender().getName(), this);
 
         mEngine.getSyncManager().doInviteOrSync(peer.getSender());
 
