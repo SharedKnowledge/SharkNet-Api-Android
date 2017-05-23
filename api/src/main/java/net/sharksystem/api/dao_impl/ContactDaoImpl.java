@@ -14,6 +14,8 @@ import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.knowledgeBase.persistent.sql.SqlSharkKB;
+import net.sharkfw.system.L;
 import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
 import net.sharksystem.api.models.Contact;
@@ -58,9 +60,10 @@ public class ContactDaoImpl implements ContactDao {
                 // setImage
                 // Create an inputStream out of the image
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                object.getImage().compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                object.getImage().compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
                 byte[] byteArray = bos.toByteArray();
                 ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
+                L.d("Contact image size(add): " + bs.available() + "Bytes.", this);
                 SharkNetUtils.setInfoWithName(this.kb, asipSpace, CONTACT_IMAGE, bs);
             }
         } catch (SharkKBException | IOException e) {
@@ -84,6 +87,7 @@ public class ContactDaoImpl implements ContactDao {
 
                 ASIPInformation information = SharkNetUtils.getInfoByName(this.kb, asipSpace, CONTACT_IMAGE);
                 if (information != null) {
+                    L.d("Contact image size(getAll): " + information.getContentLength() + "Bytes.", this);
                     contact.setImage(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
                 }
                 contactList.add(contact);
@@ -109,6 +113,7 @@ public class ContactDaoImpl implements ContactDao {
 
                     ASIPInformation information = SharkNetUtils.getInfoByName(this.kb, asipSpace, CONTACT_IMAGE);
                     if (information != null) {
+                        L.d("Contact image size(get): " + information.getContentLength() + "Bytes.", this);
                         contact.setImage(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
                     }
                     return contact;
@@ -125,42 +130,65 @@ public class ContactDaoImpl implements ContactDao {
     public void update(Contact object) {
         try {
             ASIPInterest interest = generateInterest(object.getTag());
-            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(interest);
-            while (allInformationSpaces.hasNext()) {
-                ASIPInformationSpace next = allInformationSpaces.next();
-                if (SharkCSAlgebra.identical(interest, next.getASIPSpace())) {
-                    Iterator<ASIPInformation> informations = next.informations();
-                    while (informations.hasNext()) {
-                        ASIPInformation information = informations.next();
-                        switch (information.getName()) {
-                            case CONTACT_NAME:
-                                if (object.getName() != null) {
-                                    information.setContent(object.getName());
-                                }
-                                break;
-                            case CONTACT_EMAIL:
-                                if (object.getEmail() != null) {
-                                    information.setContent(object.getEmail());
-                                }
-                                break;
-                            case CONTACT_IMAGE:
-                                if (object.getImage() != null) {
-                                    // setImage
-                                    // Create an inputStream out of the image
-                                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                                    object.getImage().compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
-                                    byte[] byteArray = bos.toByteArray();
-                                    ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
-                                    information.setContent(bs, bs.available());
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
+            if (object.getName()!=null) {
+                SharkNetUtils.setInfoWithName(this.kb, interest, CONTACT_NAME, object.getName());
             }
+            if (object.getEmail()!=null){
+                SharkNetUtils.setInfoWithName(this.kb, interest, CONTACT_EMAIL, object.getEmail());
+            }
+
+            if (object.getImage() != null) {
+                // setImage
+                // Create an inputStream out of the image
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                object.getImage().compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
+                byte[] byteArray = bos.toByteArray();
+                ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
+                L.d("Contact image size(update): " + bs.available() + "Bytes.", this);
+                SharkNetUtils.setInfoWithName(this.kb, interest, CONTACT_IMAGE, bs);
+            }
+//            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(interest);
+//            while (allInformationSpaces.hasNext()) {
+//                ASIPInformationSpace next = allInformationSpaces.next();
+//                if (SharkCSAlgebra.identical(interest, next.getASIPSpace())) {
+//                    // We have found our space
+//                    // Check for information already set
+//                    Iterator<ASIPInformation> informations = next.informations();
+//                    while (informations.hasNext()) {
+//
+//                        ASIPInformation information = informations.next();
+//                        switch (information.getName()) {
+//                            case CONTACT_NAME:
+//                                if (object.getName() != null) {
+//                                    information.setContent(object.getName());
+//                                }
+//                                break;
+//                            case CONTACT_EMAIL:
+//                                if (object.getEmail() != null) {
+//                                    information.setContent(object.getEmail());
+//                                }
+//                                break;
+//                            case CONTACT_IMAGE:
+//                                if (object.getImage() != null) {
+//                                    // setImage
+//                                    // Create an inputStream out of the image
+//                                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//                                    object.getImage().compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
+//                                    byte[] byteArray = bos.toByteArray();
+//                                    ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
+//                                    L.d("Contact image size(update): " + bs.available() + "Bytes.", this);
+//                                    information.setContent(bs, bs.available());
+//                                }
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                    }
+//                }
+//            }
         } catch (SharkKBException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

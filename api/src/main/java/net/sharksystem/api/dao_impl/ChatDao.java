@@ -17,8 +17,10 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
 import net.sharkfw.peer.SharkEngine;
+import net.sharkfw.system.L;
 import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
+import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
@@ -43,11 +45,13 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     private final static String CHAT_TITLE = "CHAT_TITLE";
     private final static String CHAT_OWNER = "CHAT_OWNER";
     private final ContactDao mContactDao;
+    private final SharkNetApi mApi;
     private SharkEngine mEngine;
 
     private SharkKB mRootKb;
 
-    public ChatDao(SharkEngine engine, SharkKB rootKb, ContactDao contactDao) {
+    public ChatDao(SharkNetApi api, SharkEngine engine, SharkKB rootKb, ContactDao contactDao) {
+        mApi = api;
         mEngine = engine;
         mRootKb = rootKb;
         mContactDao = contactDao;
@@ -61,10 +65,10 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
             // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
             PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
-//            ContactDaoImpl contactDao = new ContactDaoImpl(sharkKB);
+            ContactDaoImpl contactDao = new ContactDaoImpl(sharkKB);
             for (Contact contact : object.getContacts()) {
                 contactSet.merge(contact.getTag());
-//                contactDao.add(contact);
+                contactDao.add(contact);
             }
             // Nun müssen wir alle Daten in die kb schreiben! Womöglich bevor die SyncComponent erzeugt wird
             STSet inMemoSTSet = InMemoSharkKB.createInMemoSTSet();
@@ -84,9 +88,10 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 // setImage
                 // Create an inputStream out of the image
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                image.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                image.compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
                 byte[] byteArray = bos.toByteArray();
                 ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
+                L.d("Chat image size: " + bs.available() + "Bytes.", this);
                 SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_IMAGE, bs);
             }
 
@@ -97,7 +102,8 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
 
             PeerSemanticTag owner = object.getOwner().getTag();
-//            contactDao.add(object.getOwner());
+            contactDao.add(object.getOwner());
+
             // Anzahl contacts + title + date
             mEngine.getSyncManager().createSyncComponent(sharkKB, object.getId(), contactSet, owner, true);
         } catch (SharkKBException | IOException e) {
@@ -207,7 +213,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             MessageDao messageDao = new MessageDao(kb, mContactDao);
             messageDao.update(object.getMessages());
 
-//            ContactDaoImpl contactDao = new ContactDaoImpl(kb);
+            ContactDaoImpl contactDao = new ContactDaoImpl(kb);
 
             try {
                 kb.removeInformationSpace(generateInterest(null));
@@ -215,7 +221,21 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
                 for (Contact contact : object.getContacts()) {
                     contactSet.merge(contact.getTag());
-//                    contactDao.update(contact);
+
+                    L.d("Exchanging contacts", this);
+
+                    if (contact.equals(mApi.getAccount())){
+                        L.d("Set my Account as Contact", this);
+                        contact = mApi.getAccount();
+                    }
+
+//                    if(object.getImage()==null){
+//                        Contact contactOwn = mContactDao.get(contact.getTag());
+//                        if(contactOwn.getImage()!=null){
+//                            contact.setImage(contactOwn.getImage());
+//                        }
+//                    }
+                    contactDao.update(contact);
                 }
 
                 component.getMembers().merge(contactSet);
@@ -235,9 +255,10 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                     // setImage
                     // Create an inputStream out of the image
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    object.getImage().compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                    object.getImage().compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
                     byte[] byteArray = bos.toByteArray();
                     ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
+                    L.d("Chat image size: " + bs.available() + "Bytes.", this);
                     SharkNetUtils.setInfoWithName(kb, asipSpace, CHAT_IMAGE, bs);
                 }
 

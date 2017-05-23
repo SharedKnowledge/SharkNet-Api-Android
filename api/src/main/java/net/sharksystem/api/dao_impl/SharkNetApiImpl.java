@@ -62,7 +62,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         mContext = context;
         try {
             mContactDao = new CachedContactDaoImpl(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
-            mChatDao = new ChatDao(mEngine, mRootKb, mContactDao);
+            mChatDao = new ChatDao(this, mEngine, mRootKb, mContactDao);
             mSettingsDao = new SettingsDao(mRootKb);
         } catch (SharkKBException e) {
             e.printStackTrace();
@@ -163,6 +163,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         if (all == null || all.isEmpty()) return;
         for (Contact contact : all) {
             if (!contact.equals(mAccount)) {
+                L.d("Begin to update contact", this);
                 updateContact(contact);
                 L.d("New contact: " + contact.getName(), this);
                 if (contact.getImage() != null) {
