@@ -15,6 +15,7 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
+import net.sharkfw.knowledgeBase.persistent.sql.SqlSharkKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
 import net.sharkfw.security.PkiStorage;
 import net.sharkfw.security.SharkPkiStorage;
@@ -34,6 +35,7 @@ import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 import net.sharksystem.api.shark.ports.NfcPkiPortListener;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -60,13 +62,20 @@ public class SharkNetApiImpl implements SharkNetApi {
         mEngine = new AndroidSharkEngine(context);
         mEngine.getSyncManager().addSyncMergeListener(this);
         mContext = context;
+        mChatDao = new ChatDao(this, mEngine, mRootKb, mContactDao);
+        mSettingsDao = new SettingsDao(mRootKb);
+        InputStream stream = null;
         try {
-            mContactDao = new CachedContactDaoImpl(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
-            mChatDao = new ChatDao(this, mEngine, mRootKb, mContactDao);
-            mSettingsDao = new SettingsDao(mRootKb);
-        } catch (SharkKBException e) {
+            stream = context.getResources().getAssets().open("sharknet.sql");
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:/data/data/" + context.getPackageName() + "/contacts.db", "org.sqldroid.SQLDroidDriver", stream));
+//        try {
+//            mContactDao = new CachedContactDaoImpl(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
+//        } catch (SharkKBException e) {
+//            e.printStackTrace();
+//        }
         if (getSettings().getAccountTag() != null) {
             mAccount = mContactDao.get(getSettings().getAccountTag());
         }

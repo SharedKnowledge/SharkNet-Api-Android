@@ -60,7 +60,6 @@ dependencies {
 //    // Local installed SharkFW
     compile ('net.sharksystem:sharkfw-core:1.0-SNAPSHOT'){
         exclude group: 'org.json', module: 'json'
-        exclude group: 'org.jooq' // TODO Needs to be inserted, but seems to be compiled with Java8
         exclude group: 'commons-logging'
         exclude group: 'com.sun.mail'
         exclude group: 'javax.activation'
@@ -68,4 +67,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
     androidTestCompile 'junit:junit:4.12'
+    compile 'org.sqldroid:sqldroid:1.0.3'
 }
