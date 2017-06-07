@@ -71,9 +71,14 @@ public class SharkNetApiImpl implements SharkNetApi {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        File target = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "databases");
-        target.mkdirs();
-        File file = new File(target, "contacts1.db");
+//        File target = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "databases");
+//        File target = new File(mContext.getExternalFilesDir(null), "databases");
+//        target.mkdirs();
+        File file = new File(mContext.getExternalFilesDir(null), "contacts.db");
+        L.d(file.getAbsolutePath(), this);
+        L.d("file.canWrite() " + file.canWrite(), this);
+        L.d("file.canRead() " + file.canRead(), this);
+        L.d("file.canExecute() " + file.canExecute(), this);
         mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + file.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
         mChatDao = new ChatDao(this, mEngine, mRootKb, mContactDao);
 
