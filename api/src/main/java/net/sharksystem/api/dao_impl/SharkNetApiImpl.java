@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 
 import net.sharkfw.asip.ASIPKnowledge;
@@ -34,6 +35,7 @@ import net.sharksystem.api.shark.ports.NfcPkiPort;
 import net.sharksystem.api.shark.ports.NfcPkiPortEventListener;
 import net.sharksystem.api.shark.ports.NfcPkiPortListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyPairGenerator;
@@ -62,7 +64,6 @@ public class SharkNetApiImpl implements SharkNetApi {
         mEngine = new AndroidSharkEngine(context);
         mEngine.getSyncManager().addSyncMergeListener(this);
         mContext = context;
-        mChatDao = new ChatDao(this, mEngine, mRootKb, mContactDao);
         mSettingsDao = new SettingsDao(mRootKb);
         InputStream stream = null;
         try {
@@ -70,7 +71,12 @@ public class SharkNetApiImpl implements SharkNetApi {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:/data/data/" + context.getPackageName() + "/contacts.db", "org.sqldroid.SQLDroidDriver", stream));
+        File target = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "databases");
+        target.mkdirs();
+        File file = new File(target, "contacts1.db");
+        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + file.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
+        mChatDao = new ChatDao(this, mEngine, mRootKb, mContactDao);
+
 //        try {
 //            mContactDao = new CachedContactDaoImpl(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
 //        } catch (SharkKBException e) {

@@ -27,21 +27,21 @@ public class SharkNetUtils {
     }
 
     public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, String content) throws SharkKBException {
-        ASIPInformation information = kb.addInformation(content, space);
-        if(information!=null){
-            information.setName(name);
-        } else {
-            throw new SharkKBException("Information could not be added");
-        }
+        ASIPInformation information = kb.addInformation(name, content, space);
+//        if(information!=null){
+//            information.setName(name);
+//        } else {
+//            throw new SharkKBException("Information could not be added");
+//        }
     }
 
     public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, InputStream content) throws SharkKBException, IOException {
-        ASIPInformation information = kb.addInformation(content, content.available(), space);
-        if(information!=null){
-            information.setName(name);
-        } else {
-            throw new SharkKBException("Information could not be added");
-        }
+        ASIPInformation information = kb.addInformation(name, content, content.available(), space);
+//        if(information!=null){
+//            information.setName(name);
+//        } else {
+//            throw new SharkKBException("Information could not be added");
+//        }
     }
 
     public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, int content) throws SharkKBException{
@@ -114,140 +114,5 @@ public class SharkNetUtils {
         return 0L;
     }
 
-//    public static void setInfoWithName(SharkKB kb, ASIPSpace space, String name, boolean contentToSet) throws SharkKBException {
-//        String booleanString;
-//        if(contentToSet){
-//            booleanString = "TRUE";
-//        } else {
-//            booleanString = "FALSE";
-//        }
-//        ASIPInformation information = kb.addInformation(booleanString, space);
-//        information.setName(name);
-//    }
-
-//    public static List<? extends ContainsContent> search(String searchTerm, List<? extends  ContainsContent> searchList) throws SharkKBException {
-//        List<ContainsContent> swapList = new LinkedList<>();
-//        swapList.addAll(searchList);
-//        searchTerm = searchTerm.toLowerCase();
-//        for(int t = swapList.size() -1; t >= 0; t--){
-//            ContainsContent c = swapList.get(t);
-//            if (!c.getContent().getMessage().toLowerCase().contains(searchTerm)){
-//                swapList.remove(c);
-//            }
-//        }
-//        return swapList;
-//    }
-//
-//    /**
-//     * Sorts the Lists of Timeable Objects which are Objects with the Method getDateReceived (Comment, Feed, Message)
-//     *
-//     * @param sortList
-//     * @return
-//     */
-//    public static List<? extends Timeable> sortList(List<? extends Timeable> sortList, boolean ascending) throws SharkKBException {
-//        List<Timeable> m_list = new LinkedList<>();
-//        boolean change = false;
-//        // fix so it doesn't crash
-//        if (sortList == null) {
-//            sortList = new ArrayList<>();
-//        }
-//        m_list.addAll(sortList);
-//        Timeable temp, temp2;
-//        for (int i = 1; i < m_list.size(); i++) {
-//            for (int j = 0; j < m_list.size() - 1; j++) {
-//                change = false;
-//                if(m_list.get(j).getDateReceived() != null && m_list.get(j+1).getDateReceived()!=null){
-//                    if (m_list.get(j).getDateReceived().before(m_list.get(j + 1).getDateReceived()) && ascending) {
-//                        change = true;
-//                    }
-//                    if(m_list.get(j).getDateReceived().after(m_list.get(j + 1).getDateReceived()) && !ascending){
-//                        change = true;
-//                    }
-//
-//                    if(change){
-//                        temp = m_list.get(j);
-//                        temp2 = m_list.get(j + 1);
-//                        m_list.remove(j + 1);
-//                        m_list.remove(j);
-//                        m_list.add(j, temp2);
-//                        m_list.add(j + 1, temp);
-//                    }
-//                }
-//            }
-//        }
-//        return m_list;
-//    }
-//
-//    /**
-//     * Returns a List with object within the given timerange
-//     * @param cutList
-//     * @param start
-//     * @param stop
-//     * @return
-//     */
-//
-//    public static List<? extends Timeable> cutList(List<? extends Timeable> cutList, Timestamp start, Timestamp stop) throws SharkKBException {
-//
-//        List<Timeable> swapList = new LinkedList<>();
-//        if (start.before(stop)) {
-//            swapList.addAll(cutList);
-//            boolean reachStart = false;
-//            boolean reachStop = false;
-//            int iteratorstart = 0;
-//            int iteratorstop = 0;
-//            int iterator = 0;
-//            while ((!reachStart && !reachStop) && iterator < swapList.size()) {
-//                if (!reachStart && reachStop) {
-//                    if (swapList.get(iterator).getDateReceived().before(start) || swapList.get(iterator).getDateReceived().equals(start)) {
-//                        reachStart = true;
-//                    } else iteratorstart = iterator;
-//                }
-//                if (!reachStop) {
-//                    if (swapList.get(iterator).getDateReceived().before(stop)) {
-//                        reachStop = true;
-//                    } else iteratorstop = iterator;
-//                }
-//                iterator++;
-//            }
-//            for(int i = swapList.size()-1; i >= 0; i--){
-//                if(i<iteratorstop && reachStop) swapList.remove(i);
-//                if(i>=iteratorstart && reachStart) swapList.remove(i);
-//            }
-//        }
-//        return swapList;
-//    }
-//
-//    /**
-//     * Returns the List with the Objects within the given Intervall
-//     * @param cutList
-//     * @param startIndex
-//     * @param stopIndex
-//     * @return
-//     */
-//    public static List<? extends Timeable> cutList(List<? extends Timeable> cutList, int startIndex, int stopIndex) {
-//        List<Timeable> swapList = new LinkedList<>();
-//        if (startIndex <= stopIndex && startIndex >= 0 && stopIndex >= 0) {
-//            if (stopIndex >= cutList.size()) {
-//                stopIndex = cutList.size();
-//            }
-//            if(startIndex > cutList.size()-1){
-//                return swapList;
-//            }
-//            swapList.addAll(cutList);
-//            int iterator = stopIndex;
-//
-//            while (iterator < swapList.size()) {
-//                swapList.remove(iterator);
-//            }
-//
-//            iterator = 0;
-//            while (iterator < startIndex) {
-//                swapList.remove(iterator);
-//                iterator++;
-//            }
-//        }
-//        return swapList;
-//
-//    }
 
 }

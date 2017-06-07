@@ -37,28 +37,22 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     // Set this dependency to build and run UI Automator tests
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
-
     compile 'com.android.support:multidex:1.0.1'
-
     compile 'org.reflections:reflections:0.9.10'
-
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.0'
     compile 'com.thedeanda:lorem:2.1'
-
     compile 'com.sun.mail:android-mail:1.5.5'
     compile 'com.sun.mail:android-activation:1.5.5'
-
-//     Jitpack sharkfw v3.0.1
-//    compile ('com.github.SharedKnowledge:SharkFW:359364e1b57208ca2f92006771704780fa07beb8'){
-//        exclude group: 'org.json', module: 'json'
-//        exclude group: 'com.sun.mail'
-//        exclude group: 'commons-logging'
-//        exclude group: 'javax.activation'
-//    }
-
-//    // Local installed SharkFW
-    compile ('net.sharksystem:sharkfw-core:1.0-SNAPSHOT'){
+    //     Jitpack sharkfw v3.0.1
+    //    compile ('com.github.SharedKnowledge:SharkFW:359364e1b57208ca2f92006771704780fa07beb8'){
+    //        exclude group: 'org.json', module: 'json'
+    //        exclude group: 'com.sun.mail'
+    //        exclude group: 'commons-logging'
+    //        exclude group: 'javax.activation'
+    //    }
+    //    // Local installed SharkFW
+    compile('net.sharksystem:sharkfw-core:1.0-SNAPSHOT') {
         exclude group: 'org.json', module: 'json'
         exclude group: 'commons-logging'
         exclude group: 'com.sun.mail'
@@ -68,4 +62,5 @@ dependencies {
     compile 'com.android.support:support-v4:24.2.1'
     androidTestCompile 'junit:junit:4.12'
     compile 'org.sqldroid:sqldroid:1.0.3'
+//    compile 'org.xerial:sqlite-jdbc:3.18.0'
 }

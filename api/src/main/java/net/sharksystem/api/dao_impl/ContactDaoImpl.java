@@ -53,6 +53,7 @@ public class ContactDaoImpl implements ContactDao {
 
             // We probably need to set also the name and the email as info because it can cause
             // problems at updating the contact and so changing the PST as well
+//            L.d(L.asipSpace2String(asipSpace), this);
             SharkNetUtils.setInfoWithName(this.kb, asipSpace, CONTACT_NAME, object.getName());
             SharkNetUtils.setInfoWithName(this.kb, asipSpace, CONTACT_EMAIL, object.getEmail());
 
@@ -82,8 +83,10 @@ public class ContactDaoImpl implements ContactDao {
                 ASIPSpace asipSpace = next.getASIPSpace();
                 Contact contact = new Contact(asipSpace.getSender());
 
-                contact.setName(SharkNetUtils.getInfoAsString(this.kb, asipSpace, CONTACT_NAME));
-                contact.setEmail(SharkNetUtils.getInfoAsString(this.kb, asipSpace, CONTACT_EMAIL));
+                String name = SharkNetUtils.getInfoAsString(this.kb, asipSpace, CONTACT_NAME);
+                if(name!=null) contact.setName(name);
+                String mail = SharkNetUtils.getInfoAsString(this.kb, asipSpace, CONTACT_EMAIL);
+                if(mail!=null) contact.setEmail(mail);
 
                 ASIPInformation information = SharkNetUtils.getInfoByName(this.kb, asipSpace, CONTACT_IMAGE);
                 if (information != null) {
