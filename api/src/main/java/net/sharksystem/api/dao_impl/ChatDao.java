@@ -81,8 +81,6 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_TITLE, object.getTitle());
             }
 
-            SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_OWNER, "Owner");
-
             Bitmap image = object.getImage();
             if (image != null) {
                 // setImage
@@ -160,7 +158,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     @Override
     public Chat get(SemanticTag id) {
         SyncComponent component = mEngine.getSyncManager().getComponentByName(id);
-        if(component!=null){
+        if (component != null) {
             SyncKB kb = component.getKb();
             try {
                 Chat chat = null;
@@ -216,7 +214,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             ContactDaoImpl contactDao = new ContactDaoImpl(kb);
 
             try {
-                kb.removeInformationSpace(generateInterest(null));
+                kb.removeInformationSpace(generateInterest(component.getUniqueName()));
                 // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
                 PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
                 for (Contact contact : object.getContacts()) {
@@ -224,7 +222,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
 
                     L.d("Exchanging contacts", this);
 
-                    if (contact.equals(mApi.getAccount())){
+                    if (contact.equals(mApi.getAccount())) {
                         L.d("Set my Account as Contact", this);
                         contact = mApi.getAccount();
                     }
@@ -277,7 +275,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
     @Override
     public void remove(Chat object) {
         SyncComponent component = mEngine.getSyncManager().getComponentByName(object.getId());
-        if (component!=null) mEngine.getSyncManager().removeSyncComponent(component);
+        if (component != null) mEngine.getSyncManager().removeSyncComponent(component);
     }
 
     @Override
