@@ -74,7 +74,7 @@ public class SharkNetApiImpl implements SharkNetApi {
 //        File target = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "databases");
 //        File target = new File(mContext.getExternalFilesDir(null), "databases");
 //        target.mkdirs();
-        File file = new File(mContext.getExternalFilesDir(null), "contacts.db");
+        File file = new File(mContext.getExternalFilesDir(null), "contacts01.db");
         L.d(file.getAbsolutePath(), this);
         L.d("file.canWrite() " + file.canWrite(), this);
         L.d("file.canRead() " + file.canRead(), this);
