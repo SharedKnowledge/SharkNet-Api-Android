@@ -75,6 +75,11 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
 
         if (!mIsDiscovering) {
             mManager.clearLocalServices(mChannel, new WifiActionListener("Clear LocalServices"));
+            try {
+                L.d(L.asipSpace2String(interest), this);
+            } catch (SharkKBException e) {
+                e.printStackTrace();
+            }
             HashMap<String, String> map = WifiDirectUtil.interest2RecordMap(interest);
             mServiceInfo = WifiP2pDnsSdServiceInfo.newInstance("_sbc", "_presence._tcp", map);
             mManager.addLocalService(mChannel, mServiceInfo, new WifiActionListener("Add LocalService"));

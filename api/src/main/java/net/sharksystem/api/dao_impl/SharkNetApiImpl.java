@@ -77,9 +77,9 @@ public class SharkNetApiImpl implements SharkNetApi {
 //        File target = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "databases");
 //        File target = new File(mContext.getExternalFilesDir(null), "databases");
 //        target.mkdirs();
-        contactsDb = new File(mContext.getExternalFilesDir(null), "contacts01.db");
+        contactsDb = new File(mContext.getExternalFilesDir(null), "contacts02.db");
         L.d(contactsDb.getAbsolutePath(), this);
-        settingsDb = new File(mContext.getExternalFilesDir(null), "settings01.db");
+        settingsDb = new File(mContext.getExternalFilesDir(null), "settings02.db");
         L.d(settingsDb.getAbsolutePath(), this);
         mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
         mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
@@ -90,9 +90,24 @@ public class SharkNetApiImpl implements SharkNetApi {
 //        } catch (SharkKBException e) {
 //            e.printStackTrace();
 //        }
-        if (getSettings().getAccountTag() != null) {
-            Contact contact = mContactDao.get(getSettings().getAccountTag());
-            if(contact!=null) setAccount(contact);
+        Settings settings = getSettings();
+        if (settings.getAccountTag() != null) {
+            Contact contact = mContactDao.get(settings.getAccountTag());
+            if(contact!=null){
+                mContactDao.add(contact);
+                mEngine.setEngineOwnerPeer(contact.getTag());
+                mAccount = contact;
+            }
+            if (settings.getMailSmtpServer() != null && !settings.getMailSmtpServer().isEmpty() || settings.getMailUsername() != null && !settings.getMailUsername().isEmpty() || settings.getMailPassword() != null && !settings.getMailPassword().isEmpty() || settings.getMailPopServer() != null && !settings.getMailPopServer().isEmpty() || settings.getMailAddress() != null && !settings.getMailAddress().isEmpty()) {
+
+                // TODO
+                mEngine.setBasicMailConfiguration(settings.getMailSmtpServer(), settings.getMailUsername(), settings.getMailPassword(), settings.getMailPopServer(), settings.getMailAddress());
+                try {
+                    mEngine.startMail();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -139,21 +154,26 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     @Override
     public void clearDbs() {
-
-        InputStream stream = null;
-        InputStream stream2 = null;
-        try {
-            stream = mContext.getResources().getAssets().open("sharknet.sql");
-            stream2 = mContext.getResources().getAssets().open("sharknet.sql");
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Contact contact : mContactDao.getAll()) {
+            mContactDao.remove(contact);
         }
-        contactsDb = new File(mContext.getExternalFilesDir(null), "contacts01.db");
-        L.d(contactsDb.getAbsolutePath(), this);
-        settingsDb = new File(mContext.getExternalFilesDir(null), "settings01.db");
-        L.d(settingsDb.getAbsolutePath(), this);
-        mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
-        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
+        mSettingsDao.clearSettings();
+
+
+//        InputStream stream = null;
+//        InputStream stream2 = null;
+//        try {
+//            stream = mContext.getResources().getAssets().open("sharknet.sql");
+//            stream2 = mContext.getResources().getAssets().open("sharknet.sql");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        contactsDb = new File(mContext.getExternalFilesDir(null), "contacts02.db");
+//        L.d(contactsDb.getAbsolutePath(), this);
+//        settingsDb = new File(mContext.getExternalFilesDir(null), "settings02.db");
+//        L.d(settingsDb.getAbsolutePath(), this);
+//        mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
+//        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
 
         mAccount=null;
     }
