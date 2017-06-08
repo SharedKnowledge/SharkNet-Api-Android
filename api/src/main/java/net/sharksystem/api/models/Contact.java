@@ -36,6 +36,10 @@ public class Contact implements Comparable<Contact>{
         }
     }
 
+    public PeerSemanticTag getTagAsInMemoTag(){
+        return InMemoSharkKB.createInMemoPeerSemanticTag(tag.getName(), tag.getSI(), tag.getAddresses());
+    }
+
     public PeerSemanticTag getTag() {
         return tag;
     }

@@ -67,7 +67,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
             ContactDaoImpl contactDao = new ContactDaoImpl(sharkKB);
             for (Contact contact : object.getContacts()) {
-                contactSet.merge(contact.getTag());
+                contactSet.merge(contact.getTagAsInMemoTag());
                 contactDao.add(contact);
             }
             // Nun müssen wir alle Daten in die kb schreiben! Womöglich bevor die SyncComponent erzeugt wird
@@ -75,7 +75,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             inMemoSTSet.merge(CONFIG_TYPE);
             STSet topicSet = InMemoSharkKB.createInMemoSTSet();
             topicSet.merge(object.getId());
-            ASIPSpace asipSpace = sharkKB.createASIPSpace(topicSet, inMemoSTSet, null, object.getOwner().getTag(), contactSet, null, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPSpace asipSpace = sharkKB.createASIPSpace(topicSet, inMemoSTSet, null, object.getOwner().getTagAsInMemoTag(), contactSet, null, null, ASIPSpace.DIRECTION_INOUT);
 
             if (object.getTitle() != null) {
                 SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_TITLE, object.getTitle());
@@ -101,7 +101,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
             }
 
 
-            PeerSemanticTag owner = object.getOwner().getTag();
+            PeerSemanticTag owner = object.getOwner().getTagAsInMemoTag();
             contactDao.add(object.getOwner());
 
             // Anzahl contacts + title + date
@@ -220,7 +220,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
                 PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
                 for (Contact contact : object.getContacts()) {
-                    contactSet.merge(contact.getTag());
+                    contactSet.merge(contact.getTagAsInMemoTag());
 
                     L.d("Exchanging contacts", this);
 
@@ -245,7 +245,7 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag> {
                 inMemoSTSet.merge(CONFIG_TYPE);
                 STSet topicSet = InMemoSharkKB.createInMemoSTSet();
                 topicSet.merge(object.getId());
-                ASIPSpace asipSpace = kb.createASIPSpace(topicSet, inMemoSTSet, null, object.getOwner().getTag(), contactSet, null, null, ASIPSpace.DIRECTION_INOUT);
+                ASIPSpace asipSpace = kb.createASIPSpace(topicSet, inMemoSTSet, null, object.getOwner().getTagAsInMemoTag(), contactSet, null, null, ASIPSpace.DIRECTION_INOUT);
 
                 if (object.getTitle() != null) {
                     SharkNetUtils.setInfoWithName(kb, asipSpace, CHAT_TITLE, object.getTitle());
