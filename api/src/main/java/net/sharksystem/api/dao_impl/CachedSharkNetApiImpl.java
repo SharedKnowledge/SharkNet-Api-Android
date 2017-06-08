@@ -216,6 +216,11 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     }
 
     @Override
+    public void clearDbs() {
+        mApi.clearDbs();
+    }
+
+    @Override
     public void onNewMerge(SyncComponent component, SharkKB changes) {
         mChatsChanged = true;
     }

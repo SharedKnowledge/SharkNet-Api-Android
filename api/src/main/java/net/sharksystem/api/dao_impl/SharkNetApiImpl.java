@@ -51,6 +51,8 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class SharkNetApiImpl implements SharkNetApi {
 
     private final Context mContext;
+    private File contactsDb;
+    private File settingsDb;
     private SharkKB mRootKb = new InMemoSharkKB();
     private AndroidSharkEngine mEngine;
     private ChatDao mChatDao;
@@ -64,22 +66,23 @@ public class SharkNetApiImpl implements SharkNetApi {
         mEngine = new AndroidSharkEngine(context);
         mEngine.getSyncManager().addSyncMergeListener(this);
         mContext = context;
-        mSettingsDao = new SettingsDao(mRootKb);
         InputStream stream = null;
+        InputStream stream2 = null;
         try {
             stream = context.getResources().getAssets().open("sharknet.sql");
+            stream2 = context.getResources().getAssets().open("sharknet.sql");
         } catch (IOException e) {
             e.printStackTrace();
         }
 //        File target = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "databases");
 //        File target = new File(mContext.getExternalFilesDir(null), "databases");
 //        target.mkdirs();
-        File file = new File(mContext.getExternalFilesDir(null), "contacts01.db");
-        L.d(file.getAbsolutePath(), this);
-        L.d("file.canWrite() " + file.canWrite(), this);
-        L.d("file.canRead() " + file.canRead(), this);
-        L.d("file.canExecute() " + file.canExecute(), this);
-        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + file.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
+        contactsDb = new File(mContext.getExternalFilesDir(null), "contacts01.db");
+        L.d(contactsDb.getAbsolutePath(), this);
+        settingsDb = new File(mContext.getExternalFilesDir(null), "settings01.db");
+        L.d(settingsDb.getAbsolutePath(), this);
+        mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
+        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
         mChatDao = new ChatDao(this, mEngine, mRootKb, mContactDao);
 
 //        try {
@@ -88,7 +91,8 @@ public class SharkNetApiImpl implements SharkNetApi {
 //            e.printStackTrace();
 //        }
         if (getSettings().getAccountTag() != null) {
-            mAccount = mContactDao.get(getSettings().getAccountTag());
+            Contact contact = mContactDao.get(getSettings().getAccountTag());
+            if(contact!=null) setAccount(contact);
         }
     }
 
@@ -129,8 +133,29 @@ public class SharkNetApiImpl implements SharkNetApi {
     }
 
     @Override
-    public void setNotificationResultActivity(Intent intent){
+    public void setNotificationResultActivity(Intent intent) {
         mIntent = intent;
+    }
+
+    @Override
+    public void clearDbs() {
+
+        InputStream stream = null;
+        InputStream stream2 = null;
+        try {
+            stream = mContext.getResources().getAssets().open("sharknet.sql");
+            stream2 = mContext.getResources().getAssets().open("sharknet.sql");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        contactsDb = new File(mContext.getExternalFilesDir(null), "contacts01.db");
+        L.d(contactsDb.getAbsolutePath(), this);
+        settingsDb = new File(mContext.getExternalFilesDir(null), "settings01.db");
+        L.d(settingsDb.getAbsolutePath(), this);
+        mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
+        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
+
+        mAccount=null;
     }
 
     @Override
@@ -191,7 +216,9 @@ public class SharkNetApiImpl implements SharkNetApi {
                 }
             }
         }
-    }    @Override
+    }
+
+    @Override
     public Settings getSettings() {
         return mSettingsDao.getSettings();
     }
@@ -357,8 +384,6 @@ public class SharkNetApiImpl implements SharkNetApi {
             e.printStackTrace();
         }
     }
-
-
 
 
 }

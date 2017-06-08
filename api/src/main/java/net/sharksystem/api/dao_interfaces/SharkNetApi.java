@@ -76,4 +76,6 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
     void initPki();
 
     void setNotificationResultActivity(Intent intent);
+
+    void clearDbs();
 }
