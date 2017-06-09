@@ -83,7 +83,9 @@ public class SharkNetApiImpl implements SharkNetApi {
         L.d(settingsDb.getAbsolutePath(), this);
         mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
         mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
-        mChatDao = new ChatDao(this, mEngine, mRootKb, mContactDao);
+
+        mEngine.getSyncManager().allowInvitation(true, true);
+        mChatDao = new ChatDao(mContext, this, mEngine, mRootKb, mContactDao);
 
 //        try {
 //            mContactDao = new CachedContactDaoImpl(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
