@@ -63,9 +63,22 @@ public class SharkNetApiImpl implements SharkNetApi {
     private Intent mIntent;
 
     public SharkNetApiImpl(Context context) {
-        mEngine = new AndroidSharkEngine(context);
-        mEngine.getSyncManager().addSyncMergeListener(this);
+
         mContext = context;
+
+        InputStream stream3 = null;
+        try {
+            stream3 = context.getResources().getAssets().open("sharknet.sql");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File storageDb = new File(mContext.getExternalFilesDir(null), "storage01.db");
+        L.d(storageDb.getAbsolutePath(), this);
+        SqlSharkKB storageKb = new SqlSharkKB("jdbc:sqldroid:" + storageDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream3);
+
+        mEngine = new AndroidSharkEngine(context, storageKb);
+
+        mEngine.getSyncManager().addSyncMergeListener(this);
         InputStream stream = null;
         InputStream stream2 = null;
         try {
@@ -160,6 +173,8 @@ public class SharkNetApiImpl implements SharkNetApi {
             mContactDao.remove(contact);
         }
         mSettingsDao.clearSettings();
+
+        // TODO remove chat folder and clear SyncInfoKb.
 
 
 //        InputStream stream = null;

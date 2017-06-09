@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Created by j4rvis on 3/22/17.
@@ -96,18 +97,30 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
                     mContactDao.add(contact);
                 }
                 Date date = new Date(SharkNetUtils.getInfoAsLong(mSharkKb, asipSpace, MESSAGE_DATE));
-                SemanticTag id = asipSpace.getTopics().stTags().next();
-                Message message = new Message(id, date, contact);
-                message.setContent(SharkNetUtils.getInfoAsString(mSharkKb, asipSpace, MESSAGE_CONTENT));
-                message.setEncrypted(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_ENCRYPTED));
-                message.setSigned(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_SIGNED));
-                message.setVerified(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_VERIFIED));
+                STSet topics = asipSpace.getTopics();
+                if(topics!=null){
+                    Iterator<SemanticTag> tagIterator = topics.stTags();
+                    if(tagIterator!=null){
+                        try{
+                            SemanticTag semanticTag = tagIterator.next();
+                            if(semanticTag!=null){
+                                Message message = new Message(semanticTag, date, contact);
+                                message.setContent(SharkNetUtils.getInfoAsString(mSharkKb, asipSpace, MESSAGE_CONTENT));
+                                message.setEncrypted(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_ENCRYPTED));
+                                message.setSigned(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_SIGNED));
+                                message.setVerified(SharkNetUtils.getInfoAsBoolean(mSharkKb, asipSpace, MESSAGE_VERIFIED));
 
-                ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKb, asipSpace, MESSAGE_IMAGE_CONTENT);
-                if (information != null) {
-                    message.setImageContent(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
+                                ASIPInformation information = SharkNetUtils.getInfoByName(mSharkKb, asipSpace, MESSAGE_IMAGE_CONTENT);
+                                if (information != null) {
+                                    message.setImageContent(BitmapFactory.decodeStream(new ByteArrayInputStream(information.getContentAsByte())));
+                                }
+                                messageList.add(message);
+                            }
+                        } catch (NoSuchElementException e){
+                            // TODO
+                        }
+                    }
                 }
-                messageList.add(message);
             }
         } catch (SharkKBException e) {
             e.printStackTrace();

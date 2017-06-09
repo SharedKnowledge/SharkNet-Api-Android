@@ -20,7 +20,6 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.persistent.sql.SqlSharkKB;
 import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
-import net.sharkfw.knowledgeBase.sync.manager.SyncManager;
 import net.sharkfw.knowledgeBase.sync.manager.port.SyncAcceptKP;
 import net.sharkfw.knowledgeBase.sync.manager.port.SyncInviteKP;
 import net.sharkfw.peer.SharkEngine;
@@ -96,12 +95,6 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag>, SyncAcceptK
 
     }
 
-    private void initChatInfoKb(){
-        File chatInfoKb = new File(mContext.getExternalFilesDir(null), "infoChat01.db");
-        L.d(chatInfoKb.getAbsolutePath(), this);
-        mInfoKb = new SqlSharkKB("jdbc:sqldroid:" + chatInfoKb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", streamToSqlMeta());
-    }
-
     private void addOrUpdateChatInInfoKb(SyncComponent component, SemanticTag tag) throws SharkKBException, JSONException {
         ASIPSpace space = mInfoKb.createASIPSpace(INFO_TYPE, tag, null, null, null, null, null,  ASIPSpace.DIRECTION_INOUT);
 
@@ -155,53 +148,48 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag>, SyncAcceptK
                 }
                 String syncKbName = SharkNetUtils.getInfoAsString(mInfoKb, space, SYNC_KB_NAME);
 
-                File chat = new File(chatFolder, syncKbName + ".db");
-                L.d(chat.getAbsolutePath(), this);
-                SqlSharkKB chatSqlKb = new SqlSharkKB("jdbc:sqldroid:" + chat.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", streamToSqlMeta());
+                SharkKB sharkKB = this.getKbForChat(syncKbName);
 
-                SyncComponent syncComponent = mEngine.getSyncManager().createInvitedSyncComponent(chatSqlKb, syncComponentName, syncMembers, syncApprovedMembers, syncOwner, synIsWritable);
+                SyncComponent syncComponent = mEngine.getSyncManager().createInvitedSyncComponent(sharkKB, syncComponentName, syncMembers, syncApprovedMembers, syncOwner, synIsWritable);
             }
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
     }
 
-    private InputStream streamToSqlMeta(){
-        try {
-            return mContext.getResources().getAssets().open("sharknet.sql");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @Override
     public void add(Chat object) {
         try {
-            File chatFolder = new File(mContext.getExternalFilesDir(null), "chats");
-            chatFolder.mkdirs();
 
-            File chat = new File(chatFolder, object.getId().getSI()[0] + ".db");
-            L.d(chat.getAbsolutePath(), this);
-            SqlSharkKB sharkKB = new SqlSharkKB("jdbc:sqldroid:" + chat.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", streamToSqlMeta());
+            SharkKB sharkKB = this.getKbForChat(object.getId());
 
             // als nächstes holen wir uns alle contacts und wandeln sie zu einem pst
             PeerSTSet contactSet = InMemoSharkKB.createInMemoPeerSTSet();
-            ContactDaoImpl contactDao = new ContactDaoImpl(sharkKB);
             for (Contact contact : object.getContacts()) {
                 contactSet.merge(contact.getTagAsInMemoTag());
+            }
+            SyncComponent syncComponent = mEngine.getSyncManager().createSyncComponent(sharkKB, object.getId(), contactSet, object.getOwner().getTagAsInMemoTag(), true);
+
+            SyncKB syncKB = syncComponent.getKb();
+
+            // Adding all contacts to the chat to send the contact images within the chat.
+            ContactDaoImpl contactDao = new ContactDaoImpl(syncKB);
+            for (Contact contact : object.getContacts()) {
                 contactDao.add(contact);
             }
-            // Nun müssen wir alle Daten in die kb schreiben! Womöglich bevor die SyncComponent erzeugt wird
+
+            // Nun müssen wir alle Daten in die kb schreiben!
             STSet inMemoSTSet = InMemoSharkKB.createInMemoSTSet();
             inMemoSTSet.merge(CONFIG_TYPE);
             STSet topicSet = InMemoSharkKB.createInMemoSTSet();
             topicSet.merge(object.getId());
-            ASIPSpace asipSpace = sharkKB.createASIPSpace(topicSet, inMemoSTSet, null, object.getOwner().getTagAsInMemoTag(), contactSet, null, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPSpace asipSpace = syncKB.createASIPSpace(topicSet, inMemoSTSet, null, object.getOwner().getTagAsInMemoTag(), contactSet, null, null, ASIPSpace.DIRECTION_INOUT);
 
             if (object.getTitle() != null) {
-                SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_TITLE, object.getTitle());
+                SharkNetUtils.setInfoWithName(syncKB, asipSpace, CHAT_TITLE, object.getTitle());
             }
+
+            SharkNetUtils.setInfoWithName(syncKB, asipSpace, CHAT_OWNER, object.getOwner().getName());
 
             Bitmap image = object.getImage();
             if (image != null) {
@@ -212,19 +200,17 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag>, SyncAcceptK
                 byte[] byteArray = bos.toByteArray();
                 ByteArrayInputStream bs = new ByteArrayInputStream(byteArray);
                 L.d("Chat image size: " + bs.available() + "Bytes.", this);
-                SharkNetUtils.setInfoWithName(sharkKB, asipSpace, CHAT_IMAGE, bs);
+                SharkNetUtils.setInfoWithName(syncKB, asipSpace, CHAT_IMAGE, bs);
             }
 
-            MessageDao messageDao = new MessageDao(sharkKB, mContactDao);
+            MessageDao messageDao = new MessageDao(syncKB, mContactDao);
             for (Message message : object.getMessages()) {
                 messageDao.add(message);
             }
 
-            PeerSemanticTag owner = object.getOwner().getTagAsInMemoTag();
             contactDao.add(object.getOwner());
 
             // Anzahl contacts + title + date
-            SyncComponent syncComponent = mEngine.getSyncManager().createSyncComponent(sharkKB, object.getId(), contactSet, owner, true);
             addOrUpdateChatInInfoKb(syncComponent, object.getId());
         } catch (SharkKBException | IOException | JSONException e) {
             e.printStackTrace();
@@ -371,6 +357,8 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag>, SyncAcceptK
                     SharkNetUtils.setInfoWithName(kb, asipSpace, CHAT_TITLE, object.getTitle());
                 }
 
+                SharkNetUtils.setInfoWithName(kb, asipSpace, CHAT_OWNER, object.getOwner().getName());
+
                 if (object.getImage() != null) {
                     // setImage
                     // Create an inputStream out of the image
@@ -447,14 +435,45 @@ public class ChatDao implements DataAccessObject<Chat, SemanticTag>, SyncAcceptK
 
             interest.getApprovers().merge(mApi.getAccount().getTagAsInMemoTag());
 
-            File chat = new File(chatFolder, next.getSI()[0] + ".db");
-            L.d(chat.getAbsolutePath(), this);
-            SqlSharkKB chatSqlKb = new SqlSharkKB("jdbc:sqldroid:" + chat.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", streamToSqlMeta());
-
-            SyncComponent component = mEngine.getSyncManager().createInvitedSyncComponent(chatSqlKb, next, interest.getReceivers(), interest.getApprovers(), interest.getSender(), true);
+            SharkKB sharkKb = this.getKbForChat(next);
+            SyncComponent component = mEngine.getSyncManager().createInvitedSyncComponent(sharkKb, next, interest.getReceivers(), interest.getApprovers(), interest.getSender(), true);
             addOrUpdateChatInInfoKb(component, next);
         } catch (SharkKBException | JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private static final int SQL = 0;
+
+    int targetType = SQL;
+    private SharkKB getKbForChat(String name) throws SharkKBException {
+        switch (targetType){
+            case SQL:
+                File chatFolder = new File(mContext.getExternalFilesDir(null), "chats");
+                chatFolder.mkdirs();
+                File chatFile = new File(chatFolder, name + ".db");
+                return new SqlSharkKB("jdbc:sqldroid:" + chatFile.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", streamToSqlMeta());
+            default:
+                throw new SharkKBException("Only SQL supported yet.");
+        }
+    }
+
+
+    private SharkKB getKbForChat(SemanticTag tag) throws SharkKBException {
+        return this.getKbForChat(tag.getSI()[0]);
+    }
+    private InputStream streamToSqlMeta(){
+        try {
+            return mContext.getResources().getAssets().open("sharknet.sql");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void initChatInfoKb(){
+        File chatInfoKb = new File(mContext.getExternalFilesDir(null), "syncInfos.db");
+        L.d(chatInfoKb.getAbsolutePath(), this);
+        mInfoKb = new SqlSharkKB("jdbc:sqldroid:" + chatInfoKb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", streamToSqlMeta());
     }
 }

@@ -7,6 +7,8 @@ import net.sharkfw.asip.ASIPKnowledge;
 import net.sharkfw.asip.ASIPStub;
 import net.sharkfw.asip.SharkStub;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
+import net.sharkfw.knowledgeBase.SharkKB;
+import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.peer.J2SESharkEngine;
 import net.sharkfw.protocols.Protocols;
 import net.sharkfw.protocols.RequestHandler;
@@ -22,14 +24,18 @@ import java.io.IOException;
 
 public class AndroidSharkEngine extends J2SESharkEngine {
 
-    private final NearbyPeerManager mPeerManager;
+    private NearbyPeerManager mPeerManager;
     private Context mContext;
     private WifiDirectAdvertisingManager mAdvertisingManager;
     private Activity activity;
     private NfcMessageStub.NFCMessageListener nfcMessageListener;
 
     public AndroidSharkEngine(Context context) {
-        super();
+        this(context, new InMemoSharkKB());
+    }
+
+    public AndroidSharkEngine(Context context, SharkKB storage) {
+        super(storage);
         mContext = context;
         getSyncManager();
         mPeerManager = new NearbyPeerManager(this);
