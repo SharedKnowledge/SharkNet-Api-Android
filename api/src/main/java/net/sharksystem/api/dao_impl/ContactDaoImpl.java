@@ -49,7 +49,7 @@ public class ContactDaoImpl implements ContactDao {
     public void add(Contact object) {
 
         try {
-            ASIPSpace asipSpace = this.kb.createASIPSpace(null, TYPE, null, object.getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPSpace asipSpace = this.kb.createASIPSpace(null, TYPE, null, object.getTagAsInMemoTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
 
             // We probably need to set also the name and the email as info because it can cause
             // problems at updating the contact and so changing the PST as well
@@ -132,7 +132,7 @@ public class ContactDaoImpl implements ContactDao {
     @Override
     public void update(Contact object) {
         try {
-            ASIPInterest interest = generateInterest(object.getTag());
+            ASIPInterest interest = generateInterest(object.getTagAsInMemoTag());
             if (object.getName()!=null) {
                 SharkNetUtils.setInfoWithName(this.kb, interest, CONTACT_NAME, object.getName());
             }

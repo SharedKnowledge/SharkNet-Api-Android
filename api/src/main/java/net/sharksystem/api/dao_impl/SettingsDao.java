@@ -77,4 +77,12 @@ public class SettingsDao {
             e.printStackTrace();
         }
     }
+
+    public void clearSettings(){
+        try {
+            mSharkKB.removeInformation(mAsipSpace);
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -19,7 +19,9 @@ import net.sharkfw.protocols.Protocols;
 import net.sharkfw.system.L;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,6 +65,13 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
         PeerSemanticTag sender = mEngine.getOwner();
         ASIPInterest interest = null;
 
+        String[] addresses = sender.getAddresses();
+        List<String> strings = Arrays.asList(addresses);
+
+        if(!strings.contains(Protocols.BLUETOOTH_PREFIX + mBluetoothAddress)) {
+            sender.addAddress(Protocols.BLUETOOTH_PREFIX + mBluetoothAddress);
+        }
+
         try {
             STSet typeSTSet = InMemoSharkKB.createInMemoSTSet();
             typeSTSet.merge(TYPE_TAG);
@@ -71,10 +80,13 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
             e.printStackTrace();
         }
 
-        sender.addAddress(Protocols.BLUETOOTH_PREFIX + mBluetoothAddress);
-
         if (!mIsDiscovering) {
             mManager.clearLocalServices(mChannel, new WifiActionListener("Clear LocalServices"));
+            try {
+                L.d(L.asipSpace2String(interest), this);
+            } catch (SharkKBException e) {
+                e.printStackTrace();
+            }
             HashMap<String, String> map = WifiDirectUtil.interest2RecordMap(interest);
             mServiceInfo = WifiP2pDnsSdServiceInfo.newInstance("_sbc", "_presence._tcp", map);
             mManager.addLocalService(mChannel, mServiceInfo, new WifiActionListener("Add LocalService"));
