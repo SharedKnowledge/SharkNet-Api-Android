@@ -5,4 +5,5 @@ package net.sharksystem.api.models;
  */
 
 public class Profile {
+    //new
 }
