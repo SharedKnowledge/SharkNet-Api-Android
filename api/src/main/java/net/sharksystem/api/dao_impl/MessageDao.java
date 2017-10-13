@@ -43,6 +43,11 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
     private final static String MESSAGE_VERIFIED = "MESSAGE_VERIFIED";
     private final static String MESSAGE_SIGNED = "MESSAGE_SIGNED";
     private final static String MESSAGE_ENCRYPTED = "MESSAGE_ENCRYPTED";
+    private final static String MESSAGE_TOPIC = "MESSAGE_TOPIC";
+    private final static String MESSAGE_TYPE_A = "MESSAGE_TYPE";
+    private final static String MESSAGE_PEER = "MESSAGE_PEER";
+    private final static String MESSAGE_TIME = "MESSAGE_TIME";
+    private final static String MESSAGE_LOCATION = "MESSAGE_LOCATION";
     private final ContactDao mContactDao;
 
     private SharkKB mSharkKb;
@@ -58,7 +63,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
 //            TimeSemanticTag timeSemanticTag = InMemoSharkKB.createInMemoTimeSemanticTag(object.getDate().getTime(), 0);
             SemanticTag topic = InMemoSharkKB.createInMemoSemanticTag(Message.MESSAGE_ID, object.getSender().getTag().getName() + object.getDate().getTime());
 //            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, MESSAGE_TYPE, null, object.getSender().getTag(), null, timeSemanticTag, null, ASIPSpace.DIRECTION_INOUT);
-            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, MESSAGE_TYPE, null, object.getSender().getTag(), null, null, null, ASIPSpace.DIRECTION_INOUT);
+            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, MESSAGE_TYPE, null, object.getSender().getTag(), null, object.getTime(), object.getLocation(), ASIPSpace.DIRECTION_INOUT);
 
             SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_CONTENT, object.getContent());
             SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_DATE, object.getDate().getTime());

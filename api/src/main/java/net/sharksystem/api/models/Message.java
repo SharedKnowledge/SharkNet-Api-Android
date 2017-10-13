@@ -4,8 +4,11 @@ import android.graphics.Bitmap;
 import android.hardware.camera2.params.Face;
 import android.support.annotation.NonNull;
 
+import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
+import net.sharkfw.knowledgeBase.SpatialSemanticTag;
+import net.sharkfw.knowledgeBase.TimeSemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 
 import java.util.Date;
@@ -23,6 +26,14 @@ public class Message implements Comparable<Message> {
     private Bitmap imageContent;
     private Date date;
     private Contact sender;
+
+    // Semantic Annotations for the message
+    private SemanticTag topic = null;
+    private SemanticTag type = null;
+    private PeerSemanticTag peer = null;
+    private TimeSemanticTag time = null;
+    private SpatialSemanticTag location = null;
+
     private boolean isVerified = false;
     private boolean isSigned = false;
     private boolean isEncrypted = false;
@@ -37,6 +48,17 @@ public class Message implements Comparable<Message> {
         this.id = id;
         this.date = date;
         this.sender = sender;
+    }
+
+    public Message(SemanticTag id, Date date, Contact sender, SemanticTag topic, SemanticTag type, PeerSemanticTag peer, TimeSemanticTag time, SpatialSemanticTag location) {
+        this.id = id;
+        this.date = date;
+        this.sender = sender;
+        this.topic = topic;
+        this.type = type;
+        this.peer = peer;
+        this.time = time;
+        this.location = location;
     }
 
     public SemanticTag getId() {
@@ -97,6 +119,50 @@ public class Message implements Comparable<Message> {
 
     public boolean isEmpty(){
         return content.isEmpty() && imageContent==null;
+    }
+
+    public void setSender(Contact sender) {
+        this.sender = sender;
+    }
+
+    public SemanticTag getTopic() {
+        return topic;
+    }
+
+    public void setTopic(SemanticTag topic) {
+        this.topic = topic;
+    }
+
+    public SemanticTag getType() {
+        return type;
+    }
+
+    public void setType(SemanticTag type) {
+        this.type = type;
+    }
+
+    public PeerSemanticTag getPeer() {
+        return peer;
+    }
+
+    public void setPeer(PeerSemanticTag peer) {
+        this.peer = peer;
+    }
+
+    public TimeSemanticTag getTime() {
+        return time;
+    }
+
+    public void setTime(TimeSemanticTag time) {
+        this.time = time;
+    }
+
+    public SpatialSemanticTag getLocation() {
+        return location;
+    }
+
+    public void setLocation(SpatialSemanticTag location) {
+        this.location = location;
     }
 
     @Override
