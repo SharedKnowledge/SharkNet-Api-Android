@@ -13,6 +13,7 @@ import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.models.Profile;
 import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
@@ -163,6 +164,36 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     public int numberOfContacts() {
         refreshContacts();
         return mContacts.size();
+    }
+
+    @Override
+    public List<Profile> getProfiles() {
+        return mApi.getProfiles();
+    }
+
+    @Override
+    public Profile getProfile(PeerSemanticTag tag) {
+        return mApi.getProfile(tag);
+    }
+
+    @Override
+    public void addProfile(Profile profile) {
+        mApi.addProfile(profile);
+    }
+
+    @Override
+    public void updateProfile(Profile profile) {
+        mApi.updateProfile(profile);
+    }
+
+    @Override
+    public void removeProfile(Profile profile) {
+        mApi.removeProfile(profile);
+    }
+
+    @Override
+    public int numberOfProfiles() {
+        return mApi.numberOfProfiles();
     }
 
     @Override

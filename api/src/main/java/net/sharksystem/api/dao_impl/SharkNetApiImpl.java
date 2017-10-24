@@ -23,10 +23,12 @@ import net.sharkfw.security.SharkPkiStorage;
 import net.sharkfw.system.L;
 import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.dao_interfaces.ContactDao;
+import net.sharksystem.api.dao_interfaces.ProfileDao;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
+import net.sharksystem.api.models.Profile;
 import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.service.SharkService;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
@@ -53,10 +55,12 @@ public class SharkNetApiImpl implements SharkNetApi {
     private final Context mContext;
     private File contactsDb;
     private File settingsDb;
+    private File profilesDb;
     private SharkKB mRootKb = new InMemoSharkKB();
     private AndroidSharkEngine mEngine;
     private ChatDao mChatDao;
     private ContactDao mContactDao;
+    private ProfileDao mProfileDao;
     private SettingsDao mSettingsDao;
     private Contact mAccount;
     private boolean mIsDiscovering = false;
@@ -94,8 +98,11 @@ public class SharkNetApiImpl implements SharkNetApi {
         L.d(contactsDb.getAbsolutePath(), this);
         settingsDb = new File(mContext.getExternalFilesDir(null), "settings02.db");
         L.d(settingsDb.getAbsolutePath(), this);
+        profilesDb = new File(mContext.getExternalFilesDir(null), "profiles02.db");
+        L.d(profilesDb.getAbsolutePath(), this);
         mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
         mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
+        mProfileDao = new ProfileDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
 
         mEngine.getSyncManager().allowInvitation(true, true);
         mChatDao = new ChatDao(mContext, this, mEngine, mRootKb, mContactDao);
@@ -308,6 +315,30 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     public int numberOfContacts() {
         return mContactDao.size();
+    }
+
+    public List<Profile> getProfiles() {
+        return mProfileDao.getAll();
+    }
+
+    public Profile getProfile(PeerSemanticTag tag) {
+        return mProfileDao.get(tag);
+    }
+
+    public void addProfile(Profile profile) {
+        mProfileDao.add(profile);
+    }
+
+    public void updateProfile(Profile profile) {
+        mProfileDao.update(profile);
+    }
+
+    public void removeProfile(Profile profile) {
+        mProfileDao.remove(profile);
+    }
+
+    public int numberOfProfiles() {
+        return mProfileDao.size();
     }
 
     @Override

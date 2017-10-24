@@ -1,5 +1,6 @@
 package net.sharksystem.api.models;
 
+import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
@@ -18,34 +19,22 @@ public class Profile {
 
     private SemanticTag id;
     private Contact owner;
-    private List<Interest> entryInterests;
-    private List<Interest> outInterests;
-    private Interest activeEntryInterest;
-    private Interest activeOutInterest;
+    private ASIPInterest activeEntryInterest;
+    private ASIPInterest activeOutInterest;
 
     public Profile(Contact owner){
         this.id = InMemoSharkKB.createInMemoSemanticTag(PROFILE_ID,owner.getTag().getName() + new Date(System.currentTimeMillis()));
-        entryInterests = new ArrayList<>();
-        outInterests = new ArrayList<>();
     }
 
     public void setOwner(Contact owner) {
         this.owner = owner;
     }
 
-    public void addEntryInterest(Interest interest) {
-        this.entryInterests.add(interest);
-    }
-
-    public void addOutInterest(Interest interest) {
-        this.outInterests.add(interest);
-    }
-
-    public void setActiveEntryInterest(Interest activeEntryInterest) {
+    public void setActiveEntryInterest(ASIPInterest activeEntryInterest) {
         this.activeEntryInterest = activeEntryInterest;
     }
 
-    public void setActiveOutInterest(Interest activeOutInterest) {
+    public void setActiveOutInterest(ASIPInterest activeOutInterest) {
         this.activeOutInterest = activeOutInterest;
     }
 
@@ -53,19 +42,11 @@ public class Profile {
         return owner;
     }
 
-    public List<Interest> getEntryInterests() {
-        return entryInterests;
-    }
-
-    public List<Interest> getOutInterests() {
-        return outInterests;
-    }
-
-    public Interest getActiveEntryInterest() {
+    public ASIPInterest getActiveEntryInterest() {
         return activeEntryInterest;
     }
 
-    public Interest getActiveOutInterest() {
+    public ASIPInterest getActiveOutInterest() {
         return activeOutInterest;
     }
 

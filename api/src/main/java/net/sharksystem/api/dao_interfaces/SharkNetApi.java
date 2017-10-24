@@ -10,6 +10,7 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.models.Profile;
 import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 import net.sharksystem.api.shark.peer.NearbyPeerManager;
@@ -56,6 +57,18 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
     void removeContact(Contact contact);
 
     int numberOfContacts();
+
+    public List<Profile> getProfiles();
+
+    public Profile getProfile(PeerSemanticTag tag);
+
+    public void addProfile(Profile profile);
+
+    public void updateProfile(Profile profile);
+
+    public void removeProfile(Profile profile);
+
+    public int numberOfProfiles();
 
     void pingMailServer(SemanticTag type, PeerSemanticTag receiver);
 
