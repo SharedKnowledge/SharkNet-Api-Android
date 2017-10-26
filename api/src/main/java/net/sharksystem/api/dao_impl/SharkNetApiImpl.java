@@ -25,6 +25,7 @@ import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.ProfileDao;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
+import net.sharksystem.api.models.Broadcast;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Message;
@@ -60,6 +61,7 @@ public class SharkNetApiImpl implements SharkNetApi {
     private AndroidSharkEngine mEngine;
     private ChatDao mChatDao;
     private ContactDao mContactDao;
+    private MessageDao mMessageDao;
     private ProfileDao mProfileDao;
     private SettingsDao mSettingsDao;
     private Contact mAccount;
@@ -85,9 +87,11 @@ public class SharkNetApiImpl implements SharkNetApi {
         mEngine.getSyncManager().addSyncMergeListener(this);
         InputStream stream = null;
         InputStream stream2 = null;
+        InputStream stream4 = null;
         try {
             stream = context.getResources().getAssets().open("sharknet.sql");
             stream2 = context.getResources().getAssets().open("sharknet.sql");
+            stream4 = context.getResources().getAssets().open("sharknet.sql");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -102,7 +106,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         L.d(profilesDb.getAbsolutePath(), this);
         mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
         mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
-        mProfileDao = new ProfileDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + profilesDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
+        mProfileDao = new ProfileDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + profilesDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream4));
 
         mEngine.getSyncManager().allowInvitation(true, true);
         mChatDao = new ChatDao(mContext, this, mEngine, mRootKb, mContactDao);
@@ -292,6 +296,12 @@ public class SharkNetApiImpl implements SharkNetApi {
     public int numberOfChats() {
         return mChatDao.size();
     }
+
+
+    public void addBroadcast(Broadcast broadcast) {; } //TODO:
+
+    public Broadcast getBroadcast() {return null;} //TODO:
+
 
     public List<Contact> getContacts() {
         return mContactDao.getAll();

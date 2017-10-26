@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         multiDexEnabled true
@@ -63,4 +63,8 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
     compile 'org.sqldroid:sqldroid:1.0.3'
 //    compile 'org.xerial:sqlite-jdbc:3.18.0'
+}
+
+repositories {
+    google()
 }
