@@ -11,6 +11,7 @@ import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
 import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
+import net.sharksystem.api.models.Broadcast;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Profile;
@@ -118,6 +119,16 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     public int numberOfChats() {
         refreshChats();
         return mChats.size();
+    }
+
+    @Override
+    public Broadcast getBroadcast() {
+        return mApi.getBroadcast();
+    }
+
+    @Override
+    public void updateBroadcast(Broadcast broadcast) {
+        mApi.updateBroadcast(broadcast);
     }
 
     private void refreshContacts(){

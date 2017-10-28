@@ -48,13 +48,17 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
     private final static String MESSAGE_PEER = "MESSAGE_PEER";
     private final static String MESSAGE_TIME = "MESSAGE_TIME";
     private final static String MESSAGE_LOCATION = "MESSAGE_LOCATION";
-    private final ContactDao mContactDao;
+    private ContactDao mContactDao = null;
 
     private SharkKB mSharkKb;
 
     public MessageDao(SharkKB kb, ContactDao contactDao) {
         mSharkKb = kb;
         mContactDao = contactDao;
+    }
+
+    public MessageDao(SharkKB kb) {
+        mSharkKb = kb;
     }
 
     @Override
@@ -95,12 +99,18 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
             while (allInformationSpaces.hasNext()) {
                 ASIPInformationSpace next = allInformationSpaces.next();
                 ASIPSpace asipSpace = next.getASIPSpace();
-
-                Contact contact = mContactDao.get(asipSpace.getSender());
-                if(contact==null){
-                    contact = new Contact(asipSpace.getSender());
-                    mContactDao.add(contact);
+                Contact contact = null;
+                if (mContactDao != null) {
+                    contact = mContactDao.get(asipSpace.getSender());
+                    if(contact==null){
+                        contact = new Contact(asipSpace.getSender());
+                        mContactDao.add(contact);
+                    }
                 }
+                else  {
+                    contact = new Contact(asipSpace.getSender());
+                }
+
                 Date date = new Date(SharkNetUtils.getInfoAsLong(mSharkKb, asipSpace, MESSAGE_DATE));
                 STSet topics = asipSpace.getTopics();
                 if(topics!=null){

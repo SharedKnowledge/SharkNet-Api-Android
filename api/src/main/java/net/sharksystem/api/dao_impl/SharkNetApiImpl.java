@@ -60,6 +60,7 @@ public class SharkNetApiImpl implements SharkNetApi {
     private SharkKB mRootKb = new InMemoSharkKB();
     private AndroidSharkEngine mEngine;
     private ChatDao mChatDao;
+    private BroadcastDao mBroadcastDao;
     private ContactDao mContactDao;
     private MessageDao mMessageDao;
     private ProfileDao mProfileDao;
@@ -110,6 +111,7 @@ public class SharkNetApiImpl implements SharkNetApi {
 
         mEngine.getSyncManager().allowInvitation(true, true);
         mChatDao = new ChatDao(mContext, this, mEngine, mRootKb, mContactDao);
+        mBroadcastDao = new BroadcastDao(mContext, this, mEngine, mRootKb);
 
 //        try {
 //            mContactDao = new CachedContactDaoImpl(new InMemoSharkKB(InMemoSharkKB.createInMemoSemanticNet(), InMemoSharkKB.createInMemoSemanticNet(), mRootKb.getPeersAsTaxonomy(), InMemoSharkKB.createInMemoSpatialSTSet(), InMemoSharkKB.createInMemoTimeSTSet()));
@@ -297,11 +299,9 @@ public class SharkNetApiImpl implements SharkNetApi {
         return mChatDao.size();
     }
 
+    public Broadcast getBroadcast() {return mBroadcastDao.get(null);}
 
-    public void addBroadcast(Broadcast broadcast) {; } //TODO:
-
-    public Broadcast getBroadcast() {return null;} //TODO:
-
+    public void updateBroadcast(Broadcast broadcast) {mBroadcastDao.update(broadcast);}
 
     public List<Contact> getContacts() {
         return mContactDao.getAll();

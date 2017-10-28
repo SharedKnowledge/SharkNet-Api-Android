@@ -8,6 +8,7 @@ import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
+import net.sharksystem.api.models.Broadcast;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
 import net.sharksystem.api.models.Profile;
@@ -45,6 +46,10 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
     void removeChat(Chat chat);
 
     int numberOfChats();
+
+    Broadcast getBroadcast();
+
+    void updateBroadcast(Broadcast broadcast);
 
     List<Contact> getContacts();
 
