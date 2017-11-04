@@ -117,7 +117,7 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
                 e.printStackTrace();
             }
         }
-        return null;
+        return new Broadcast();
     }
 
     @Override
