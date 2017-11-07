@@ -59,7 +59,7 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
         if(context!=null){
             try {
                 getKbForBroadcast();
-                this.engine.getSyncManager().addSemanticRoutingListener(this);
+                this.engine.getBroadcastManager().addSemanticRoutingListener(this);
 
             } catch (SharkKBException e) {
                 e.printStackTrace();
@@ -72,7 +72,7 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
         chatFolder.mkdirs();
         File chatFile = new File(chatFolder,   "broadcast.db");
         SharkKB sharkKB =  new SqlSharkKB("jdbc:sqldroid:" + chatFile.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", streamToSqlMeta());
-        SyncComponent syncComponent = engine.getSyncManager().createSyncComponent(sharkKB, this.broadcast.getId(), new InMemoPeerSTSet(), engine.getOwner(), true);
+        SyncComponent syncComponent = engine.getBroadcastManager().createSyncComponent(sharkKB, this.broadcast.getId(), new InMemoPeerSTSet(), engine.getOwner(), true);
         SyncKB syncKB = syncComponent.getKb();
         MessageDao messageDao = new MessageDao(syncKB);
         for (Message message : broadcast.getMessages()) {
@@ -104,7 +104,7 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
 
     @Override
     public Broadcast get(SemanticTag id) {
-        SyncComponent component = engine.getSyncManager().getComponentByName(broadcast.getId());
+        SyncComponent component = engine.getBroadcastManager().getBroadcastComponent();
         if (component != null) {
             SyncKB kb = component.getKb();
             try {
@@ -122,7 +122,7 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
 
     @Override
     public void update(Broadcast object) {
-        SyncComponent component = engine.getSyncManager().getComponentByName(broadcast.getId());
+        SyncComponent component = engine.getBroadcastManager().getBroadcastComponent();
         SyncKB kb = component.getKb();
         MessageDao messageDao = new MessageDao(kb);
         messageDao.update(object.getMessages());
