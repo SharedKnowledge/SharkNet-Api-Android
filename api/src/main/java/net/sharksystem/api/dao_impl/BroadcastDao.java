@@ -105,19 +105,13 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
     @Override
     public Broadcast get(SemanticTag id) {
         SyncComponent component = engine.getBroadcastManager().getBroadcastComponent();
-        if (component != null) {
-            SyncKB kb = component.getKb();
-            try {
-                Iterator<ASIPInformationSpace> informationSpaces = kb.getInformationSpaces(generateInterest());
-                ASIPInformationSpace next = informationSpaces.next();
-                MessageDao messageDao = new MessageDao(kb);
-                broadcast.setMessages(messageDao.getAll());
-                return broadcast;
-            } catch (SharkKBException e) {
-                e.printStackTrace();
-            }
-        }
-        return new Broadcast();
+        SyncKB kb = component.getKb();
+        //Iterator<ASIPInformationSpace> informationSpaces = kb.getInformationSpaces(generateInterest());
+        //ASIPInformationSpace next = informationSpaces.next();
+        MessageDao messageDao = new MessageDao(kb);
+        broadcast.setMessages(messageDao.getAll());
+        return broadcast;
+
     }
 
     @Override

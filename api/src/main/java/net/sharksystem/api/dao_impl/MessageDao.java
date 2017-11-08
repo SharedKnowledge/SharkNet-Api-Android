@@ -132,7 +132,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
                                 messageList.add(message);
                             }
                         } catch (NoSuchElementException e){
-                            // TODO
+                            return null;
                         }
                     }
                 }

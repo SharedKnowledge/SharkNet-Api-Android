@@ -299,7 +299,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         return mChatDao.size();
     }
 
-    public Broadcast getBroadcast() {/*return mBroadcastDao.get(null)*/ return new Broadcast();}
+    public Broadcast getBroadcast() {return mBroadcastDao.get(null) /*return new Broadcast()*/;}
 
     public void updateBroadcast(Broadcast broadcast) {mBroadcastDao.update(broadcast);}
 
