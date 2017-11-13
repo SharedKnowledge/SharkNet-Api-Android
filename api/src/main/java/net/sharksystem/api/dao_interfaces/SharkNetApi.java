@@ -51,6 +51,8 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
 
     void updateBroadcast(Broadcast broadcast);
 
+    void updateBroadcast(Broadcast broadcast, List<PeerSemanticTag> peers);
+
     List<Contact> getContacts();
 
     Contact getContact(PeerSemanticTag tag);

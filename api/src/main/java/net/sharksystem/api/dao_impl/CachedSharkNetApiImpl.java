@@ -131,6 +131,11 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
         mApi.updateBroadcast(broadcast);
     }
 
+    @Override
+    public void updateBroadcast(Broadcast broadcast, List<PeerSemanticTag> peers) {
+        mApi.updateBroadcast(broadcast, peers);
+    }
+
     private void refreshContacts(){
         if(mContacts.isEmpty() || mContactsChanged) {
             mContacts = mApi.getContacts();

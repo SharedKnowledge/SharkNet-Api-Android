@@ -122,6 +122,14 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
         messageDao.update(object.getMessages());
     }
 
+    public void update(Broadcast object, List<PeerSemanticTag> peers) {
+        SyncComponent component = engine.getBroadcastManager().getBroadcastComponent();
+        SyncKB kb = component.getKb();
+        MessageDao messageDao = new MessageDao(kb);
+        messageDao.update(object.getMessages());
+        engine.getBroadcastManager().sendBroadcastMessage(component, peers);
+    }
+
     private ASIPSpace generateInterest() {
         try {
             return InMemoSharkKB.createInMemoASIPInterest(null, null, null, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
