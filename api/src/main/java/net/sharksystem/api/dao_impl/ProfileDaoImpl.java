@@ -35,23 +35,33 @@ public class ProfileDaoImpl implements ProfileDao {
 
     private SharkKB kb;
     private final static String ACTIVE_ENTRY_PROFILE = "ACTIVE_ENTRY_PROFILE";
+    private final static String ACTIVE_OUT_PROFILE = "ACTIVE_OUT_PROFILE";
 
     ProfileDaoImpl(SharkKB kb) {
         this.kb = kb;
+        Profile profile = get(null);
+        if (profile == null) {
+            profile = new Profile(kb.getOwner());
+            profile.setActiveEntryInterest(generateInterest(ASIPSpace.DIRECTION_IN));
+            profile.setActiveOutInterest(generateInterest(ASIPSpace.DIRECTION_OUT));
+            add(profile);
+        }
     }
 
     @Override
     public void add(Profile object) {
         try {
             if (object.getActiveEntryInterest() != null) {
-                this.kb.createASIPSpace(object.getActiveEntryInterest().getTopics(), object.getActiveEntryInterest().getTypes(),
+                ASIPSpace asipSpace = this.kb.createASIPSpace(object.getActiveEntryInterest().getTopics(), object.getActiveEntryInterest().getTypes(),
                         object.getActiveEntryInterest().getApprovers(), null, null,
                         object.getActiveEntryInterest().getTimes(), object.getActiveEntryInterest().getLocations(), ASIPSpace.DIRECTION_IN);
+                SharkNetUtils.setInfoWithName(kb, asipSpace, ACTIVE_ENTRY_PROFILE, "Entry Profile");
             }
             if (object.getActiveOutInterest() != null) {
-                this.kb.createASIPSpace(object.getActiveOutInterest().getTopics(), object.getActiveOutInterest().getTypes(),
+                ASIPSpace asipSpace = this.kb.createASIPSpace(object.getActiveOutInterest().getTopics(), object.getActiveOutInterest().getTypes(),
                         object.getActiveOutInterest().getApprovers(), null, null,
                         object.getActiveOutInterest().getTimes(), object.getActiveOutInterest().getLocations(), ASIPSpace.DIRECTION_OUT);
+                SharkNetUtils.setInfoWithName(kb, asipSpace, ACTIVE_OUT_PROFILE, "Out Profile");
             }
         } catch (SharkKBException e) {
             e.printStackTrace();
@@ -65,20 +75,20 @@ public class ProfileDaoImpl implements ProfileDao {
         try {
             ASIPInterest asipInterest = InMemoSharkKB.createInMemoASIPInterest(null, null, null, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
             Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(asipInterest);
+            Profile profile = new Profile(kb.getOwner());
             while (allInformationSpaces.hasNext()) {
                 ASIPInformationSpace next = allInformationSpaces.next();
                 ASIPSpace asipSpace = next.getASIPSpace();
-                Profile profile = new Profile(new Contact(kb.getOwner()));
                 ASIPInterest interest = new InMemoInterest(asipSpace.getTopics(), asipSpace.getTypes(), null,
                         asipSpace.getApprovers(), null, asipSpace.getTimes(), asipSpace.getLocations(), asipSpace.getDirection() );
                 if (interest.getDirection() == ASIPSpace.DIRECTION_IN) {
                     profile.setActiveEntryInterest(interest);
                 }
-                else if (interest.getDirection() == ASIPSpace.DIRECTION_IN) {
+                else if (interest.getDirection() == ASIPSpace.DIRECTION_OUT) {
                     profile.setActiveOutInterest(interest);
                 }
-                profileList.add(profile);
             }
+            profileList.add(profile);
         } catch (SharkKBException e) {
             e.printStackTrace();
         }
@@ -87,18 +97,36 @@ public class ProfileDaoImpl implements ProfileDao {
 
     @Override
     public Profile get(PeerSemanticTag id) {
-        //TODO
-        return null;
+        return getAll().get(0);
     }
 
     @Override
     public void update(Profile object) {
-        //TODO
+        remove(object);
+        add(object);
     }
 
     @Override
     public void remove(Profile object) {
-        //TODO
+        try {
+            ASIPInterest asipInterest = InMemoSharkKB.createInMemoASIPInterest(null, null, null, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
+            Iterator<ASIPInformationSpace> allInformationSpaces = this.kb.getInformationSpaces(asipInterest);
+            while (allInformationSpaces.hasNext()) {
+                ASIPInformationSpace next = allInformationSpaces.next();
+                ASIPSpace asipSpace = next.getASIPSpace();
+                Profile profile = new Profile(kb.getOwner());
+                ASIPInterest interest = new InMemoInterest(asipSpace.getTopics(), asipSpace.getTypes(), null,
+                        asipSpace.getApprovers(), null, asipSpace.getTimes(), asipSpace.getLocations(), asipSpace.getDirection() );
+                if (interest.getDirection() == ASIPSpace.DIRECTION_IN && profile.getActiveEntryInterest() != null) {
+                    kb.removeInformation(asipSpace);
+                }
+                else if (interest.getDirection() == ASIPSpace.DIRECTION_OUT && profile.getActiveOutInterest() != null) {
+                    kb.removeInformation(asipSpace);
+                }
+            }
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -118,6 +146,15 @@ public class ProfileDaoImpl implements ProfileDao {
         }
 
         return 0;
+    }
+
+    private ASIPInterest generateInterest(int direction) {
+        try {
+            return InMemoSharkKB.createInMemoASIPInterest(null, null, null, null, null, null, null, direction);
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

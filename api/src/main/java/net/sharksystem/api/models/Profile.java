@@ -2,6 +2,7 @@ package net.sharksystem.api.models;
 
 import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.knowledgeBase.Interest;
+import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 
@@ -17,17 +18,12 @@ public class Profile {
 
     public final static String PROFILE_ID = "PROFILE_ID";
 
-    private SemanticTag id;
-    private Contact owner;
+    //private SemanticTag id;
     private ASIPInterest activeEntryInterest;
     private ASIPInterest activeOutInterest;
 
-    public Profile(Contact owner){
-        this.id = InMemoSharkKB.createInMemoSemanticTag(PROFILE_ID,owner.getTag().getName() + new Date(System.currentTimeMillis()));
-    }
-
-    public void setOwner(Contact owner) {
-        this.owner = owner;
+    public Profile(PeerSemanticTag owner){
+        //this.id = InMemoSharkKB.createInMemoSemanticTag(PROFILE_ID,owner.getName() + new Date(System.currentTimeMillis()));
     }
 
     public void setActiveEntryInterest(ASIPInterest activeEntryInterest) {
@@ -38,10 +34,6 @@ public class Profile {
         this.activeOutInterest = activeOutInterest;
     }
 
-    public Contact getOwner() {
-        return owner;
-    }
-
     public ASIPInterest getActiveEntryInterest() {
         return activeEntryInterest;
     }
@@ -50,14 +42,14 @@ public class Profile {
         return activeOutInterest;
     }
 
-    public SemanticTag getId() {
+    /*public SemanticTag getId() {
 
         return id;
     }
 
     public void setId(SemanticTag id) {
         this.id = id;
-    }
+    }*/
 
 
 

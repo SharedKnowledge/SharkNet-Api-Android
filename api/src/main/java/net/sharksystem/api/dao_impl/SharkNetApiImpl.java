@@ -103,7 +103,7 @@ public class SharkNetApiImpl implements SharkNetApi {
         L.d(contactsDb.getAbsolutePath(), this);
         settingsDb = new File(mContext.getExternalFilesDir(null), "settings02.db");
         L.d(settingsDb.getAbsolutePath(), this);
-        profilesDb = new File(mContext.getExternalFilesDir(null), "profiles02.db");
+        profilesDb = new File(mContext.getExternalFilesDir(null), "profiles.db");
         L.d(profilesDb.getAbsolutePath(), this);
         mSettingsDao = new SettingsDao(new SqlSharkKB("jdbc:sqldroid:" + settingsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream2));
         mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));

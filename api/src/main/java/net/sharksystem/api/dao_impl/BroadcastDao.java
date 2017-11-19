@@ -130,15 +130,6 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
         engine.getBroadcastManager().sendBroadcastMessage(component, peers);
     }
 
-    private ASIPSpace generateInterest() {
-        try {
-            return InMemoSharkKB.createInMemoASIPInterest(null, null, null, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
-        } catch (SharkKBException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @Override
     public void remove(Broadcast object) {
         ; // Singleton Pattern, Broadcast is generated in the constructor
