@@ -2,10 +2,12 @@ package net.sharksystem.api.utils;
 
 import net.sharkfw.asip.ASIPInformation;
 import net.sharkfw.asip.ASIPSpace;
+import net.sharkfw.knowledgeBase.STSet;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.TimeSemanticTag;
+import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,6 +114,17 @@ public class SharkNetUtils {
             return Long.parseLong(information.getContentAsString());
         }
         return 0L;
+    }
+
+    public static ASIPSpace generateGeneralInterest(int direction, SemanticTag topic) throws SharkKBException {
+        STSet topicSet = InMemoSharkKB.createInMemoSTSet();
+        topicSet.merge(topic);
+        try {
+            return InMemoSharkKB.createInMemoASIPInterest(topicSet, null, null, null, null, null, null, direction);
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
