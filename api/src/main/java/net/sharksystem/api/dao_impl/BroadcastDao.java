@@ -141,7 +141,7 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
     }
 
     @Override
-    public void onNewMerge(SyncComponent component, SharkKB changes) {
+    public void onNewMerge(SyncComponent component, SharkKB changes, boolean accepted) {
 
     }
 }
