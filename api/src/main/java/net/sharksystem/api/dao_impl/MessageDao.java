@@ -67,7 +67,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
 //            TimeSemanticTag timeSemanticTag = InMemoSharkKB.createInMemoTimeSemanticTag(object.getDate().getTime(), 0);
             SemanticTag topic = InMemoSharkKB.createInMemoSemanticTag(Message.MESSAGE_ID, object.getSender().getTag().getName() + object.getDate().getTime());
 //            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, MESSAGE_TYPE, null, object.getSender().getTag(), null, timeSemanticTag, null, ASIPSpace.DIRECTION_INOUT);
-            ASIPSpace asipSpace = mSharkKb.createASIPSpace(topic, MESSAGE_TYPE, null, object.getSender().getTag(), null, object.getTime(), object.getLocation(), ASIPSpace.DIRECTION_INOUT);
+            ASIPSpace asipSpace = mSharkKb.createASIPSpace(object.getTopic(), MESSAGE_TYPE, null, object.getSender().getTag(), null, object.getTime(), object.getLocation(), ASIPSpace.DIRECTION_INOUT);
 
             SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_CONTENT, object.getContent());
             SharkNetUtils.setInfoWithName(mSharkKb, asipSpace, MESSAGE_DATE, object.getDate().getTime());
