@@ -20,6 +20,7 @@ import net.sharkfw.knowledgeBase.sync.SyncKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
 import net.sharkfw.peer.SharkEngine;
 import net.sharkfw.routing.SemanticRoutingKP;
+import net.sharkfw.system.L;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Broadcast;
@@ -122,12 +123,18 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
         messageDao.update(object.getMessages());
     }
 
-    public void update(Broadcast object, List<PeerSemanticTag> peers) {
+    public void update(Broadcast object, Message message, List<PeerSemanticTag> peers) {
         SyncComponent component = engine.getBroadcastManager().getBroadcastComponent();
         SyncKB kb = component.getKb();
         MessageDao messageDao = new MessageDao(kb);
         messageDao.update(object.getMessages());
-        engine.getBroadcastManager().sendBroadcastMessage(component, peers);
+        SyncComponent compMessage = createComponentMessage(message);
+        if (compMessage != null) {
+            engine.getBroadcastManager().sendBroadcastMessage(compMessage, peers);
+        }
+        else {
+            L.w("Could not create SyncComponent!");
+        }
     }
 
     @Override
@@ -143,5 +150,37 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
     @Override
     public void onNewMerge(SyncComponent component, SharkKB changes, boolean accepted) {
 
+    }
+
+    private SyncComponent createComponentMessage(Message object) {
+        SyncComponent component = null;
+        SharkKB kb = new InMemoSharkKB();
+        SemanticTag topic = InMemoSharkKB.createInMemoSemanticTag(Message.MESSAGE_ID, object.getSender().getTag().getName() + object.getDate().getTime());
+        ASIPSpace asipSpace;
+        try {
+            if (object.getTopic() != null) {
+                asipSpace = kb.createASIPSpace(object.getTopic(), MessageDao.MESSAGE_TYPE, null, object.getSender().getTag(), null, object.getTime(), object.getLocation(), ASIPSpace.DIRECTION_INOUT);
+            } else {
+                asipSpace = kb.createASIPSpace(topic, MessageDao.MESSAGE_TYPE, null, object.getSender().getTag(), null, object.getTime(), object.getLocation(), ASIPSpace.DIRECTION_INOUT);
+            }
+
+            SharkNetUtils.setInfoWithName(kb, asipSpace, MessageDao.MESSAGE_CONTENT, object.getContent());
+            SharkNetUtils.setInfoWithName(kb, asipSpace, MessageDao.MESSAGE_DATE, object.getDate().getTime());
+            SharkNetUtils.setInfoWithName(kb, asipSpace, MessageDao.MESSAGE_VERIFIED, object.isVerified());
+            SharkNetUtils.setInfoWithName(kb, asipSpace, MessageDao.MESSAGE_SIGNED, object.isSigned());
+            SharkNetUtils.setInfoWithName(kb, asipSpace, MessageDao.MESSAGE_ENCRYPTED, object.isEncrypted());
+        }
+        catch (SharkKBException e) {
+            e.printStackTrace();
+            return null;
+        }
+        try {
+            component = new SyncComponent(kb, this.broadcast.getId(), new InMemoPeerSTSet(), engine.getOwner(), true);
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return component;
     }
 }

@@ -11,6 +11,7 @@ import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharksystem.api.models.Broadcast;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.models.Message;
 import net.sharksystem.api.models.Profile;
 import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
@@ -51,7 +52,7 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
 
     void updateBroadcast(Broadcast broadcast);
 
-    void updateBroadcast(Broadcast broadcast, List<PeerSemanticTag> peers);
+    void updateBroadcast(Broadcast broadcast, Message message, List<PeerSemanticTag> peers);
 
     List<Contact> getContacts();
 

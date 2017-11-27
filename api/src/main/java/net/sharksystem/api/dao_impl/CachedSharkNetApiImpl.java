@@ -14,6 +14,7 @@ import net.sharksystem.api.dao_interfaces.SharkNetApi;
 import net.sharksystem.api.models.Broadcast;
 import net.sharksystem.api.models.Chat;
 import net.sharksystem.api.models.Contact;
+import net.sharksystem.api.models.Message;
 import net.sharksystem.api.models.Profile;
 import net.sharksystem.api.models.Settings;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
@@ -132,8 +133,8 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     }
 
     @Override
-    public void updateBroadcast(Broadcast broadcast, List<PeerSemanticTag> peers) {
-        mApi.updateBroadcast(broadcast, peers);
+    public void updateBroadcast(Broadcast broadcast, Message message, List<PeerSemanticTag> peers) {
+        mApi.updateBroadcast(broadcast, message, peers);
     }
 
     private void refreshContacts(){

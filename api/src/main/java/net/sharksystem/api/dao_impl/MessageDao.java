@@ -36,18 +36,18 @@ import java.util.NoSuchElementException;
 public class MessageDao implements DataAccessObject<Message, SemanticTag> {
 
     public final static SemanticTag MESSAGE_TYPE = InMemoSharkKB.createInMemoSemanticTag("MESSAGE", "si:message");
-    private final static String MESSAGE_CONTENT = "MESSAGE_CONTENT";
-    private final static String MESSAGE_IMAGE_CONTENT = "MESSAGE_IMAGE_CONTENT";
+    public final static String MESSAGE_CONTENT = "MESSAGE_CONTENT";
+    public final static String MESSAGE_IMAGE_CONTENT = "MESSAGE_IMAGE_CONTENT";
     //    private final static String MESSAGE_SENDER = "MESSAGE_SENDER";
-    private final static String MESSAGE_DATE = "MESSAGE_DATE";
-    private final static String MESSAGE_VERIFIED = "MESSAGE_VERIFIED";
-    private final static String MESSAGE_SIGNED = "MESSAGE_SIGNED";
-    private final static String MESSAGE_ENCRYPTED = "MESSAGE_ENCRYPTED";
-    private final static String MESSAGE_TOPIC = "MESSAGE_TOPIC";
-    private final static String MESSAGE_TYPE_A = "MESSAGE_TYPE";
-    private final static String MESSAGE_PEER = "MESSAGE_PEER";
-    private final static String MESSAGE_TIME = "MESSAGE_TIME";
-    private final static String MESSAGE_LOCATION = "MESSAGE_LOCATION";
+    public final static String MESSAGE_DATE = "MESSAGE_DATE";
+    public final static String MESSAGE_VERIFIED = "MESSAGE_VERIFIED";
+    public final static String MESSAGE_SIGNED = "MESSAGE_SIGNED";
+    public final static String MESSAGE_ENCRYPTED = "MESSAGE_ENCRYPTED";
+    public final static String MESSAGE_TOPIC = "MESSAGE_TOPIC";
+    public final static String MESSAGE_TYPE_A = "MESSAGE_TYPE";
+    public final static String MESSAGE_PEER = "MESSAGE_PEER";
+    public final static String MESSAGE_TIME = "MESSAGE_TIME";
+    public final static String MESSAGE_LOCATION = "MESSAGE_LOCATION";
     private ContactDao mContactDao = null;
 
     private SharkKB mSharkKb;

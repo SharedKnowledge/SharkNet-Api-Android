@@ -303,7 +303,7 @@ public class SharkNetApiImpl implements SharkNetApi {
 
     public void updateBroadcast(Broadcast broadcast) {mBroadcastDao.update(broadcast);}
 
-    public void updateBroadcast(Broadcast broadcast, List<PeerSemanticTag> peers) {mBroadcastDao.update(broadcast, peers);}
+    public void updateBroadcast(Broadcast broadcast, Message message, List<PeerSemanticTag> peers) {mBroadcastDao.update(broadcast, message, peers);}
 
     public List<Contact> getContacts() {
         return mContactDao.getAll();
