@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
+import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.knowledgeBase.SpatialSemanticTag;
 import net.sharkfw.knowledgeBase.TimeSemanticTag;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
@@ -42,6 +43,7 @@ public class Message implements Comparable<Message> {
         this.sender = sender;
         this.date = new Date(System.currentTimeMillis());
         this.id = InMemoSharkKB.createInMemoSemanticTag(MESSAGE_ID,sender.getTag().getName() + date.getTime());
+        //this.time = InMemoSharkKB.createInMemoTimeSemanticTag(date.getTime(), 0);
     }
 
     public Message(SemanticTag id, Date date, Contact sender) {
