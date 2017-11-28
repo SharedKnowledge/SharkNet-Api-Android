@@ -43,7 +43,7 @@ public class Message implements Comparable<Message> {
         this.sender = sender;
         this.date = new Date(System.currentTimeMillis());
         this.id = InMemoSharkKB.createInMemoSemanticTag(MESSAGE_ID,sender.getTag().getName() + date.getTime());
-        //this.time = InMemoSharkKB.createInMemoTimeSemanticTag(date.getTime(), 0);
+        this.time = InMemoSharkKB.createInMemoTimeSemanticTag(date.getTime(), 0);
     }
 
     public Message(SemanticTag id, Date date, Contact sender) {

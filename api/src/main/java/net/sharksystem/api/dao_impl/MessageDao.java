@@ -13,6 +13,7 @@ import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.knowledgeBase.TimeSTSet;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharksystem.api.dao_interfaces.ContactDao;
 import net.sharksystem.api.dao_interfaces.DataAccessObject;
@@ -281,6 +282,7 @@ public class MessageDao implements DataAccessObject<Message, SemanticTag> {
         typeSet.merge(MESSAGE_TYPE);
         STSet topicSet = InMemoSharkKB.createInMemoSTSet();
         topicSet.merge(tag);
-        return InMemoSharkKB.createInMemoASIPInterest(topicSet, typeSet, sender, null, null, null, null, ASIPSpace.DIRECTION_INOUT);
+        TimeSTSet timeSet = InMemoSharkKB.createInMemoTimeSTSet();
+        return InMemoSharkKB.createInMemoASIPInterest(topicSet, typeSet, sender, null, null, timeSet, null, ASIPSpace.DIRECTION_INOUT);
     }
 }
