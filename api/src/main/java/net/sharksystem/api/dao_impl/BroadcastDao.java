@@ -130,7 +130,10 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
         messageDao.update(object.getMessages());
         SyncComponent compMessage = createComponentMessage(message);
         if (compMessage != null) {
-            engine.getBroadcastManager().sendBroadcastMessage(compMessage, peers);
+            for (PeerSemanticTag peer: peers) {
+                engine.getBroadcastManager().sendBroadcastMessage(compMessage, peer);
+            }
+            //engine.getBroadcastManager().sendBroadcastMessage(compMessage, peers);
         }
         else {
             L.w("Could not create SyncComponent!");
@@ -148,7 +151,7 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
     }
 
     @Override
-    public void onNewMerge(SyncComponent component, SharkKB changes, boolean accepted) {
+    public void onNewMerge(SyncComponent component, SharkKB changes, boolean accepted, boolean forwarded) {
 
     }
 
