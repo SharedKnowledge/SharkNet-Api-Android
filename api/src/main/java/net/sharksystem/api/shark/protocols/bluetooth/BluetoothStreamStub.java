@@ -31,7 +31,6 @@ public class BluetoothStreamStub implements StreamStub {
     private final BluetoothAdapter mBluetoothAdapter;
     private final AndroidSharkEngine mEngine;
     private String mLocalAddress = null;
-
     private RequestHandler mRequestHandler;
     private BluetoothServer mBluetoothServer;
     private BluetoothConnection mBluetoothConnection;
@@ -62,29 +61,36 @@ public class BluetoothStreamStub implements StreamStub {
         if(mBluetoothConnection==null){
             mBluetoothConnection = new BluetoothConnection(this, remoteDevice, this.getLocalAddress());
         } else {
-            Thread waitThreadTemp = Thread.currentThread();
-            mWaitThreads.add(waitThreadTemp);
-            try {
-                waitThreadTemp.wait(60*60*1000);
-                this.killConnection();
-                return this.createStreamConnection(addressString);
-            } catch (InterruptedException e) {
-                return this.createStreamConnection(addressString);
-            }
+            this.killConnection();
+            return this.createStreamConnection(addressString);
+//            Thread waitThreadTemp = Thread.currentThread();
+//            mWaitThreads.add(waitThreadTemp);
+//            try {
+//                waitThreadTemp.wait(5000);
+//                this.killConnection();
+//                return this.createStreamConnection(addressString);
+//            } catch (InterruptedException e) {
+//                return this.createStreamConnection(addressString);
+//            }
         }
 
         return mBluetoothConnection;
     }
 
     private synchronized void killConnection() {
-        long now = System.currentTimeMillis();
+        //long now = System.currentTimeMillis();
 
-        if(mLastCall == 0 || now - mLastCall >= 60*60*1000){
+        //if(mLastCall == 0 || now - mLastCall >= 60*60*1000){
             // Do not notify the streamStub.streamClosed method
-            mBluetoothConnection.close(false);
-            mBluetoothConnection = null;
-            mLastCall = now;
+        try {
+            mBluetoothConnection.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        mBluetoothConnection.close(false);
+            mBluetoothConnection = null;
+            //mLastCall = now;
+        //}
     }
 
     @Override
