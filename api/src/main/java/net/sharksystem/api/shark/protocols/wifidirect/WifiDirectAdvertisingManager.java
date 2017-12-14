@@ -1,5 +1,6 @@
 package net.sharksystem.api.shark.protocols.wifidirect;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -19,7 +20,14 @@ import net.sharkfw.protocols.Protocols;
 import net.sharkfw.system.L;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +41,7 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
     private static final String TYPE_NAME = "RADAR";
     public static final SemanticTag TYPE_TAG = InMemoSharkKB.createInMemoSemanticTag(TYPE_NAME, TYPE_SI);
     private final AndroidSharkEngine mEngine;
-    private final String mBluetoothAddress;
+    private String mBluetoothAddress;
     private final WifiP2pManager mManager;
     private final WifiP2pManager.Channel mChannel;
     private boolean mIsDiscovering = false;
@@ -45,6 +53,21 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
         mEngine = engine;
 
         mBluetoothAddress = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
+        if (mBluetoothAddress==null || mBluetoothAddress.equals("")) BluetoothAdapter.getDefaultAdapter().getAddress();
+        if (mBluetoothAddress==null || mBluetoothAddress.equals("")) {
+            try {
+                BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                Field mServiceField = mBluetoothAdapter.getClass().getDeclaredField("mService");
+                mServiceField.setAccessible(true);
+                Object btManagerService = mServiceField.get(mBluetoothAdapter);
+                Method mMethod = btManagerService.getClass().getMethod("getAddress");
+                mBluetoothAddress = (String) mMethod.invoke(btManagerService);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (mBluetoothAddress==null || mBluetoothAddress.equals("")) mBluetoothAddress = "80:5A:04:2D:4F:0B";
+
 
         mManager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
 //        Looper.prepare();

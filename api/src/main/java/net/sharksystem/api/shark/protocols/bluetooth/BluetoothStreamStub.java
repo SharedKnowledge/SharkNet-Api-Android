@@ -16,6 +16,8 @@ import net.sharkfw.system.SharkNotSupportedException;
 import net.sharksystem.api.shark.peer.AndroidSharkEngine;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +30,7 @@ public class BluetoothStreamStub implements StreamStub {
 
     public static UUID BT_UUID = UUID.fromString("ED01E22D-19DD-4B79-81BA-444E9B6D89BF");
     public static String BT_NAME = "SHARK_BT";
+    public static String staticLocalAddress = "";
     private final BluetoothAdapter mBluetoothAdapter;
     private final AndroidSharkEngine mEngine;
     private String mLocalAddress = null;
@@ -41,6 +44,21 @@ public class BluetoothStreamStub implements StreamStub {
     public BluetoothStreamStub(AndroidSharkEngine engine, RequestHandler requestHandler) {
         mEngine = engine;
         mLocalAddress = android.provider.Settings.Secure.getString(engine.getContext().getContentResolver(), "bluetooth_address");
+        if (mLocalAddress==null || mLocalAddress.equals("")) BluetoothAdapter.getDefaultAdapter().getAddress();
+        if (mLocalAddress==null || mLocalAddress.equals("")) {
+            try {
+                BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                Field mServiceField = mBluetoothAdapter.getClass().getDeclaredField("mService");
+                mServiceField.setAccessible(true);
+                Object btManagerService = mServiceField.get(mBluetoothAdapter);
+                Method mMethod = btManagerService.getClass().getMethod("getAddress");
+                mLocalAddress = (String) mMethod.invoke(btManagerService);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (mLocalAddress==null || mLocalAddress.equals("")) mLocalAddress = "80:5A:04:2D:4F:0B";
+        staticLocalAddress = mLocalAddress;
         mRequestHandler = requestHandler;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }

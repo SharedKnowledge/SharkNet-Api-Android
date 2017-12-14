@@ -132,6 +132,11 @@ public class BroadcastDao implements DataAccessObject<Broadcast, SemanticTag>, S
         if (compMessage != null) {
             for (PeerSemanticTag peer: peers) {
                 engine.getBroadcastManager().sendBroadcastMessage(compMessage, peer);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             //engine.getBroadcastManager().sendBroadcastMessage(compMessage, peers);
