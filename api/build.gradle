@@ -37,7 +37,7 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     // Set this dependency to build and run UI Automator tests
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
-    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.android.support:multidex:1.0.2'
     compile 'org.reflections:reflections:0.9.10'
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.0'
@@ -58,8 +58,8 @@ dependencies {
         exclude group: 'com.sun.mail'
         exclude group: 'javax.activation'
     }
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:appcompat-v7:27.0.2'
+    compile 'com.android.support:support-v4:27.0.2'
     androidTestCompile 'junit:junit:4.12'
     compile 'org.sqldroid:sqldroid:1.0.3'
 //    compile 'org.xerial:sqlite-jdbc:3.18.0'
