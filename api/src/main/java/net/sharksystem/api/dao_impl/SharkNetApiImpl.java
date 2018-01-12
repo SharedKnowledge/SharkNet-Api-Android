@@ -8,13 +8,16 @@ import android.content.Intent;
 import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 
+import net.sharkfw.asip.ASIPInterest;
 import net.sharkfw.asip.ASIPKnowledge;
+import net.sharkfw.asip.engine.ASIPInMessage;
 import net.sharkfw.asip.engine.ASIPOutMessage;
 import net.sharkfw.asip.engine.serializer.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkKB;
 import net.sharkfw.knowledgeBase.SharkKBException;
+import net.sharkfw.knowledgeBase.broadcast.SemanticFilter;
 import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 import net.sharkfw.knowledgeBase.persistent.sql.SqlSharkKB;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
@@ -206,6 +209,31 @@ public class SharkNetApiImpl implements SharkNetApi {
 //        mContactDao = new CachedContactDaoImpl(new SqlSharkKB("jdbc:sqldroid:" + contactsDb.getAbsolutePath(), "org.sqldroid.SQLDroidDriver", stream));
 
         mAccount=null;
+    }
+
+    @Override
+    public void addSemanticFilter(SemanticFilter filter) {
+        mEngine.addSemanticFilter(filter);
+    }
+
+    @Override
+    public void removeSemanticFilter(SemanticFilter filter) {
+        mEngine.removeSemanticFilter(filter);
+    }
+
+    @Override
+    public boolean executeSemanticFilters(ASIPInMessage message, SharkKB newKnowledge, ASIPInterest entryProfile) {
+        return mEngine.executeSemanticFilters(message, newKnowledge, entryProfile);
+    }
+
+    @Override
+    public int getFilterCount() {
+        return mEngine.getFilterCount();
+    }
+
+    @Override
+    public void swapFilterPosition(int oldPosition, int newPosition) {
+        mEngine.swapFilterPosition(oldPosition, newPosition);
     }
 
     @Override
