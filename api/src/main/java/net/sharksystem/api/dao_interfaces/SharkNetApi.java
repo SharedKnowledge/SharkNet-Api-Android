@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 
 import net.sharkfw.asip.ASIPInterest;
+import net.sharkfw.asip.engine.ASIPInMessage;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
+import net.sharkfw.knowledgeBase.SharkKB;
+import net.sharkfw.knowledgeBase.broadcast.SemanticFilter;
 import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharksystem.api.models.Broadcast;
 import net.sharksystem.api.models.Chat;
@@ -99,4 +102,14 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
     void setNotificationResultActivity(Intent intent);
 
     void clearDbs();
+
+    public void addSemanticFilter(SemanticFilter filter);
+
+    public void removeSemanticFilter(SemanticFilter filter);
+
+    public boolean executeSemanticFilters(ASIPInMessage message, SharkKB newKnowledge, ASIPInterest entryProfile);
+
+    public int getFilterCount();
+
+    public void swapFilterPosition(int oldPosition, int newPosition);
 }

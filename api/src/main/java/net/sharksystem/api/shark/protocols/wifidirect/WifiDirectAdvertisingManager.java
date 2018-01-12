@@ -113,7 +113,6 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
             HashMap<String, String> map = WifiDirectUtil.interest2RecordMap(interest);
             mServiceInfo = WifiP2pDnsSdServiceInfo.newInstance("_sbc", "_presence._tcp", map);
             mManager.addLocalService(mChannel, mServiceInfo, new WifiActionListener("Add LocalService"));
-
             mManager.clearServiceRequests(mChannel, new WifiActionListener("Clear ServiceRequests"));
             WifiP2pDnsSdServiceRequest wifiP2pDnsSdServiceRequest = WifiP2pDnsSdServiceRequest.newInstance();
             mManager.addServiceRequest(mChannel, wifiP2pDnsSdServiceRequest, new WifiActionListener("Add ServiceRequest"));
@@ -144,8 +143,6 @@ public class WifiDirectAdvertisingManager implements WifiP2pManager.DnsSdTxtReco
 
     @Override
     public void onDnsSdTxtRecordAvailable(String fullDomainName, Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
-
-
         if (srcDevice == null || txtRecordMap.isEmpty()) return;
         try {
             ASIPInterest interest = WifiDirectUtil.recordMap2Interest(txtRecordMap);
