@@ -237,6 +237,11 @@ public class SharkNetApiImpl implements SharkNetApi {
     }
 
     @Override
+    public List<SemanticFilter> getAllSemanticFilters() {
+        return mEngine.getAllSemanticFilters();
+    }
+
+    @Override
     public void onNewMerge(SyncComponent component, SharkKB changes) {
         changesIncludeContacts(changes);
 
