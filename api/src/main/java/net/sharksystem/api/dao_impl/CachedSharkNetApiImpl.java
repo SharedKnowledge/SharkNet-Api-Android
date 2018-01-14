@@ -272,31 +272,6 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     }
 
     @Override
-    public void addSemanticFilter(SemanticFilter filter) {
-        mApi.addSemanticFilter(filter);
-    }
-
-    @Override
-    public void removeSemanticFilter(SemanticFilter filter) {
-        mApi.removeSemanticFilter(filter);
-    }
-
-    @Override
-    public boolean executeSemanticFilters(ASIPInMessage message, SharkKB newKnowledge, ASIPInterest entryProfile) {
-        return mApi.executeSemanticFilters(message, newKnowledge, entryProfile);
-    }
-
-    @Override
-    public int getFilterCount() {
-        return mApi.getFilterCount();
-    }
-
-    @Override
-    public void swapFilterPosition(int oldPosition, int newPosition) {
-        mApi.swapFilterPosition(oldPosition, newPosition);
-    }
-
-    @Override
     public void onNewMerge(SyncComponent component, SharkKB changes) {
         mChatsChanged = true;
     }
