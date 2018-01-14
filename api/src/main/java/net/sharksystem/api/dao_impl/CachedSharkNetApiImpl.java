@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import net.sharkfw.asip.ASIPInterest;
+import net.sharkfw.asip.engine.ASIPInMessage;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.SemanticTag;
 import net.sharkfw.knowledgeBase.SharkCSAlgebra;
 import net.sharkfw.knowledgeBase.SharkKB;
+import net.sharkfw.knowledgeBase.broadcast.SemanticFilter;
 import net.sharkfw.knowledgeBase.sync.manager.SyncComponent;
 import net.sharkfw.knowledgeBase.sync.manager.port.SyncMergeKP;
 import net.sharksystem.api.dao_interfaces.SharkNetApi;
@@ -271,5 +274,30 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     @Override
     public void onNewMerge(SyncComponent component, SharkKB changes) {
         mChatsChanged = true;
+    }
+
+    @Override
+    public void addSemanticFilter(SemanticFilter filter) {
+        mApi.getSharkEngine().addSemanticFilter(filter);
+    }
+
+    @Override
+    public void removeSemanticFilter(SemanticFilter filter) {
+        mApi.getSharkEngine().removeSemanticFilter(filter);
+    }
+
+    @Override
+    public boolean executeSemanticFilters(ASIPInMessage message, SharkKB newKnowledge, ASIPInterest entryProfile) {
+        return mApi.getSharkEngine().executeSemanticFilters(message, newKnowledge, entryProfile);
+    }
+
+    @Override
+    public int getFilterCount() {
+        return mApi.getSharkEngine().getFilterCount();
+    }
+
+    @Override
+    public void swapFilterPosition(int oldPosition, int newPosition) {
+        mApi.getSharkEngine().swapFilterPosition(oldPosition, newPosition);
     }
 }
