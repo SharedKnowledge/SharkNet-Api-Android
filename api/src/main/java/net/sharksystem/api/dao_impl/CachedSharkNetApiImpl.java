@@ -300,4 +300,9 @@ public class CachedSharkNetApiImpl implements SharkNetApi, SyncMergeKP.SyncMerge
     public void swapFilterPosition(int oldPosition, int newPosition) {
         mApi.getSharkEngine().swapFilterPosition(oldPosition, newPosition);
     }
+
+    @Override
+    public List<SemanticFilter> getAllSemanticFilters() {
+        return mApi.getAllSemanticFilters();
+    }
 }

@@ -112,4 +112,6 @@ public interface SharkNetApi extends SyncMergeKP.SyncMergeListener {
     public int getFilterCount();
 
     public void swapFilterPosition(int oldPosition, int newPosition);
+
+    List<SemanticFilter> getAllSemanticFilters();
 }
